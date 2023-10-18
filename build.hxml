@@ -1,0 +1,13 @@
+--class-path src
+--class-path test
+
+--library blok.core
+--library kit.http
+
+--main Run
+
+--each
+--js dist/index.js
+--next
+-D blok.server
+-js dist/server.js
