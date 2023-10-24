@@ -1,7 +1,8 @@
-package blok.ui;
+package blok.bridge;
 
 import haxe.Json;
 import blok.html.TagCollection;
+import blok.ui.*;
 import blok.data.*;
 import blok.signal.Signal;
 
@@ -16,7 +17,7 @@ private final blokIslandTag = 'blok-island';
   children:Children
 }) {
   return new VRealNode(getTypeForTag(blokIslandTag), blokIslandTag, {
-    style: ('display:content':ReadonlySignal<String>),
+    style: ('display:contents':ReadonlySignal<String>),
     'data-component': props.component,
     'data-props': props.props
   }, props.children);

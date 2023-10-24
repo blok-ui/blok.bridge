@@ -1,6 +1,7 @@
 package ex;
 
 import blok.ui.*;
+import blok.bridge.*;
 import blok.html.*;
 
 class Counter extends Component implements Island {

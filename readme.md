@@ -7,6 +7,8 @@ Usage
 -----
 
 > Note: this is a notional example only.
+>
+> Note: this will probably work best as some kind of init macro? Think on how to can create a simple Setup function to handle all the files it needs to generate.
 
 ```haxe
 import blok.ui.*;
@@ -50,19 +52,18 @@ function main() {
   var bridge = new Bridge([
     // Pass in all the endpoints we want:
     new MyApi('prefix')
-  ], _ -> Example.node({}).inSuspense(() -> 'loading...'));
-  var options:BridgeOptions = {
-    jsPath: FromCompiler,
-    hydrationId: '__bridge_data',
+  ], _ -> Example.node({}).inSuspense(() -> 'loading...'), {
+    appNameStrategy: FromCompiler(),
+    hydrationStrategy: Collect('__bridge_data'),
     rootId: 'root'
-  };
+  });
 
   #if blok.server
   // This will serve our JSON api server:
   var server = new kit.http.server.NodeServer(3000);
   var mw = bridge.createMiddleware();
   var handler = new kit.http.Handler(req -> {
-    return bridge.mount(options)
+    return bridge.mount()
       .next(document -> new kit.http.Response(OK, [], document.toString()))
       .mapError(err -> new kit.http.Response(InternalError, [], err.message))
   });
@@ -72,11 +73,16 @@ function main() {
 		case Closed: trace('closed');
 	});
   // or you can just do this:
-  bridge.serve(options);
+  bridge.serve();
+  // For static sites, you'd do something like this:
+  bridge.renderToString().handle(res -> switch res {
+    case Ok(html):
+      // Save `html` somewhere.
+    case Error(e):
+      trace(e.message); 
+  });
   #else
-  bridge.mount(options).handle(_ -> trace('Document ready'));
-  // Or:
-  bridge.hydrate(options);
+  bridge.hydrate().handle(_ -> trace('Document ready'));
   #end
 }
 ```
@@ -84,7 +90,7 @@ function main() {
 Islands
 -------
 
-Another feature we can add are `IslandComponents`. IslandComponents look just like normal Components, but they require that all their properties be json serializable. Here's an example:
+Another feature we can add are `Islands`. Island Components look just like normal Components, but they require that all their properties be json serializable (ideally -- not sure how to pull that off yet). Here's an example:
 
 ```haxe
 package my.ui;
@@ -104,6 +110,8 @@ class Counter extends Component implements Island {
 > note: IslandComponents can use normal components inside themselves -- they just act as a bridge.
 
 This can be used inside a normal Component:
+
+> Note: we might want to add some kind of Server marker in case we want to ensure server-only features can be used? For example, we might want to disallow `Context` when inside a server component, as I'm not sure how to make those work.
 
 ```haxe
 package my.ui;
@@ -142,3 +150,31 @@ function main() {
   islands.hydrate();
 }
 ```
+
+> Note: ideally we can find a better method than this, but for now...
+
+Ideally we can ignore the `Islands<...>` class entirely (it is, for a lot of reasons, pretty clunky) and instead just have one call in our project:
+
+```haxe
+function main() {
+  var bridge = new Bridge([
+    // Pass in all the endpoints we want:
+    new MyApi('prefix')
+  ], _ -> App.node({}));
+  bridge.generateStaticHtml({
+    hydrationId: '__bridgeData',
+    strategy: Islands, // might also be Hydration
+    htmlName: 'index',
+    appName: 'assets/app.js'
+  }).handle(res -> switch res {
+    case Ok: 
+      trace('Done');
+      Sys.exit(0);
+    case Error(e): 
+      trace(e.message);
+      Sys.exit(1);
+  });
+}
+```
+
+This will, in addition to generating a static HTML file, also run a new Haxe command to create the client-side app (which will contain only the Island components that were used during generation). This is really expanding the scope a lot though -- so let's stick to the simple stuff for now.

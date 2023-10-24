@@ -8,6 +8,6 @@
 
 --each
 --js dist/index.js
---next
--D blok.server
--js dist/server.js
+# --next
+# -D blok.server
+# -js dist/server.js

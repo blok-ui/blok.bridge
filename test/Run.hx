@@ -26,7 +26,7 @@ function main() {
 ';
   trace(out);
   #else
-  var islands = new blok.ui.Islands<'ex'>();
+  var islands = new blok.bridge.Islands<['ex']>();
   islands.hydrate();
   #end
 }

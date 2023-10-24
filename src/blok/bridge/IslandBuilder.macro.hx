@@ -1,8 +1,7 @@
-package blok.ui;
+package blok.bridge;
 
 import blok.macro.ClassBuilder;
 import haxe.macro.Context;
-import haxe.macro.Expr;
 
 using haxe.macro.Tools;
 using blok.macro.MacroTools;
@@ -13,7 +12,7 @@ function build() {
   var params = cls.params.toTypeParamDecl();
 
   if (cls.superClass == null || !Context.unify(TInst(cls.superClass.t, []), (macro:blok.ui.Component).toType())) {
-    cls.pos.error('Must extend blok.ui.Component to use blok.ui.Island');
+    cls.pos.error('Must extend blok.ui.Component to use blok.bridge.Island');
   }
 
   var module = Context.getLocalModule().split('.');
@@ -22,14 +21,18 @@ function build() {
     : module.concat([cls.name]).join('.');
 
   // @todo: We need to investigate props somehow and make sure they
-  // are serializable.
+  // are serializable. The big issue here: build order. Not sure the best
+  // way to deal with that. We can probably just scan through `:attribute`,
+  // `:signal`. `:observable` etc and see what each is. Ideally we should
+  // expose this somehow: add a `getComponentProps` method and a bunch
+  // of utility functions in `blok.core`.
   
   var fields = macro class {
     public static function island(props) {
       // @todo: Throw error if not in server context?
       var child = node(props);
-      var json = blok.ui.IslandTools.propsToJson(props);
-      return blok.ui.IslandTools.createIslandVNode({
+      var json = blok.bridge.IslandTools.propsToJson(props);
+      return blok.bridge.IslandTools.createIslandVNode({
         component: $v{name},
         props: json,
         children: child
@@ -48,9 +51,9 @@ function build() {
   builder.add(macro class {
     #if !blok.server
     public static function hydrateIslands(adaptor:blok.adaptor.Adaptor) {
-      var elements = blok.ui.IslandTools.getIslandElementsForComponent($v{name});
+      var elements = blok.bridge.IslandTools.getIslandElementsForComponent($v{name});
       return [ for (el in elements) {
-        var props:Dynamic = blok.ui.IslandTools.getIslandProps(el);
+        var props:Dynamic = blok.bridge.IslandTools.getIslandProps(el);
         var comp = node(props).createComponent();
         // @todo: this is a bit awkward, but it works...
         // ... but *should* we have some sort of Root component set up by the
