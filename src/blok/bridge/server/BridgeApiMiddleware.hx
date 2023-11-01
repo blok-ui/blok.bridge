@@ -3,7 +3,7 @@ package blok.bridge.server;
 import kit.http.Handler;
 import kit.http.*;
 
-class BridgeMiddleware implements Middleware {
+class BridgeApiMiddleware implements Middleware {
   final bridge:Bridge;
 
   public function new(bridge) {
@@ -11,11 +11,11 @@ class BridgeMiddleware implements Middleware {
   }
 
   public function apply(handler:Handler):Handler {
-    return new BridgeHandler(bridge, handler);
+    return new BridgeApiHandler(bridge, handler);
   }
 }
 
-class BridgeHandler implements HandlerObject {
+class BridgeApiHandler implements HandlerObject {
   final bridge:Bridge;
   final handler:Handler;
 
@@ -25,7 +25,11 @@ class BridgeHandler implements HandlerObject {
   }
 
   public function process(request:Request):Future<Response> {
-    // @todo: try to match endpoints and generate a JSON response.
+    switch (bridge.apis.match(request)) {
+      case Some(res): return res;
+      case None:
+    }
+
     return handler.process(request);
   }
 }

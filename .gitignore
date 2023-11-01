@@ -1,1 +1,5 @@
-/dist
+dump
+dist
+/__*
+/**/__*
+/node_modules

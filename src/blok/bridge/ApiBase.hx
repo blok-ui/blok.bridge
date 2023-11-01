@@ -1,8 +1,10 @@
 package blok.bridge;
 
-import kit.http.Response;
+import blok.context.*;
+import kit.http.*;
 
-interface ApiBase {
-  public function match(url:String):Maybe<Future<Response>>;
-  public function makeCurrent():Void;
+interface ApiBase extends Providable {
+  #if blok.server
+  public function match(request:Request):Maybe<Future<Response>>;
+  #end
 }

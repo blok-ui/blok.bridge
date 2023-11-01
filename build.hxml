@@ -4,10 +4,21 @@
 --library blok.core
 --library kit.http
 
+-D js-es=6
+-D analyzer-optimize
+
+--debug
+
+-dce full
+
 --main Run
 
 --each
+
 --js dist/index.js
-# --next
-# -D blok.server
-# -js dist/server.js
+
+--next
+
+-D blok.server
+--library hxnodejs
+-js dist/server.js

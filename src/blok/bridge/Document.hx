@@ -11,6 +11,8 @@ abstract class Document {
     return getLayer(options.rootId);
   }
 
-  abstract public function getLayer<T>(name:String):T;
+  abstract public function getHead():Dynamic;
+  abstract public function getBody():Dynamic;
+  abstract public function getLayer(name:String):Dynamic;
   abstract public function toString():String;
 }

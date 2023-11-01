@@ -18,3 +18,20 @@ function extractString(expr:Expr):String {
       '';
   }
 }
+
+function toKebabCase(str:String) {
+  var out = '';
+  for (i in 0...str.length) {
+    var c = str.charAt(i);
+    if (c.toUpperCase() == c) {
+      if (i == 0) {
+        out += c.toLowerCase();
+      } else {
+        out += '-' + c.toLowerCase();
+      }
+    } else {
+      out += c;
+    }
+  }
+  return out;
+}

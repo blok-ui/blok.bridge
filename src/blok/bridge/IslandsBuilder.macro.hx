@@ -2,12 +2,13 @@ package blok.bridge;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import blok.macro.ClassBuilder;
+import blok.macro.*;
 
 using Lambda;
 using sys.FileSystem;
 using kit.Hash;
 using haxe.io.Path;
+using haxe.macro.Tools;
 using blok.macro.MacroTools;
 using blok.bridge.macro.MacroTools;
 
@@ -36,11 +37,11 @@ function buildIslands(packs:Array<String>) {
   
   if (path.typePathExists()) return TPath(path);
 
-  var builder = new ClassBuilder([]);
-  var islands = [ for (pack in packs) scanForClasses(pack, 'blok.bridge.Island') ].flatten();
+  var builder = new FieldBuilder([]);
+  var islands = [ for (pack in packs) scanForClasses(pack, 'blok.bridge.IslandComponent') ].flatten();
   var hydration:Array<Expr> = [ for (island in islands) {
     var path = island.pack.concat([ island.name, island.sub ].filter(n -> n != null));
-    macro $p{path}.hydrateIslands(adaptor);
+    macro $p{path}.hydrateIslands(root);
   } ];
 
   builder.add(macro class {
@@ -48,9 +49,15 @@ function buildIslands(packs:Array<String>) {
 
     public function new() {}
 
-    public function hydrate() {
-      var components = Lambda.flatten([ $a{hydration} ]);
-      return components;
+    public function hydrate(?parent:blok.ui.ComponentBase) {
+      var realRoot = parent?.findAncestorOfType(blok.ui.RootComponent)?.unwrap()?.getRealNode();
+      var root = blok.ui.RootComponent.node({
+        target: realRoot, // hm
+        child: () -> null,
+        adaptor: parent?.getAdaptor() ?? adaptor
+      }).createComponent();
+      $b{hydration}
+      return root;
     }
   });
 
@@ -104,4 +111,3 @@ private function scanForClassInDir(root:String, pack:Array<String>, implementing
   
   return types;
 }
-

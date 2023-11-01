@@ -1,10 +1,9 @@
-package ex;
+package ex.island;
 
-import blok.ui.*;
 import blok.bridge.*;
 import blok.html.*;
 
-class Counter extends Component implements Island {
+class Counter extends IslandComponent {
   @:signal final count:Int;
 
   function render() {
