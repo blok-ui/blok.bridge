@@ -1,0 +1,27 @@
+# THIS FILE WAS GENERATED FROM A `project.toml`. DO NOT EDIT!
+# To configure things, edit your `project.toml` and run
+# `> bridge setup`.
+
+# Note: for haxe completion support, point your editor at THIS file.
+
+# Note: while it's recommended you use the Blok cli, you *can* generate
+# or serve your site by running `node build.js`.
+# However, you generally should build your app using `> bridge dev`
+# or `> bridge prod`.
+
+-cp example/src
+-lib blok.bridge
+-lib breeze
+-lib hxnodejs
+-lib kit.file
+-lib toml
+-D js-es=6
+-D message-reporting=pretty
+--debug
+-D analyzer-optimize
+-dce full
+-D breeze.output=styles-v0_0_1
+
+-main Run
+
+-js dist/build.js

@@ -1,0 +1,28 @@
+name = 'example'
+version = '0.0.1'
+
+[islands]
+main = 'ExampleIslands'
+
+[build]
+sources = [ 'example/src' ]
+target = 'js'
+output = 'build.js'
+main = 'Run'
+
+[build.dependencies]
+shared = ['breeze']
+server = ['hxnodejs']
+
+[build.flags.shared]
+js-es = "6"
+message-reporting = 'pretty'
+debug = true
+analyzer-optimize = true
+dce = "full"
+
+[build.flags.server]
+'breeze.output' = 'styles-{{version}}'
+
+[build.flags.client]
+'breeze.output' = 'none'

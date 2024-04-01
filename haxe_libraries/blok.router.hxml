@@ -1,0 +1,5 @@
+# @install: lix --silent download "gh://github.com/blok-ui/blok.router#7383632c766fb4a46140f23be8b3e58d6f1eba70" into blok.router/0.0.0/github/7383632c766fb4a46140f23be8b3e58d6f1eba70
+-lib blok.core
+-lib kit
+-cp ${HAXE_LIBCACHE}/blok.router/0.0.0/github/7383632c766fb4a46140f23be8b3e58d6f1eba70/src
+-D blok.router=0.0.0

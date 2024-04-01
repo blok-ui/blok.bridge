@@ -1,45 +1,14 @@
 Blok Bridge
 ===========
 
-Server-only functions for Blok.
+Tools for making Blok apps that run on the server and the client.
 
 Usage
 -----
 
-Apis are just normal Blok Contexts. They can be used as resources:
+> Coming soon.
 
-```haxe
-class SomeComponent extends Component {
-  @:resource final foo:Foo = FooApi.from(this).getFoo(1);
+Todo
+----
 
-  // etc.
-}
-```
-
-> @todo: More on this once things stabilize.
-
-Islands
--------
-
-> Note: this is mostly speculative for now.
-
-Islands must be used inside an `Archipelago` component (that's me being cute with naming). On the server, the `Archipelago` is just a standard component that renders its children. On the client, the `Archipelago` will instead load all the `IslandComponents` it can find in the given packages and hydrate them. This ensures that those components will still have access to any parent contexts.
-
-```haxe
-function main() {
-  // Depending on the mode, `Bridge.mount` will create static
-  // HTML, mount to the DOM, or mount to an empty node to allow 
-  // the Archipelago to hydrate the registered Islands.
-  Bridge.mount([
-    new FooApi()
-  ], _ -> Archipelago.wrap(
-    // A list of packages to scan for Islands.
-    [my.islands, other.islands],
-    // The child to render on the server. Note: `wrap` is a macro,
-    // so this code will simply be removed on the client side.
-    Html.div({}, 
-      my.islands.SomeIsland.node({ foo: 'bar' })
-    )
-  ));
-}
-```
+Ideally we'll get rid of the `project.toml` thing and the CLI app needed to set up the actual HXML files, but right now I can't think of a way around it.

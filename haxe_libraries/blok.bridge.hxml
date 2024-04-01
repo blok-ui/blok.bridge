@@ -1,0 +1,6 @@
+-cp src
+
+-lib blok.core
+-lib blok.router
+
+-D blok.bridge=0.0.1

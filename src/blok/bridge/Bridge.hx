@@ -1,98 +1,127 @@
 package blok.bridge;
 
+import blok.bridge.asset.*;
+import blok.bridge.project.*;
+import blok.bridge.project.loader.*;
+import blok.context.Provider;
+import blok.html.Server;
+import blok.html.server.*;
+import blok.router.*;
 import blok.suspense.SuspenseBoundary;
-import blok.context.*;
 import blok.ui.*;
-import blok.html.*;
+import kit.file.FileSystem;
+import kit.file.adaptor.SysAdaptor;
 
-#if blok.server
-import blok.bridge.server.*;
-#else
-import blok.bridge.client.*;
-#end
-
-enum AppNameStrategy {
-  Skip;
-  Custom(path:String);
-  FromCompiler(?name:String);
-}
-
-enum HydrationStrategy {
-  Skip;
-  Collect(id:String);
-  IslandsOnly;
-}
-
-typedef BridgeOptions = {
-  public final rootId:String;
-  public final ?appNameStrategy:AppNameStrategy;
-  public final ?hydrationStrategy:HydrationStrategy;
-}
-
-// @todo: This is a mess right now.
 class Bridge {
-  public final apis:ApiCollection;
-  public final options:BridgeOptions;
-  
-  final render:(bridge:Bridge)->Child;
+  /**
+    Start your Bridge app using a project.toml for configuration. This is
+    the recommended way to use Blok Bridge.
 
-  public function new(apis, render, ?options:BridgeOptions) {
-    this.apis = new ApiCollection(apis);
+    Note that this method expects to find a project.toml at the root
+    of the current working directory (cwd). If that's not how you have 
+    things set up, you may need to use a custom ProjectLoader and
+    kit.file.FileSystem instance.
+  **/
+  public static function start(render):Task<Bridge> {
+    var fs = new FileSystem(new SysAdaptor(Sys.getCwd()));
+    var loader = new TomlProjectLoader(fs);
+    return fromLoader(loader, render, fs);
+  }
+
+  /**
+    Start your app using a custom loader for your project configuration.
+  **/
+  public static function fromLoader(loader:ProjectLoader, render, ?fs) {
+    return loader
+      .load()
+      .next(project -> new Bridge(project, render, fs));
+  }
+
+  final project:Project;
+  final render:()->Child;
+  final fs:FileSystem;
+
+  public function new(project, render, ?fs) {
+    this.project = project;
     this.render = render;
-    this.options = options ?? { rootId: 'root' };
+    this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
   }
 
-  public function mount():Task<Document> {
-    var doc = createDocument();
-    return new Future<Result<Document>>(activate -> {
-      var suspended:Bool = false;
-      createRoot(doc, () -> SuspenseBoundary.node({
-        onSuspended: () -> suspended = true,
-        onComplete: () -> activate(Ok(doc)),
-        fallback: () -> 'loading...', // @todo: Some new default
-        child: renderRoot()
-      }));
-      if (!suspended) activate(Ok(doc));
+  public function generate():Task<AppContext> {
+    var app = new AppContext(project, fs.directory(project.paths.publicDirectory));
+    var islands = new IslandContext();
+    var visitor = new RouteVisitor();
+
+    app.addAsset(new ClientAppAsset(fs, project, islands));
+    visitor.enqueue('/');
+
+    return renderUntilComplete(app, islands, visitor).next(documents -> {
+      for (asset in documents) app.addAsset(asset);
+      return app;
     });
   }
 
-  function renderRoot() {
-    return Provider.compose(apis, _ -> render(this));
+  function renderUntilComplete(
+    assets:AppContext,
+    islands:IslandContext,
+    visitor:RouteVisitor
+  ):Task<Array<HtmlAsset>> {
+    var paths = visitor.drain();
+    return Task
+      .parallel(...paths.map(path -> renderPath(path, assets, islands, visitor)))
+      .next(documents -> {
+        if (visitor.hasPending()) {
+          return renderUntilComplete(assets, islands, visitor)
+            .next(moreDocuments -> documents.concat(moreDocuments));
+        }
+        return documents;
+      });
   }
+  
+  function renderPath(
+    path:String,
+    assets:AppContext,
+    islands:IslandContext,
+    visitor:RouteVisitor
+  ):Task<HtmlAsset> {
+    return new Task(activate -> {
+      var document = new Element('#document', {});
+      var root:Null<View> = null;
+      var suspended = false;
+      var activated = false;
 
-  #if blok.server
-  public function serve() {
-    #if nodejs
-    // @todo: need configuration.
-    var server = new kit.http.server.NodeServer(3000);
-    var handler = createMiddleware().apply(new BridgeHtmlHandler(this));
-    server.serve(handler);
-    #end
-  }
+      function checkActivation() {
+        if (activated) throw 'Activated more than once on a render';
+        activated = true;
+      }
 
-  public function createMiddleware():BridgeApiMiddleware {
-    return new BridgeApiMiddleware(this);
-  }
+      function sendHtml(path:String, document:Element) {
+        var html = new HtmlAsset(path, document.toString());
 
-  function createDocument():Document {
-    return new ServerDocument({
-      rootId: options.rootId
+        root?.dispose();
+        activate(Ok(html));
+      }
+
+      root = mount(document, () -> Provider
+        .provide(() -> assets)
+        .provide(() -> islands)
+        .provide(() -> visitor)
+        .provide(() -> new Navigator({ url: path }))
+        .child(_ -> SuspenseBoundary.node({
+          child: render(),
+          onSuspended: () -> suspended = true,
+          onComplete: () -> {
+            checkActivation();
+            sendHtml(path, document);
+          },
+          fallback: () -> Placeholder.node()
+        }))
+      );
+
+      if (suspended == false) {
+        checkActivation();
+        sendHtml(path, document);
+      }
     });
   }
-
-  function createRoot(document:Document, render) {
-    Server.mount(document.getRootLayer(), render);
-  }
-  #else
-  function createDocument():Document {
-    return new ClientDocument({
-      rootId: options.rootId
-    });
-  }
-
-  function createRoot(document:Document, render) {
-    // @todo
-    Client.hydrate(document.getRootLayer(), render);
-  }
-  #end
 }

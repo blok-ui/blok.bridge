@@ -1,8 +1,12 @@
---class-path src
---class-path test
+-cp src
 
---library blok.core
---library kit.http
+-lib blok.core
+-lib blok.router
+-lib kit.http
+-lib kit.file
+-lib kit.cli
+-lib toml
+-lib hxnodejs
 
 -D js-es=6
 -D analyzer-optimize
@@ -11,14 +15,6 @@
 
 -dce full
 
---main Run
+--main blok.BridgeCli
 
---each
-
---js dist/index.js
-
---next
-
--D blok.server
---library hxnodejs
--js dist/server.js
+--js dist/bridge.js
