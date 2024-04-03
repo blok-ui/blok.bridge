@@ -2,5 +2,6 @@
 
 -lib blok.core
 -lib blok.router
+-lib kit.http
 
 -D blok.bridge=0.0.1

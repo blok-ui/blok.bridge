@@ -25,6 +25,10 @@ class ClientAppAsset implements Asset {
     return outputMainFile().next(_ -> runHaxeCommand());
   }
 
+  // function isBuildNeeded() {
+
+  // }
+
   function runHaxeCommand():Task<Nothing> {
     var path = createHaxeCommand();
     return switch Sys.command(path) {

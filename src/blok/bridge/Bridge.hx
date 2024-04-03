@@ -2,7 +2,6 @@ package blok.bridge;
 
 import blok.bridge.asset.*;
 import blok.bridge.project.*;
-import blok.bridge.project.loader.*;
 import blok.context.Provider;
 import blok.html.Server;
 import blok.html.server.*;
@@ -16,17 +15,8 @@ class Bridge {
   /**
     Start your Bridge app using a project.toml for configuration. This is
     the recommended way to use Blok Bridge.
-
-    Note that this method expects to find a project.toml at the root
-    of the current working directory (cwd). If that's not how you have 
-    things set up, you may need to use a custom ProjectLoader and
-    kit.file.FileSystem instance.
   **/
-  public static function start(render):Task<Bridge> {
-    var fs = new FileSystem(new SysAdaptor(Sys.getCwd()));
-    var loader = new TomlProjectLoader(fs);
-    return fromLoader(loader, render, fs);
-  }
+  public static macro function start(render, ?fs);
 
   /**
     Start your app using a custom loader for your project configuration.
@@ -47,8 +37,24 @@ class Bridge {
     this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
   }
 
+  public function generatePage(path:String):Task<{
+    html:HtmlAsset,
+    app:AppContext
+  }> {
+    var app = createAppContext();
+    var islands = new IslandContext();
+    var visitor = new RouteVisitor();
+    
+    app.addAsset(new ClientAppAsset(fs, project, islands));
+
+    return renderPath(path, app, islands, visitor).next(html -> {
+      html: html,
+      app: app
+    });
+  }
+
   public function generate():Task<AppContext> {
-    var app = new AppContext(project, fs.directory(project.paths.publicDirectory));
+    var app = createAppContext();
     var islands = new IslandContext();
     var visitor = new RouteVisitor();
 
@@ -62,16 +68,16 @@ class Bridge {
   }
 
   function renderUntilComplete(
-    assets:AppContext,
+    app:AppContext,
     islands:IslandContext,
     visitor:RouteVisitor
   ):Task<Array<HtmlAsset>> {
     var paths = visitor.drain();
     return Task
-      .parallel(...paths.map(path -> renderPath(path, assets, islands, visitor)))
+      .parallel(...paths.map(path -> renderPath(path, app, islands, visitor)))
       .next(documents -> {
         if (visitor.hasPending()) {
-          return renderUntilComplete(assets, islands, visitor)
+          return renderUntilComplete(app, islands, visitor)
             .next(moreDocuments -> documents.concat(moreDocuments));
         }
         return documents;
@@ -80,7 +86,7 @@ class Bridge {
   
   function renderPath(
     path:String,
-    assets:AppContext,
+    app:AppContext,
     islands:IslandContext,
     visitor:RouteVisitor
   ):Task<HtmlAsset> {
@@ -103,7 +109,7 @@ class Bridge {
       }
 
       root = mount(document, () -> Provider
-        .provide(() -> assets)
+        .provide(() -> app)
         .provide(() -> islands)
         .provide(() -> visitor)
         .provide(() -> new Navigator({ url: path }))
@@ -123,5 +129,9 @@ class Bridge {
         sendHtml(path, document);
       }
     });
+  }
+
+  inline function createAppContext() {
+    return new AppContext(project, fs.directory(project.paths.publicDirectory));
   }
 }

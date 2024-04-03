@@ -11,7 +11,7 @@ function main() {
       ],
       fallback: _ -> 'Not found'
     }))
-    .next(bridge -> bridge.generate())
+    .generate()
     .next(app -> app.process())
     .handle(result -> switch result {
       case Ok(_): trace('Created');

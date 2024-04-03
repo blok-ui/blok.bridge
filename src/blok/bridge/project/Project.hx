@@ -7,6 +7,8 @@ using haxe.io.Path;
 
 @:fallback(null)
 class Project implements Context implements Config {
+  public static macro function embed();
+
   @:prop public final name:String;
 
   @:prop 
