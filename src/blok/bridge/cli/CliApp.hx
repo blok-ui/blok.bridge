@@ -1,9 +1,8 @@
 package blok.bridge.cli;
 
-import haxe.Json;
-import kit.file.adaptor.SysAdaptor;
-import kit.file.FileSystem;
 import blok.bridge.project.loader.*;
+import kit.file.FileSystem;
+import kit.file.adaptor.SysAdaptor;
 
 using kit.Cli;
 
