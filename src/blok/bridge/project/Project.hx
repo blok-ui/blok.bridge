@@ -28,18 +28,27 @@ class Project implements Context implements Config {
   public final build:BuildConfig;
 
   public function toBuildServerHxml(?options:{
+    ?message:Array<String>,
     ?builtinDependencies:Array<String>
   }):String {
     var body = new StringBuf();
+    var outputPath = paths.createPrivateOutputPath(build.output);
+    var message = options?.message ?? [
+      'THIS FILE WAS GENERATED FROM A `project.toml`. DO NOT EDIT!',
+      '',
+      'To configure things, edit your `project.toml` and run `$$ bridge setup`',
+      '',
+      'Note: for haxe completion support, point your editor at THIS file.',
+      '',
+      'Note: while it\'s recommended you use the Blok Bridge cli, you can',
+      'generate or serve your site by running `$$ node ${outputPath}`.'
+    ];
     
-    body.add('# THIS FILE WAS GENERATED FROM A `project.toml`. DO NOT EDIT!\n');
-    body.add('# To configure things, edit your `project.toml` and run\n');
-    body.add('# `> bridge setup`.\n\n');
-    body.add('# Note: for haxe completion support, point your editor at THIS file.\n\n');
-    body.add('# Note: while it\'s recommended you use the Blok cli, you *can* generate\n');
-    body.add('# or serve your site by running `node ${build.output}`.\n');
-    body.add('# However, you generally should build your app using `> bridge dev`\n');
-    body.add('# or `> bridge prod`.\n\n');
+    for (line in message) {
+      body.add('# $line\n');
+    }
+
+    body.add('\n');
 
     for (flag in toFlags({ 
       isClient: false,
@@ -49,7 +58,7 @@ class Project implements Context implements Config {
     }
 
     body.add('\n-main ${build.main}\n\n');
-    body.add('-${build.target} ${paths.createPrivateOutputPath(build.output)}\n');
+    body.add('-${build.target} ${outputPath}\n');
 
     return body.toString();
   }
