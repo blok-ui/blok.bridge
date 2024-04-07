@@ -27,7 +27,9 @@ class Project implements Context implements Config {
   @:json(to = value.toJson(), from = BuildConfig.fromJson(value))
   public final build:BuildConfig;
 
-  public function toBuildServerHxml():String {
+  public function toBuildServerHxml(?options:{
+    ?builtinDependencies:Array<String>
+  }):String {
     var body = new StringBuf();
     
     body.add('# THIS FILE WAS GENERATED FROM A `project.toml`. DO NOT EDIT!\n');
@@ -39,7 +41,10 @@ class Project implements Context implements Config {
     body.add('# However, you generally should build your app using `> bridge dev`\n');
     body.add('# or `> bridge prod`.\n\n');
 
-    for (flag in toFlags({ isClient: false })) {
+    for (flag in toFlags({ 
+      isClient: false,
+      builtinDependencies: options?.builtinDependencies
+    })) {
       body.add(flag + '\n');
     }
 
@@ -49,7 +54,10 @@ class Project implements Context implements Config {
     return body.toString();
   }
 
-  public function toFlags(options:{ isClient:Bool }):Array<String> {
+  public function toFlags(?options:{ 
+    ?isClient:Bool,
+    ?builtinDependencies:Array<String>
+  }):Array<String> {
     var cmd = [];
     var version = version.toFileNameSafeString();
     var dependencies = build.dependencies.shared.concat(switch options.isClient {
@@ -60,12 +68,14 @@ class Project implements Context implements Config {
       case true: build.flags.client.toEntries();
       case false: build.flags.server.toEntries();
     });
+    var isClient = options?.isClient ?? false;
+    var builtin = options?.builtinDependencies ?? [ 'blok.bridge' ];
 
-    if (!dependencies.contains('blok.bridge')) {
-      dependencies.unshift('blok.bridge');
+    for (dep in builtin) if (!dependencies.contains(dep)) {
+      dependencies.unshift(dep);
     }
 
-    if (!options.isClient) {
+    if (!isClient) {
       if (!dependencies.contains('kit.file')) {
         dependencies.push('kit.file');
       }
