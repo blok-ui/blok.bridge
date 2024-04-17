@@ -1,28 +1,28 @@
+[project]
 name = 'example'
 version = '0.0.1'
+releasenote = 'First release'
+url = 'https://github.com/blok-ui/blok.bridge'
+license = 'MIT'
+contributors = ['wartman']
+tags = ['markup', 'compiler']
 
-[islands]
-main = 'ExampleIslands'
-
-[build]
+[build.shared]
 sources = [ 'example/src' ]
-target = 'js'
-output = 'build.js'
+dependencies = ['breeze']
+flags.js-es = "6"
+flags.message-reporting = 'pretty'
+flags.debug = true
+flags.analyzer-optimize = true
+flags.dce = "full"
+
+[build.server]
 main = 'Run'
+dependencies = ['hxnodejs']
+flags.breeze-output = 'styles-{{version}}'
+target.type = 'js'
+target.output = 'build.js'
 
-[build.dependencies]
-shared = ['breeze']
-server = ['hxnodejs']
-
-[build.flags.shared]
-js-es = "6"
-message-reporting = 'pretty'
-debug = true
-analyzer-optimize = true
-dce = "full"
-
-[build.flags.server]
-'breeze.output' = 'styles-{{version}}'
-
-[build.flags.client]
-'breeze.output' = 'none'
+[build.client]
+main = 'ExampleIslands'
+flags.breeze-output = 'none'

@@ -9,29 +9,31 @@ using Lambda;
 
 @:fallback(error('No AppContext found'))
 class AppContext implements Context {
-  public final project:Project;
-  public final output:Directory;
+	public final project:Project;
+	public final privateDirectory:Directory;
+	public final publicDirectory:Directory;
 
-  final assets:Array<Asset> = [];
+	final assets:Array<Asset> = [];
 
-  public function new(project, output) {
-    this.project = project;
-    this.output = output;
-  }
+	public function new(project, privateDirectory, publicDirectory) {
+		this.project = project;
+		this.privateDirectory = privateDirectory;
+		this.publicDirectory = publicDirectory;
+	}
 
-  public function addAsset(asset:Asset) {
-    var id = asset.getIdentifier();
-    if (id != null && assets.exists(asset -> asset.getIdentifier() == id)) {
-      return;
-    }
-    if (!assets.contains(asset)) {
-      assets.push(asset);
-    }
-  }
+	public function addAsset(asset:Asset) {
+		var id = asset.getIdentifier();
+		if (id != null && assets.exists(asset -> asset.getIdentifier() == id)) {
+			return;
+		}
+		if (!assets.contains(asset)) {
+			assets.push(asset);
+		}
+	}
 
-  public function process() {
-    return Task.parallel(...assets.map(asset -> asset.process(this)));
-  }
+	public function process() {
+		return Task.parallel(...assets.map(asset -> asset.process(this)));
+	}
 
-  public function dispose() {}
+	public function dispose() {}
 }

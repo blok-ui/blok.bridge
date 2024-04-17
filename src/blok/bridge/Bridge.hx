@@ -12,126 +12,118 @@ import kit.file.FileSystem;
 import kit.file.adaptor.SysAdaptor;
 
 class Bridge {
-  /**
-    Start your Bridge app using a project.toml for configuration. This is
-    the recommended way to use Blok Bridge.
-  **/
-  public static macro function start(render, ?fs);
+	/**
+		Start your Bridge app using a project.toml for configuration. This is
+		the recommended way to use Blok Bridge.
+	**/
+	public static macro function start(render, ?fs);
 
-  /**
-    Start your app using a custom loader for your project configuration.
-  **/
-  public static function fromLoader(loader:ProjectLoader, render, ?fs) {
-    return loader
-      .load()
-      .next(project -> new Bridge(project, render, fs));
-  }
+	/**
+		Start your app using a custom loader for your project configuration.
+	**/
+	public static function fromLoader(loader:ProjectLoader, render, ?fs) {
+		return loader
+			.load()
+			.next(project -> new Bridge(project, render, fs));
+	}
 
-  final project:Project;
-  final render:()->Child;
-  final fs:FileSystem;
+	final project:Project;
+	final render:() -> Child;
+	final fs:FileSystem;
 
-  public function new(project, render, ?fs) {
-    this.project = project;
-    this.render = render;
-    this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
-  }
+	public function new(project, render, ?fs) {
+		this.project = project;
+		this.render = render;
+		this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
+	}
 
-  public function generatePage(path:String):Task<{
-    html:HtmlAsset,
-    app:AppContext
-  }> {
-    var app = createAppContext();
-    var islands = new IslandContext();
-    var visitor = new RouteVisitor();
-    
-    app.addAsset(new ClientAppAsset(fs, project, islands));
+	public function generatePage(path:String):Task<{
+		html:HtmlAsset,
+		app:AppContext
+	}> {
+		var app = createAppContext();
+		var islands = new IslandContext();
+		var visitor = new RouteVisitor();
 
-    return renderPath(path, app, islands, visitor).next(html -> {
-      html: html,
-      app: app
-    });
-  }
+		app.addAsset(new ClientAppAsset(islands));
 
-  public function generate():Task<AppContext> {
-    var app = createAppContext();
-    var islands = new IslandContext();
-    var visitor = new RouteVisitor();
+		return renderPath(path, app, islands, visitor).next(html -> {
+			html: html,
+			app: app
+		});
+	}
 
-    app.addAsset(new ClientAppAsset(fs, project, islands));
-    visitor.enqueue('/');
+	public function generate():Task<AppContext> {
+		var app = createAppContext();
+		var islands = new IslandContext();
+		var visitor = new RouteVisitor();
 
-    return renderUntilComplete(app, islands, visitor).next(documents -> {
-      for (asset in documents) app.addAsset(asset);
-      return app;
-    });
-  }
+		app.addAsset(new ClientAppAsset(islands));
+		visitor.enqueue('/');
 
-  function renderUntilComplete(
-    app:AppContext,
-    islands:IslandContext,
-    visitor:RouteVisitor
-  ):Task<Array<HtmlAsset>> {
-    var paths = visitor.drain();
-    return Task
-      .parallel(...paths.map(path -> renderPath(path, app, islands, visitor)))
-      .next(documents -> {
-        if (visitor.hasPending()) {
-          return renderUntilComplete(app, islands, visitor)
-            .next(moreDocuments -> documents.concat(moreDocuments));
-        }
-        return documents;
-      });
-  }
-  
-  function renderPath(
-    path:String,
-    app:AppContext,
-    islands:IslandContext,
-    visitor:RouteVisitor
-  ):Task<HtmlAsset> {
-    return new Task(activate -> {
-      var document = new Element('#document', {});
-      var root:Null<View> = null;
-      var suspended = false;
-      var activated = false;
+		return renderUntilComplete(app, islands, visitor).next(documents -> {
+			for (asset in documents) app.addAsset(asset);
+			return app;
+		});
+	}
 
-      function checkActivation() {
-        if (activated) throw 'Activated more than once on a render';
-        activated = true;
-      }
+	function renderUntilComplete(app:AppContext, islands:IslandContext, visitor:RouteVisitor):Task<Array<HtmlAsset>> {
+		var paths = visitor.drain();
+		return Task
+			.parallel(...paths.map(path -> renderPath(path, app, islands, visitor)))
+			.next(documents -> {
+				if (visitor.hasPending()) {
+					return renderUntilComplete(app, islands, visitor)
+						.next(moreDocuments -> documents.concat(moreDocuments));
+				}
+				return documents;
+			});
+	}
 
-      function sendHtml(path:String, document:Element) {
-        var html = new HtmlAsset(path, document.toString());
+	function renderPath(path:String, app:AppContext, islands:IslandContext, visitor:RouteVisitor):Task<HtmlAsset> {
+		return new Task(activate -> {
+			var document = new Element('#document', {});
+			var root:Null<View> = null;
+			var suspended = false;
+			var activated = false;
 
-        root?.dispose();
-        activate(Ok(html));
-      }
+			function checkActivation() {
+				if (activated) throw 'Activated more than once on a render';
+				activated = true;
+			}
 
-      root = mount(document, () -> Provider
-        .provide(() -> app)
-        .provide(() -> islands)
-        .provide(() -> visitor)
-        .provide(() -> new Navigator({ url: path }))
-        .child(_ -> SuspenseBoundary.node({
-          child: render(),
-          onSuspended: () -> suspended = true,
-          onComplete: () -> {
-            checkActivation();
-            sendHtml(path, document);
-          },
-          fallback: () -> Placeholder.node()
-        }))
-      );
+			function sendHtml(path:String, document:Element) {
+				var html = new HtmlAsset(path, document.toString());
 
-      if (suspended == false) {
-        checkActivation();
-        sendHtml(path, document);
-      }
-    });
-  }
+				root?.dispose();
+				activate(Ok(html));
+			}
 
-  inline function createAppContext() {
-    return new AppContext(project, fs.directory(project.paths.publicDirectory));
-  }
+			root = mount(document, () -> Provider
+				.provide(() -> app)
+				.provide(() -> islands)
+				.provide(() -> visitor)
+				.provide(() -> new Navigator({url: path}))
+				.child(_ -> SuspenseBoundary.node({
+					child: render(),
+					onSuspended: () -> suspended = true,
+					onComplete: () -> {
+						checkActivation();
+						sendHtml(path, document);
+					},
+					fallback: () -> Placeholder.node()
+				}))
+			);
+
+			if (suspended == false) {
+				checkActivation();
+				sendHtml(path, document);
+			}
+		});
+	}
+
+	inline function createAppContext() {
+		var paths = project.getPaths();
+		return new AppContext(project, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
+	}
 }

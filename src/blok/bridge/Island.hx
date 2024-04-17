@@ -8,66 +8,70 @@ import blok.ui.*;
 
 @:autoBuild(blok.bridge.IslandBuilder.build())
 abstract class Island extends View {
-  var __child:Null<View> = null;
+	var __child:Null<View> = null;
 
-  abstract function setup():Void;
-  abstract function render():Child;
-  abstract function toJson():Dynamic;
-  abstract function __islandName():String;
-  abstract function __updateProps():Void;
+	abstract function setup():Void;
 
-  function __render():VNode {
-    var child = Scope.wrap(_ -> render());
-    #if !blok.client
-    switch findAncestorOfType(Island) {
-      case None:
-        return IslandElement.node({
-          component: __islandName(),
-          props: toJson(),
-          child: child
-        });
-      case Some(_):
-        // We don't want to wrap nested Islands! Only top-level
-        // Islands will need hydration.
-    }
-    #end
-    return child;
-  }
-  
-  function __initialize() {
-    __child = __render().createComponent();
-    __child?.mount(getAdaptor(), this, __slot);
-    Owner.with(this, setup);
-  }
+	abstract function render():Child;
 
-  function __hydrate(cursor:Cursor) {
-    __child = __render().createComponent();
-    __child?.hydrate(cursor, getAdaptor(), this, __slot);
-    Owner.with(this, setup);
-  }
+	abstract function toJson():Dynamic;
 
-  function __update() {
-    __updateProps();
-    __child = updateChild(this, __child, __render(), __slot);
-  }
+	abstract function __islandName():String;
 
-  function __validate() {
-    __child = updateChild(this, __child, __render(), __slot);
-  }
+	abstract function __updateProps():Void;
 
-  function __dispose() {}
+	function __render():VNode {
+		var child = Scope.wrap(_ -> render());
+		#if !blok.client
+		switch findAncestorOfType(Island) {
+			case None:
+				return IslandElement.node({
+					component: __islandName(),
+					props: toJson(),
+					child: child
+				});
+			case Some(_):
+				// We don't want to wrap nested Islands! Only top-level
+				// Islands will need hydration.
+		}
+		#end
+		return child;
+	}
 
-  function __updateSlot(oldSlot:Null<Slot>, newSlot:Null<Slot>) {
-    __child?.updateSlot(newSlot);
-  }
+	function __initialize() {
+		__child = __render().createComponent();
+		__child?.mount(getAdaptor(), this, __slot);
+		Owner.with(this, setup);
+	}
 
-  public function getPrimitive():Dynamic {
-    var node = __child?.getPrimitive();
-    assert(node != null, 'No primitive found');
-    return node;
-  }
+	function __hydrate(cursor:Cursor) {
+		__child = __render().createComponent();
+		__child?.hydrate(cursor, getAdaptor(), this, __slot);
+		Owner.with(this, setup);
+	}
 
-  public function visitChildren(visitor:(child:View) -> Bool) {
-    if (__child != null) visitor(__child);
-  }
+	function __update() {
+		__updateProps();
+		__child = updateChild(this, __child, __render(), __slot);
+	}
+
+	function __validate() {
+		__child = updateChild(this, __child, __render(), __slot);
+	}
+
+	function __dispose() {}
+
+	function __updateSlot(oldSlot:Null<Slot>, newSlot:Null<Slot>) {
+		__child?.updateSlot(newSlot);
+	}
+
+	public function getPrimitive():Dynamic {
+		var node = __child?.getPrimitive();
+		assert(node != null, 'No primitive found');
+		return node;
+	}
+
+	public function visitChildren(visitor:(child:View) -> Bool) {
+		if (__child != null) visitor(__child);
+	}
 }

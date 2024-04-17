@@ -18,7 +18,7 @@
 --debug
 -D analyzer-optimize
 -dce full
--D breeze.output=styles-v0_0_1
+-D breeze-output=styles-v0_0_1
 
 -main Run
 
