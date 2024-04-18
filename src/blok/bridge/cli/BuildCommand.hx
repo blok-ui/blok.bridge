@@ -35,6 +35,7 @@ class BuildCommand implements Command {
 				var code = try Sys.command(cmd) catch (e) {
 					return new Error(InternalError, e.message);
 				}
+
 				if (code == 0) {
 					output.writeLn('Compiled.');
 				} else {

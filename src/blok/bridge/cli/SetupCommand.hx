@@ -1,5 +1,6 @@
 package blok.bridge.cli;
 
+import haxe.Json;
 import blok.bridge.project.loader.*;
 import kit.file.FileSystem;
 
@@ -22,7 +23,7 @@ class SetupCommand implements Command {
 	**/
 	@:command
 	function hxml():Task<Int> {
-		output.writeLn('Setting up...');
+		output.writeLn('Creating hxml file...');
 		return loader.load()
 			.next(project -> fs
 				.file('build-${project.getMeta().name}.hxml')
@@ -31,6 +32,24 @@ class SetupCommand implements Command {
 			.next(_ -> {
 				output.writeLn('Setup complete.');
 				return 0;
+			});
+	}
+
+	/**
+		Generate or update a haxelib.json file.
+	**/
+	@:command
+	function haxelib() {
+		output.writeLn('Creating haxelib.json...');
+		return loader.load()
+			.next(project -> {
+				// @todo: Not ready to output actual haxelib yet.
+				return fs.file('haxelib-test.json')
+					.write(project.createHaxelibJson())
+					.next(_ -> {
+						output.writeLn('Created.');
+						return 0;
+					});
 			});
 	}
 

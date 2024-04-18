@@ -78,11 +78,16 @@ class ProjectTargetType implements Config {
 	@:prop public final output:String;
 }
 
+class ProjectDependency implements Config {
+	@:prop public final name:String;
+	@:json(to = value.toString(), from = SemVer.parse(value)) @:prop public final version:SemVer;
+}
+
 class ProjectTarget implements Config {
 	@:prop public final name:String;
 	@:prop public final sources:Array<String> = [];
 	@:json(from = FlagsMap.fromJson(value), to = value.toJson()) @:prop public final flags:FlagsMap = new FlagsMap();
-	@:prop public final dependencies:Array<String> = [];
+	@:prop public final dependencies:Array<ProjectDependency> = [];
 	@:prop public final main:String = null;
 	@:prop public final target:ProjectTargetType = null;
 	@:prop public final hxml:ProjectTargetHxml = null;

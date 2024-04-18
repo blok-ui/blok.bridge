@@ -1,5 +1,6 @@
 package blok.bridge;
 
+import haxe.Json;
 import blok.bridge.project.*;
 
 using StringTools;
@@ -65,13 +66,38 @@ class BridgeProject implements Project implements Config {
 		return body.toString();
 	}
 
+	public function createHaxelibJson():String {
+		var dependencies:{} = {};
+
+		for (dep in build.server.dependencies) {
+			Reflect.setField(dependencies, dep.name, dep.version.toString());
+		}
+
+		for (dep in build.shared.dependencies) {
+			Reflect.setField(dependencies, dep.name, dep.version.toString());
+		}
+
+		var contents = {
+			name: project.name,
+			classPath: build.server.sources[0] ?? build.shared.sources[0] ?? 'src',
+			license: project.license,
+			tags: project.tags,
+			contributors: project.contributors,
+			version: project.version.toString(),
+			releasenote: project.releasenote,
+			dependencies: dependencies
+		};
+
+		return Json.stringify(contents, '  ');
+	}
+
 	function getBuildFlags(isClient:Bool) {
 		var cmd = [];
 		var version = project.version.toFileNameSafeString();
 		var dependencies = build.shared.dependencies.concat(switch isClient {
 			case true: build.client.dependencies;
 			case false: build.server.dependencies;
-		});
+		}).map(dep -> dep.name);
 		var sources = build.shared.sources.concat(switch isClient {
 			case true: build.client.sources;
 			case false: build.server.sources;

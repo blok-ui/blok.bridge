@@ -8,4 +8,5 @@ interface Project {
 	public function getBuildFlagsForServer():Array<String>;
 	public function getBuildFlagsForClient():Array<String>;
 	public function createServerHxml():String;
+	public function createHaxelibJson():String;
 }
