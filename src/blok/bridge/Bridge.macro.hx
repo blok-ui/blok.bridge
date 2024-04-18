@@ -1,6 +1,6 @@
 package blok.bridge;
 
-import blok.bridge.project.BridgeProject;
+import blok.bridge.BridgeProject;
 
 class Bridge {
 	public static function start(render, ?fs) {

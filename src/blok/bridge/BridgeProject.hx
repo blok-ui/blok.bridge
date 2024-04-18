@@ -1,4 +1,6 @@
-package blok.bridge.project;
+package blok.bridge;
+
+import blok.bridge.project.*;
 
 using StringTools;
 
@@ -63,7 +65,6 @@ class BridgeProject implements Project implements Config {
 		return body.toString();
 	}
 
-	// @todo: Extract this into it's own thing.
 	function getBuildFlags(isClient:Bool) {
 		var cmd = [];
 		var version = project.version.toFileNameSafeString();

@@ -10,6 +10,7 @@ tags = ['markup', 'compiler']
 [build.shared]
 sources = [ 'example/src' ]
 dependencies = ['breeze']
+flags.no-deprecation-warnings = true
 flags.js-es = "6"
 flags.message-reporting = 'pretty'
 flags.debug = true

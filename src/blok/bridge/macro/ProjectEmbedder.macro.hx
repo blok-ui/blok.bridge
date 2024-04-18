@@ -1,4 +1,4 @@
-package blok.bridge.project;
+package blok.bridge.macro;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -8,24 +8,22 @@ import sys.io.File;
 using Reflect;
 using haxe.io.Path;
 
-class BridgeProject {
-	public static function embed():Expr {
-		function search(dir:String):Maybe<String> {
-			var path = Path.join([dir, 'project.toml']);
-			if (FileSystem.exists(path)) return Some(File.getContent(path));
-			var upOne = dir.directory();
-			if (FileSystem.isDirectory(upOne)) return search(upOne);
-			return None;
-		}
-
-		return search(Sys.getCwd()).map(value -> {
-			var data:{} = Toml.parse(value);
-			var expr = toObject(data);
-			macro blok.bridge.project.BridgeProject.fromJson($expr);
-		}).or(() -> {
-			Context.error('Could not find a project.toml in the current working directory or in any parent directories.', Context.currentPos());
-		});
+function embed(factory:Expr) {
+	function search(dir:String):Maybe<String> {
+		var path = Path.join([dir, 'project.toml']);
+		if (FileSystem.exists(path)) return Some(File.getContent(path));
+		var upOne = dir.directory();
+		if (FileSystem.isDirectory(upOne)) return search(upOne);
+		return None;
 	}
+
+	return search(Sys.getCwd()).map(value -> {
+		var data:{} = Toml.parse(value);
+		var expr = toObject(data);
+		macro $factory($expr);
+	}).or(() -> {
+		Context.error('Could not find a project.toml in the current working directory or in any parent directories.', Context.currentPos());
+	});
 }
 
 private function toExpr(value:Dynamic):Expr {

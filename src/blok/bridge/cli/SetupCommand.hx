@@ -2,17 +2,10 @@ package blok.bridge.cli;
 
 import blok.bridge.project.loader.*;
 import kit.file.FileSystem;
-import kit.file.adaptor.SysAdaptor;
 
 using kit.Cli;
 
-class CliApp implements Command {
-	public static function run() {
-		var fs = new FileSystem(new SysAdaptor(Sys.getCwd()));
-		var loader = new TomlProjectLoader(fs);
-		Cli.fromSys().execute(new CliApp(fs, loader));
-	}
-
+class SetupCommand implements Command {
 	final fs:FileSystem;
 	final loader:TomlProjectLoader;
 
@@ -22,10 +15,13 @@ class CliApp implements Command {
 	}
 
 	/**
-		Setup HXML files based on your `build.toml` configuration.
+		Create HXML files based on your `project.toml` configuration.
+
+		This is needed if you want code completion to work in your editor
+		or IDE, but is not required to compile apps.
 	**/
 	@:command
-	function setup():Task<Int> {
+	function hxml():Task<Int> {
 		output.writeLn('Setting up...');
 		return loader.load()
 			.next(project -> fs
@@ -38,6 +34,9 @@ class CliApp implements Command {
 			});
 	}
 
+	/**
+		Various commands for setting up Bridge-based projects.
+	**/
 	@:defaultCommand
 	function help():Task<Int> {
 		output.write(getDocs());

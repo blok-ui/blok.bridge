@@ -13,6 +13,7 @@
 -lib hxnodejs
 -lib kit.file
 -lib toml
+-D no-deprecation-warnings
 -D js-es=6
 -D message-reporting=pretty
 --debug

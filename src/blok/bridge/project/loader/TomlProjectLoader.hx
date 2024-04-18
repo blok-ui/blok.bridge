@@ -1,13 +1,14 @@
 package blok.bridge.project.loader;
 
-import blok.bridge.project.Project;
 import kit.file.*;
 
 class TomlProjectLoader implements ProjectLoader {
 	final fs:FileSystem;
+	final factory:(data:{}) -> Project;
 
-	public function new(fs) {
+	public function new(fs, factory) {
 		this.fs = fs;
+		this.factory = factory;
 	}
 
 	public function load():Task<Project> {
@@ -19,6 +20,6 @@ class TomlProjectLoader implements ProjectLoader {
 			} catch (e) {
 				new Error(InternalError, e.message);
 			})
-			.next((data:Dynamic) -> BridgeProject.fromJson(data).as(Project));
+			.next((data:Dynamic) -> factory(data));
 	}
 }
