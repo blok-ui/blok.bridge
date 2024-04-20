@@ -20,7 +20,7 @@ flags.dce = "full"
 [build.server]
 main = 'Run'
 dependencies = [{ name = 'hxnodejs', version = '12.1.0' }]
-flags.breeze-output = 'styles-{{version}}'
+flags.breeze-output = 'cwd:{{assets}}/styles-{{version}}'
 target.type = 'js'
 target.output = 'build.js'
 

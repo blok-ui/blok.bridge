@@ -17,7 +17,7 @@ class HtmlAsset implements Asset {
 	}
 
 	public function toString() {
-		return '<!doctype html>' + html;
+		return html;
 	}
 
 	public function process(context:AppContext):Task<Nothing> {

@@ -130,11 +130,21 @@ class BridgeProject implements Project implements Config {
 		}
 
 		for (flag in flags) {
-			// @todo: Should we make this work with other variables?
-			cmd.push(flag.replace('{{version}}', version));
+			cmd.push(replaceVariables([
+				'version' => version,
+				'public' => paths.publicDirectory,
+				'assets' => paths.createPublicOutputPath(paths.assetsPath)
+			], flag));
 		}
 
 		return cmd;
+	}
+
+	function replaceVariables(props:Map<String, String>, str:String) {
+		for (key => value in props) {
+			str = str.replace('{{$key}}', value);
+		}
+		return str;
 	}
 }
 

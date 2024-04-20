@@ -5,11 +5,12 @@ import ex.layout.MainLayout;
 import blok.ui.*;
 
 class CounterPage extends Component {
-  @:attribute final initialCount:Int;
+	@:attribute final initialCount:Int;
 
-  function render():Child {
-    return MainLayout.node({
-      children: Counter.node({ count: initialCount })
-    });
-  }
+	function render():Child {
+		return MainLayout.node({
+			pageTitle: 'Counter ${initialCount}',
+			children: Counter.node({count: initialCount})
+		});
+	}
 }
