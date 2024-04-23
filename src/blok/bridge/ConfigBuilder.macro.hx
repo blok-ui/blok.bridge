@@ -1,4 +1,4 @@
-package blok.bridge.project;
+package blok.bridge;
 
 import haxe.macro.Expr;
 import blok.macro.*;

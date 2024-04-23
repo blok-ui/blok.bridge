@@ -1,7 +1,6 @@
 package blok.bridge;
 
-import blok.bridge.asset.*;
-import blok.bridge.project.*;
+import blok.bridge.asset.HtmlAsset;
 import blok.context.Provider;
 import blok.html.Server;
 import blok.html.server.*;
@@ -14,12 +13,12 @@ import kit.file.adaptor.SysAdaptor;
 using Lambda;
 
 class Generator {
-	final project:Project;
+	final paths:AppPaths;
 	final render:() -> Child;
 	final fs:FileSystem;
 
-	public function new(project, render, ?fs) {
-		this.project = project;
+	public function new(paths, render, ?fs) {
+		this.paths = paths;
 		this.render = render;
 		this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
 	}
@@ -29,7 +28,6 @@ class Generator {
 		var islands = new IslandContext();
 		var visitor = new RouteVisitor();
 
-		app.addAsset(new ClientAppAsset(islands));
 		visitor.enqueue('/');
 
 		return renderUntilComplete(app, islands, visitor).next(documents -> {
@@ -45,8 +43,6 @@ class Generator {
 		var app = createAppContext();
 		var islands = new IslandContext();
 		var visitor = new RouteVisitor();
-
-		app.addAsset(new ClientAppAsset(islands));
 
 		return renderPath(path, app, islands, visitor).next(html -> {
 			html: html,
@@ -112,7 +108,6 @@ class Generator {
 	}
 
 	inline function createAppContext() {
-		var paths = project.paths;
-		return new AppContext(project, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
+		return new AppContext(paths, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
 	}
 }

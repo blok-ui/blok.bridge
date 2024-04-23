@@ -1,6 +1,5 @@
 package blok.bridge;
 
-import blok.bridge.project.Project;
 import blok.context.Context;
 import blok.debug.Debug;
 import kit.file.Directory;
@@ -9,14 +8,14 @@ using Lambda;
 
 @:fallback(error('No AppContext found'))
 class AppContext implements Context {
-	public final project:Project;
+	public final paths:AppPaths;
 	public final privateDirectory:Directory;
 	public final publicDirectory:Directory;
 
 	final assets:Array<Asset> = [];
 
-	public function new(project, privateDirectory, publicDirectory) {
-		this.project = project;
+	public function new(paths, privateDirectory, publicDirectory) {
+		this.paths = paths;
 		this.privateDirectory = privateDirectory;
 		this.publicDirectory = publicDirectory;
 	}
