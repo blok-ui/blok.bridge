@@ -11,8 +11,8 @@ class MainLayout extends Component {
 
 	function render() {
 		var app = AppContext.from(this);
-		var version = app.project.getMeta().version.toFileNameSafeString();
-		var paths = app.project.getPaths();
+		var version = app.project.project.version.toFileNameSafeString();
+		var paths = app.project.paths;
 		var title = Html.title().child('Example');
 
 		if (pageTitle != null) {

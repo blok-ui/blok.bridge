@@ -9,21 +9,17 @@ using Reflect;
 using haxe.io.Path;
 
 function embed(factory:Expr) {
-	function search(dir:String):Maybe<String> {
-		var path = Path.join([dir, 'project.toml']);
-		if (FileSystem.exists(path)) return Some(File.getContent(path));
-		var upOne = dir.directory();
-		if (FileSystem.isDirectory(upOne)) return search(upOne);
-		return None;
+	var path = Path.join([Sys.getCwd(), 'project.toml']);
+
+	if (!FileSystem.exists(path)) {
+		Context.error('Could not find a project.toml in the current working directory.', Context.currentPos());
 	}
 
-	return search(Sys.getCwd()).map(value -> {
-		var data:{} = Toml.parse(value);
-		var expr = toObject(data);
-		macro $factory($expr);
-	}).or(() -> {
-		Context.error('Could not find a project.toml in the current working directory or in any parent directories.', Context.currentPos());
-	});
+	var value = File.getContent(path);
+	var data:{} = Toml.parse(value);
+	var expr = toObject(data);
+
+	return macro $factory($expr);
 }
 
 private function toExpr(value:Dynamic):Expr {

@@ -10,23 +10,9 @@ class BridgeProject implements Project implements Config {
 
 	@:prop public final project:ProjectMeta;
 	@:prop public final paths:ProjectPaths;
-	@:prop public final build:BridgeProjectTargets;
-
-	public function getMeta():ProjectMeta {
-		return project;
-	}
-
-	public function getPaths():ProjectPaths {
-		return paths;
-	}
-
-	public function getClientTarget():ProjectTarget {
-		return build.client;
-	}
-
-	public function getServerTarget():ProjectTarget {
-		return build.server;
-	}
+	@:prop public final shared:ProjectTarget;
+	@:prop public final server:ProjectTarget;
+	@:prop public final client:ProjectTarget;
 
 	public function getBuildFlagsForServer():Array<String> {
 		return getBuildFlags(false);
@@ -38,7 +24,7 @@ class BridgeProject implements Project implements Config {
 
 	public function createServerHxml():String {
 		var body = new StringBuf();
-		var outputPath = paths.createPrivateOutputPath(build.server.target.output);
+		var outputPath = paths.createPrivateOutputPath(server.target.output);
 		var message = [
 			'THIS FILE WAS GENERATED FROM A `project.toml`. DO NOT EDIT!',
 			'',
@@ -60,8 +46,8 @@ class BridgeProject implements Project implements Config {
 			body.add(flag + '\n');
 		}
 
-		body.add('\n-main ${build.server.main}\n\n');
-		body.add('-${build.server.target.type} ${outputPath}\n');
+		body.add('\n-main ${server.main}\n\n');
+		body.add('-${server.target.type} ${outputPath}\n');
 
 		return body.toString();
 	}
@@ -69,17 +55,17 @@ class BridgeProject implements Project implements Config {
 	public function createHaxelibJson():String {
 		var dependencies:{} = {};
 
-		for (dep in build.server.dependencies) {
+		for (dep in server.dependencies) {
 			Reflect.setField(dependencies, dep.name, dep.version.toString());
 		}
 
-		for (dep in build.shared.dependencies) {
+		for (dep in shared.dependencies) {
 			Reflect.setField(dependencies, dep.name, dep.version.toString());
 		}
 
 		var contents = {
 			name: project.name,
-			classPath: build.server.sources[0] ?? build.shared.sources[0] ?? 'src',
+			classPath: server.sources[0] ?? shared.sources[0] ?? 'src',
 			license: project.license,
 			tags: project.tags,
 			contributors: project.contributors,
@@ -94,17 +80,17 @@ class BridgeProject implements Project implements Config {
 	function getBuildFlags(isClient:Bool) {
 		var cmd = [];
 		var version = project.version.toFileNameSafeString();
-		var dependencies = build.shared.dependencies.concat(switch isClient {
-			case true: build.client.dependencies;
-			case false: build.server.dependencies;
+		var dependencies = shared.dependencies.concat(switch isClient {
+			case true: client.dependencies;
+			case false: server.dependencies;
 		}).map(dep -> dep.name);
-		var sources = build.shared.sources.concat(switch isClient {
-			case true: build.client.sources;
-			case false: build.server.sources;
+		var sources = shared.sources.concat(switch isClient {
+			case true: client.sources;
+			case false: server.sources;
 		});
-		var flags = build.shared.flags.toEntries().concat(switch isClient {
-			case true: build.client.flags.toEntries();
-			case false: build.server.flags.toEntries();
+		var flags = shared.flags.toEntries().concat(switch isClient {
+			case true: client.flags.toEntries();
+			case false: server.flags.toEntries();
 		});
 		var builtin = ['blok.bridge'];
 
@@ -146,10 +132,4 @@ class BridgeProject implements Project implements Config {
 		}
 		return str;
 	}
-}
-
-class BridgeProjectTargets implements Config {
-	@:prop public final shared:ProjectTarget;
-	@:prop public final server:ProjectTarget;
-	@:prop public final client:ProjectTarget;
 }

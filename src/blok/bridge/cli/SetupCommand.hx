@@ -1,14 +1,13 @@
 package blok.bridge.cli;
 
-import haxe.Json;
-import blok.bridge.project.loader.*;
+import blok.bridge.project.*;
 import kit.file.FileSystem;
 
 using kit.Cli;
 
 class SetupCommand implements Command {
 	final fs:FileSystem;
-	final loader:TomlProjectLoader;
+	final loader:ProjectLoader;
 
 	public function new(fs, loader) {
 		this.fs = fs;
@@ -26,7 +25,7 @@ class SetupCommand implements Command {
 		output.writeLn('Creating hxml file...');
 		return loader.load()
 			.next(project -> fs
-				.file('build-${project.getMeta().name}.hxml')
+				.file('build-${project.project.name}.hxml')
 				.write(project.createServerHxml())
 			)
 			.next(_ -> {

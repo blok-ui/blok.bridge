@@ -7,7 +7,7 @@ license = 'MIT'
 contributors = ['wartman']
 tags = ['ui']
 
-[build.shared]
+[shared]
 sources = ['example/src']
 dependencies = [{ name = 'breeze', version = '0.0.1' }]
 flags.no-deprecation-warnings = true
@@ -17,13 +17,13 @@ flags.debug = true
 flags.analyzer-optimize = true
 flags.dce = "full"
 
-[build.server]
+[server]
 main = 'Run'
 dependencies = [{ name = 'hxnodejs', version = '12.1.0' }]
 flags.breeze-output = 'cwd:{{assets}}/styles-{{version}}'
 target.type = 'js'
 target.output = 'build.js'
 
-[build.client]
+[client]
 main = 'ExampleIslands'
 flags.breeze-output = 'none'

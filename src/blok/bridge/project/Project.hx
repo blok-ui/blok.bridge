@@ -1,10 +1,10 @@
 package blok.bridge.project;
 
 interface Project {
-	public function getMeta():ProjectMeta;
-	public function getPaths():ProjectPaths;
-	public function getServerTarget():ProjectTarget;
-	public function getClientTarget():ProjectTarget;
+	public final project:ProjectMeta;
+	public final paths:ProjectPaths;
+	public final server:ProjectTarget;
+	public final client:ProjectTarget;
 	public function getBuildFlagsForServer():Array<String>;
 	public function getBuildFlagsForClient():Array<String>;
 	public function createServerHxml():String;

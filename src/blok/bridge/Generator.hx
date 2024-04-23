@@ -112,7 +112,7 @@ class Generator {
 	}
 
 	inline function createAppContext() {
-		var paths = project.getPaths();
+		var paths = project.paths;
 		return new AppContext(project, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
 	}
 }

@@ -1,13 +1,13 @@
 package blok.bridge.cli;
 
 import blok.bridge.project.Project;
-import blok.bridge.project.loader.TomlProjectLoader;
+import blok.bridge.project.ProjectLoader;
 import kit.cli.Command;
 
 using blok.bridge.cli.CliTools;
 
 class BuildCommand implements Command {
-	final loader:TomlProjectLoader;
+	final loader:ProjectLoader;
 
 	public function new(loader) {
 		this.loader = loader;
@@ -20,8 +20,8 @@ class BuildCommand implements Command {
 	function project() {
 		return loader.load()
 			.next(project -> {
-				var paths = project.getPaths();
-				var server = project.getServerTarget();
+				var paths = project.paths;
+				var server = project.server;
 				var outputPath = paths.createPrivateOutputPath(server.target?.output ?? 'build.js');
 				var cmd = [
 					'haxe'.createNodeCommand(),
@@ -61,8 +61,8 @@ class BuildCommand implements Command {
 	}
 
 	function doGenerate(project:Project):Task<Int> {
-		var paths = project.getPaths();
-		var server = project.getServerTarget();
+		var paths = project.paths;
+		var server = project.server;
 		var outputPath = paths.createPrivateOutputPath(server.target?.output ?? 'build.js');
 
 		output.writeLn('Generating...');
