@@ -2,9 +2,9 @@ package blok.bridge;
 
 using haxe.io.Path;
 
-class AppPaths implements Config {
+class PathsConfig implements Config {
 	@:prop public final dataDirectory:String = 'data';
-	@:prop public final privateDirectory:String = 'dist';
+	@:prop public final privateDirectory:String = 'artifacts';
 	@:prop public final publicDirectory:String = 'dist/public';
 	@:prop public final assetsPath:String = 'assets';
 

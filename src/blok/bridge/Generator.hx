@@ -12,13 +12,14 @@ import kit.file.adaptor.SysAdaptor;
 
 using Lambda;
 
+// @todo: Ideally we could do cool things with threads here, but for now...
 class Generator {
-	final paths:AppPaths;
+	final config:GeneratorConfig;
 	final render:() -> Child;
 	final fs:FileSystem;
 
-	public function new(paths, render, ?fs) {
-		this.paths = paths;
+	public function new(config, render, ?fs) {
+		this.config = config;
 		this.render = render;
 		this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
 	}
@@ -108,6 +109,7 @@ class Generator {
 	}
 
 	inline function createAppContext() {
-		return new AppContext(paths, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
+		var paths = config.paths;
+		return new AppContext(config, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
 	}
 }

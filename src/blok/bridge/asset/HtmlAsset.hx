@@ -20,14 +20,23 @@ class HtmlAsset implements Asset {
 		return html;
 	}
 
-	public function process(context:AppContext):Task<Nothing> {
+	public function process(app:AppContext):Task<Nothing> {
 		var path = path.trim().normalize();
 		if (path.startsWith('/')) path = path.substr(1);
 
-		// @todo: Allow path to be configured so it can either be an
-		// index.html in a folder *or* just directly naming the html file.
-		return context.publicDirectory
-			.file(Path.join([path, 'index.html']))
-			.write(toString());
+		return switch app.config.strategy {
+			case DirectoryWithIndexHtmlFile:
+				app.publicDirectory
+					.file(Path.join([path, 'index.html']))
+					.write(toString());
+			case NamedHtmlFile if (path == ''):
+				app.publicDirectory
+					.file('index.hxml')
+					.write(toString());
+			case NamedHtmlFile:
+				app.publicDirectory
+					.file(path.withExtension('html'))
+					.write(toString());
+		}
 	}
 }

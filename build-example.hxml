@@ -2,7 +2,6 @@
 
 -lib blok.bridge
 -lib breeze
--lib hxnodejs
 -lib kit.file
 -lib toml
 
@@ -13,8 +12,5 @@
 -D breeze-output=cwd:dist/public/assets/styles-v0_0_1
 
 --debug
--dce full
 
--main Run
-
--js dist/build.js
+--run Run

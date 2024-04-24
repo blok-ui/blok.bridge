@@ -8,14 +8,14 @@ using Lambda;
 
 @:fallback(error('No AppContext found'))
 class AppContext implements Context {
-	public final paths:AppPaths;
+	public final config:GeneratorConfig;
 	public final privateDirectory:Directory;
 	public final publicDirectory:Directory;
 
 	final assets:Array<Asset> = [];
 
-	public function new(paths, privateDirectory, publicDirectory) {
-		this.paths = paths;
+	public function new(config, privateDirectory, publicDirectory) {
+		this.config = config;
 		this.privateDirectory = privateDirectory;
 		this.publicDirectory = publicDirectory;
 	}
