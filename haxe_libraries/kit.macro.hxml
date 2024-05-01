@@ -1,0 +1,4 @@
+# @install: lix --silent download "gh://github.com/wartman/kit.macro#70d2d447c5c793cb6f28ad4def55edd8ec77d4e0" into kit.macro/0.0.1/github/70d2d447c5c793cb6f28ad4def55edd8ec77d4e0
+-lib kit
+-cp ${HAXE_LIBCACHE}/kit.macro/0.0.1/github/70d2d447c5c793cb6f28ad4def55edd8ec77d4e0/src
+-D kit.macro=0.0.1

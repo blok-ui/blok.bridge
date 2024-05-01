@@ -8,7 +8,7 @@ class BridgeClient extends Component {
 	@:attribute final output:String = 'app.js';
 	@:attribute final main:String = 'Island';
 	@:attribute final sources:Array<String> = null;
-	@:attribute final libraries:Array<String> = null;
+	@:attribute final dependencies:Array<String> = null;
 	@:attribute final flags:Map<String, Dynamic> = [];
 	@:computed final assetPath:String = AppContext.from(this).config.paths.createAssetPath(output);
 
@@ -17,7 +17,7 @@ class BridgeClient extends Component {
 		var islands = IslandContext.from(this);
 		context.addAsset(new ClientAppAsset({
 			sources: sources,
-			libraries: libraries,
+			dependencies: dependencies,
 			output: output,
 			main: main,
 			flags: flags

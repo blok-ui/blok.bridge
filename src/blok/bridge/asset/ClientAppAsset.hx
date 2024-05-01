@@ -1,18 +1,20 @@
 package blok.bridge.asset;
 
+import hotdish.node.Build;
+import hotdish.*;
+import hotdish.node.*;
 import haxe.Template;
 
 using kit.Hash;
 using StringTools;
 using haxe.io.Path;
-using blok.bridge.cli.CliTools;
 
 typedef ClientAppOptions = {
 	public final ?output:String;
 	public final ?sources:Array<String>;
 	public final ?main:String;
-	public final ?libraries:Array<String>;
-	public final ?flags:Map<String, Dynamic>;
+	public final ?dependencies:Array<String>;
+	public final ?flags:BuildFlags;
 };
 
 class ClientAppAsset implements Asset {
@@ -31,78 +33,47 @@ class ClientAppAsset implements Asset {
 	}
 
 	public function process(app:AppContext):Task<Nothing> {
-		return outputMainFile(app).next(_ -> runHaxeCommand(app));
+		return outputMainFile(app).next(_ -> buildJsFile(app));
 	}
 
-	function runHaxeCommand(app:AppContext):Task<Nothing> {
-		var path = createHaxeCommand(app);
-		return switch Sys.command(path) {
-			case 0: Nothing;
-			case _: new Error(InternalError, 'Failed to generate haxe file');
-		}
-	}
-
-	function createHaxeCommand(app:AppContext) {
+	function buildJsFile(app:AppContext) {
 		var sources:Array<String> = options.sources ?? ['src'];
-		var output = app.config.paths.createAssetOutputPath(options.output ?? 'app.js');
-		var libraries = options.libraries ?? [];
-		var cmd = [
-			'haxe'.createNodeCommand(),
-			'-D blok.client',
-			'-cp ${app.config.paths.privateDirectory}',
-			'-main ${main}',
-			'-js ${output}'
-		];
+		var dependencies = options.dependencies ?? [];
+		var flags = options.flags ?? new BuildFlags();
 
-		if (!libraries.contains('blok.bridge')) {
-			libraries.push('blok.bridge');
+		if (!dependencies.contains('blok.bridge')) {
+			dependencies.push('blok.bridge');
 		}
 
-		for (source in sources) {
-			cmd.push('-cp $source');
-		}
-
-		for (lib in libraries) {
-			cmd.push('-lib $lib');
-		}
-
-		for (flag in getFlags()) {
-			cmd.push(flag);
-		}
-
-		cmd.push('-D js-es=6');
-		cmd.push('-D message-reporting=pretty');
+		flags.set('blok.client', true);
+		flags.set('js-es', '6');
+		flags.set('message-reporting', 'pretty');
 
 		#if debug
-		cmd.push('--debug');
+		flags.set('debug', true);
 		#else
-		cmd.push('--dce full');
-		cmd.push('-D analyzer-optimize');
+		flags.set('dce', 'full');
+		flags.set('analyzer-optimize', true);
 		#end
 
-		#if debug
-		trace(cmd.join(' '));
-		#end
+		var group = new Group({
+			children: [
+				new Build({
+					main: main,
+					sources: sources.concat([app.config.paths.privateDirectory]),
+					dependencies: dependencies.map(name -> ({name: name} : Dependency)),
+					flags: flags,
+					children: [
+						new Output({
+							type: Js,
+							output: app.config.paths.createAssetOutputPath(options.output ?? 'app.js')
+						})
+					]
+				})
+			]
+		});
 
-		return cmd.join(' ');
-	}
-
-	function getFlags() {
-		var out:Array<String> = [];
-		for (flag => value in options.flags ?? []) {
-			if (flag == 'debug') {
-				if (value == true) out.push('--debug');
-			} else if (flag == 'dce') {
-				out.push('-dce ${value}');
-			} else if (flag == 'macro') {
-				out.push('--macro ${value}');
-			} else if (value == true) {
-				out.push('-D $flag');
-			} else {
-				out.push('-D ${flag}=${value}');
-			}
-		}
-		return out;
+		return group.run();
 	}
 
 	function outputMainFile(app:AppContext) {

@@ -14,7 +14,7 @@ using Lambda;
 
 // @todo: Ideally we could do cool things with threads here, but for now...
 class Generator {
-	final config:GeneratorConfig;
+	final config:AppConfig;
 	final render:() -> Child;
 	final fs:FileSystem;
 

@@ -48,7 +48,7 @@ class MainLayout extends Component {
 				BridgeClient.node({
 					output: 'app.js',
 					sources: ['src', 'example/src'],
-					libraries: ['breeze'],
+					dependencies: ['breeze'],
 					flags: [
 						'breeze.output' => 'none'
 					]

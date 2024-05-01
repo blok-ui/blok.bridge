@@ -1,6 +1,7 @@
 -cp example/src
 
 -lib blok.bridge
+-lib hotdish
 -lib breeze
 -lib kit.file
 -lib toml

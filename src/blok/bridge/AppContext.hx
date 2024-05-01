@@ -8,7 +8,7 @@ using Lambda;
 
 @:fallback(error('No AppContext found'))
 class AppContext implements Context {
-	public final config:GeneratorConfig;
+	public final config:AppConfig;
 	public final privateDirectory:Directory;
 	public final publicDirectory:Directory;
 
