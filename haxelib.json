@@ -7,7 +7,7 @@
   "version": "0.0.1",
   "releasenote": "First release",
   "dependencies": {
-    "hxnodejs": "12.1.0",
+    "hotdish": "0.0.1",
     "blok.core": "0.9.0",
     "blok.router": "0.0.0",
     "kit.file": "0.1.0",

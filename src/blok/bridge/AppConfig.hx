@@ -2,7 +2,7 @@ package blok.bridge;
 
 import haxe.macro.Compiler;
 
-enum abstract HtmlGenerationStrategy(String) {
+enum abstract HtmlGenerationStrategy(String) to String {
 	final DirectoryWithIndexHtmlFile;
 	final NamedHtmlFile;
 }
@@ -23,11 +23,8 @@ class AppConfig implements Config {
 	@:prop public final strategy:HtmlGenerationStrategy = DirectoryWithIndexHtmlFile;
 	@:prop public final paths:PathsConfig = new PathsConfig({});
 
-	@:json(from = [for (field in Reflect.fields(value)) field => Reflect.field(value, field)], to = {
-		var out = {};
-		for (key => data in value) Reflect.setField(out, key, data);
-		out;
-	}) @:prop final options:Map<String, String> = new Map();
+	@:json(from = SerializableMap.fromJson(value), to = value.toJson())
+	@:prop final options:SerializableMap = new SerializableMap([]);
 
 	public function getOption(key:String):Maybe<String> {
 		return options.get(key).toMaybe();

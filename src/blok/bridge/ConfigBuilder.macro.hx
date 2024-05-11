@@ -1,23 +1,23 @@
 package blok.bridge;
 
 import haxe.macro.Expr;
-import blok.macro.*;
-import blok.macro.builder.*;
+import kit.macro.*;
+import kit.macro.parser.*;
 
-using blok.macro.MacroTools;
+using kit.macro.Tools;
 
-final builderFactory = new ClassBuilderFactory([
+final factory = new ClassBuilderFactory([
 	new ConfigBuilder(),
-	new JsonSerializerBuilder({}),
-	new ConstructorBuilder({})
+	new JsonSerializerParser({}),
+	new ConstructorParser({})
 ]);
 
 function build() {
-	return builderFactory.fromContext().export();
+	return factory.fromContext().export();
 }
 
-class ConfigBuilder implements Builder {
-	public final priority:BuilderPriority = Normal;
+class ConfigBuilder implements Parser {
+	public final priority:Priority = Normal;
 
 	public function new() {}
 
@@ -40,12 +40,13 @@ class ConfigBuilder implements Builder {
 			case FVar(t, e):
 				var name = field.name;
 
-				builder.addProp('new', {name: name, type: t, optional: e != null});
-				builder.addHook('init', if (e == null) {
-					macro this.$name = props.$name;
-				} else {
-					macro if (props.$name != null) this.$name = props.$name;
-				});
+				builder.hook(Init)
+					.addProp({name: name, type: t, optional: e != null})
+					.addExpr(if (e == null) {
+						macro this.$name = props.$name;
+					} else {
+						macro if (props.$name != null) this.$name = props.$name;
+					});
 			default:
 				field.pos.error(':prop fields must be vars');
 		}

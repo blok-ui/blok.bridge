@@ -9,15 +9,19 @@ using Lambda;
 @:fallback(error('No AppContext found'))
 class AppContext implements Context {
 	public final config:AppConfig;
+	public final document:DocumentController = #if blok.client new blok.bridge.document.ClientDocumentController() #else new blok.bridge.document.ServerDocumentController() #end;
 	public final privateDirectory:Directory;
 	public final publicDirectory:Directory;
 
 	final assets:Array<Asset> = [];
 
-	public function new(config, privateDirectory, publicDirectory) {
+	public function new(config, privateDirectory, publicDirectory, ?document) {
 		this.config = config;
 		this.privateDirectory = privateDirectory;
 		this.publicDirectory = publicDirectory;
+		if (document != null) {
+			this.document = document;
+		}
 	}
 
 	public function addAsset(asset:Asset) {
