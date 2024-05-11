@@ -3,6 +3,8 @@ Blok Bridge
 
 Tools for making Blok apps that run on the server and the client.
 
+> Note: This is still highly experimental and will probably change a lot. Ideally this package will become a low-level way to share code between the client and the server, and will become the foundation of more complex frameworks like blok.tower.
+
 Usage
 -----
 
