@@ -40,9 +40,9 @@ class IslandElement extends Component {
 		#if blok.client
 		return child;
 		#else
-		IslandContext
-			.maybeFrom(this)
-			.inspect(islands -> islands.registerIsland(component));
+		// IslandContext
+		// 	.maybeFrom(this)
+		// 	.inspect(islands -> islands.registerIsland(component));
 		return new VPrimitive(
 			getTypeForTag(tag),
 			tag,

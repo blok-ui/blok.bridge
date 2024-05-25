@@ -24,7 +24,7 @@ class HtmlAsset implements Asset {
 		var path = path.trim().normalize();
 		if (path.startsWith('/')) path = path.substr(1);
 
-		return switch app.config.strategy {
+		return switch app.config.generator.strategy {
 			case DirectoryWithIndexHtmlFile:
 				app.publicDirectory
 					.file(Path.join([path, 'index.html']))

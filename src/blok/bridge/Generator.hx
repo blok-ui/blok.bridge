@@ -1,5 +1,6 @@
 package blok.bridge;
 
+import blok.html.Html;
 import blok.bridge.asset.HtmlAsset;
 import blok.context.Provider;
 import blok.html.Server;
@@ -26,12 +27,11 @@ class Generator {
 
 	public function generate():Task<AppContext> {
 		var app = createAppContext();
-		var islands = new IslandContext();
 		var visitor = new RouteVisitor();
 
 		visitor.enqueue('/');
 
-		return renderUntilComplete(app, islands, visitor).next(documents -> {
+		return renderUntilComplete(app, visitor).next(documents -> {
 			for (asset in documents) app.addAsset(asset);
 			return app;
 		});
@@ -42,29 +42,28 @@ class Generator {
 		app:AppContext
 	}> {
 		var app = createAppContext();
-		var islands = new IslandContext();
 		var visitor = new RouteVisitor();
 
-		return renderPath(path, app, islands, visitor).next(html -> {
+		return renderPath(path, app, visitor).next(html -> {
 			html: html,
 			app: app
 		});
 	}
 
-	function renderUntilComplete(app:AppContext, islands:IslandContext, visitor:RouteVisitor):Task<Array<HtmlAsset>> {
+	function renderUntilComplete(app:AppContext, visitor:RouteVisitor):Task<Array<HtmlAsset>> {
 		var paths = visitor.drain();
 		return Task
-			.parallel(...paths.map(path -> renderPath(path, app, islands, visitor)))
+			.parallel(...paths.map(path -> renderPath(path, app, visitor)))
 			.next(documents -> {
 				if (visitor.hasPending()) {
-					return renderUntilComplete(app, islands, visitor)
+					return renderUntilComplete(app, visitor)
 						.next(moreDocuments -> documents.concat(moreDocuments));
 				}
 				return documents;
 			});
 	}
 
-	function renderPath(path:String, app:AppContext, islands:IslandContext, visitor:RouteVisitor):Task<HtmlAsset> {
+	function renderPath(path:String, app:AppContext, visitor:RouteVisitor):Task<HtmlAsset> {
 		return new Task(activate -> {
 			var document = new ElementPrimitive('#document', {});
 			var root:Null<View> = null;
@@ -87,7 +86,6 @@ class Generator {
 
 			root = mount(document, () -> Provider
 				.provide(() -> app)
-				.provide(() -> islands)
 				.provide(() -> visitor)
 				.provide(() -> new Navigator({url: path}))
 				.child(_ -> SuspenseBoundary.node({

@@ -1,17 +1,21 @@
--cp example/src
+# THIS IS A GENERATED FILE. DO NOT EDIT.
 
--lib blok.bridge
--lib hotdish
+-cp example/src
 -lib breeze
+-D analyzer-optimize
+-dce full
+--debug
+-lib blok.bridge
+-D blok.paths.data=data
+-D blok.generator.strategy=DirectoryWithIndexHtmlFile
+-D blok.generator.manifest=blok-bridge-manifest
+-D blok.generator.artifacts=artifacts
+-D blok.paths.private=artifacts
+-D blok.paths.assets=assets
+-D blok.generator.version=0.0.1
+-D blok.paths.public=dist/public
 -lib kit.file
 -lib toml
-
--D no-deprecation-warnings
--D js-es=6
--D message-reporting=pretty
--D analyzer-optimize
--D breeze-output=cwd:dist/public/assets/styles-v0_0_1
-
---debug
-
---run Run
+-D breeze.output=cwd:dist/public/assets/styles-v0_0_1
+--macro blok.bridge.macro.IslandIntrospector.run()
+-main Run

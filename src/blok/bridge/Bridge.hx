@@ -3,6 +3,9 @@ package blok.bridge;
 import blok.bridge.asset.*;
 
 class Bridge {
+	public macro static function startIslands();
+
+	#if !blok.client
 	/**
 		Startup a Bridge app using the default configuration/using
 		configuration from compiler flags.
@@ -34,4 +37,5 @@ class Bridge {
 	}> {
 		return generator.generatePage(path);
 	}
+	#end
 }
