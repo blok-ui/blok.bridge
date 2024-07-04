@@ -18,7 +18,7 @@ class MainLayout extends Component {
 			title.child(' | ').child(pageTitle);
 		}
 
-		return Fragment.node([
+		return Fragment.of([
 			Html.head().child([
 				title,
 				// @todo: Replace this with some kind of Assets component that
@@ -26,7 +26,7 @@ class MainLayout extends Component {
 				Html.link({
 					href: paths.createAssetPath('styles-v0_0_1.css'),
 					rel: 'stylesheet'
-				})
+				}).node()
 			]),
 			Html.body().child([
 				Html.header().child([
@@ -42,7 +42,7 @@ class MainLayout extends Component {
 				Html.script({
 					src: paths.createAssetPath(app.config.getClientAppName())
 				})
-			])
+			]).node()
 		]);
 	}
 }

@@ -2,21 +2,21 @@ package blok.bridge;
 
 import haxe.macro.Expr;
 import kit.macro.*;
-import kit.macro.parser.*;
+import kit.macro.step.*;
 
 using kit.macro.Tools;
 
 final factory = new ClassBuilderFactory([
 	new ConfigBuilder(),
-	new JsonSerializerParser({}),
-	new ConstructorParser({})
+	new JsonSerializerBuildStep({}),
+	new ConstructorBuildStep({})
 ]);
 
 function build() {
 	return factory.fromContext().export();
 }
 
-class ConfigBuilder implements Parser {
+class ConfigBuilder implements BuildStep {
 	public final priority:Priority = Normal;
 
 	public function new() {}

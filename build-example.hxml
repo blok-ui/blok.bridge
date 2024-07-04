@@ -14,8 +14,9 @@
 -D blok.paths.assets=assets
 -D blok.generator.version=0.0.1
 -D blok.paths.public=dist/public
+-cp artifacts
 -lib kit.file
 -lib toml
 -D breeze.output=cwd:dist/public/assets/styles-v0_0_1
 --macro blok.bridge.macro.IslandIntrospector.run()
--main Run
+-main BridgeGenerate

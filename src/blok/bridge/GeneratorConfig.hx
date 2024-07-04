@@ -8,6 +8,7 @@ enum abstract HtmlGenerationStrategy(String) to String from String {
 }
 
 class GeneratorConfig implements Config {
+	@:prop public final bootstrap:String = 'Routes';
 	@:prop public final version:SemVer = '0.0.1';
 	@:prop public final artifactPath:String = 'artifacts';
 	@:prop public final manifestName:String = 'blok-bridge-manifest';

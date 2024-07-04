@@ -1,14 +1,14 @@
-import hotdish.node.Build.BuildFlags;
-import hotdish.node.*;
-import hotdish.*;
 import blok.bridge.*;
 import blok.bridge.hotdish.*;
+import hotdish.*;
+import hotdish.node.*;
 
 // This is an example of how to use the Hotdish build system
 // to create a Blok Bridge app.
 //
 // Note that this is a bit of a mess: Hotdish is not really ready
-// for use yet.
+// for use yet. You can also run Bridge without this step -- it should
+// still work.
 function main() {
 	var version = new SemVer(0, 0, 1);
 	var project = new Project({
@@ -22,7 +22,6 @@ function main() {
 		children: [
 			// Define shared dependencies with an outer Build node.
 			new Build({
-				main: 'Run',
 				sources: ['example/src'],
 				flags: {
 					'dce': 'full',
@@ -37,6 +36,7 @@ function main() {
 					new BlokBridge({
 						config: new AppConfig({
 							generator: new GeneratorConfig({
+								bootstrap: 'Routes',
 								version: version
 							})
 						}),
@@ -46,9 +46,9 @@ function main() {
 								{name: 'kit.file'},
 								{name: 'toml'}
 							],
-							flags: BuildFlags.fromMap([
-								'breeze.output' => 'cwd:dist/public/assets/styles-${version.toFileNameSafeString()}'
-							]),
+							flags: {
+								'breeze.output': 'cwd:dist/public/assets/styles-${version.toFileNameSafeString()}'
+							},
 							children: [
 								// We could output our build script somewhere,
 								// but it's simpler just to *Run* it.
@@ -64,9 +64,9 @@ function main() {
 						// Configure our client build step. Note that this is optional,
 						// and only needed if we have client-only flags.
 						client: new BuildClient({
-							flags: BuildFlags.fromMap([
-								'breeze.output' => 'none'
-							])
+							flags: {
+								'breeze.output': 'none'
+							}
 						})
 					})
 				]

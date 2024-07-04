@@ -1,15 +1,15 @@
 package blok.bridge;
 
 import kit.macro.*;
-import kit.macro.parser.*;
+import kit.macro.step.*;
 import blok.ui.ComponentBuilder.factory;
 
 using Lambda;
 using haxe.macro.Tools;
 
 function build() {
-	return factory.withParsers(
-		new JsonSerializerParser({
+	return factory.withSteps(
+		new JsonSerializerBuildStep({
 			customParser: options -> switch options.type.toType().toComplexType() {
 				case macro :blok.signal.Signal<$wrappedType>:
 					var name = options.name;
@@ -24,7 +24,7 @@ function build() {
 	).fromContext().export();
 }
 
-class IslandBuilder implements Parser {
+class IslandBuilder implements BuildStep {
 	public final priority:Priority = Late;
 
 	public function new() {}

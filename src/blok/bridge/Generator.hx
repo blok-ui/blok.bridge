@@ -1,6 +1,5 @@
 package blok.bridge;
 
-import blok.html.Html;
 import blok.bridge.asset.HtmlAsset;
 import blok.context.Provider;
 import blok.html.Server;

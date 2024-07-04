@@ -35,7 +35,9 @@ class AppContext implements Context {
 	}
 
 	public function process() {
-		return Task.parallel(...assets.map(asset -> asset.process(this)));
+		return Task
+			.parallel(...assets.map(asset -> asset.process(this)))
+			.next(_ -> this);
 	}
 
 	public function dispose() {}

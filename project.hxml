@@ -8,6 +8,8 @@
 
 -cp ./
 
+--debug
+
 -lib hotdish
 -lib blok.bridge
 

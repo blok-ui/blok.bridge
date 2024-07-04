@@ -3,9 +3,10 @@ package blok.bridge;
 import blok.bridge.asset.*;
 
 class Bridge {
+	#if blok.client
 	public macro static function startIslands();
+	#else
 
-	#if !blok.client
 	/**
 		Startup a Bridge app using the default configuration/using
 		configuration from compiler flags.
@@ -19,6 +20,19 @@ class Bridge {
 	**/
 	public static function build(config, render, ?fs) {
 		return new Bridge(new AppConfig(config), render, fs);
+	}
+
+	/**
+		Run a Bridge app using a Bootstrap class.
+
+		Note: this is mostly intended for internal use. If you're not
+		using Hotdish, you probably don't need to use this method.
+	**/
+	public static function use(bootstrap:Bootstrap) {
+		return start(() -> bootstrap.start())
+			.generate()
+			.next(app -> app.process())
+			.handle(result -> bootstrap.finish(result));
 	}
 
 	final generator:Generator;
