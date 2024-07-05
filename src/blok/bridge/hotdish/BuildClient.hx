@@ -1,6 +1,5 @@
 package blok.bridge.hotdish;
 
-import haxe.Template;
 import hotdish.Node;
 import hotdish.node.*;
 import hotdish.node.Build;
@@ -8,6 +7,8 @@ import hotdish.node.Build;
 using StringTools;
 using haxe.io.Path;
 
+// @todo: run a minifier here if we're not in dev mode? Might be an option
+// for a child node?
 class BuildClient extends Node {
 	@:prop final main:String = 'BridgeIslands';
 	@:prop final sources:Array<String> = [];
@@ -21,7 +22,7 @@ class BuildClient extends Node {
 				children: [
 					new Artifact({
 						path: Path.join([config.generator.artifactPath, main]).withExtension('hx'),
-						contents: template.execute({})
+						contents: contents
 					})
 				],
 				then: () -> [
@@ -45,7 +46,7 @@ class BuildClient extends Node {
 	}
 }
 
-private final template = new Template('// THIS IS A GENERATED FILE.
+private final contents = '// THIS IS A GENERATED FILE.
 // DO NOT EDIT.
 
 function main() {
@@ -53,4 +54,4 @@ function main() {
 	blok.bridge.Bridge.startIslands();
 	#end
 }
-');
+';

@@ -17,6 +17,6 @@
 -cp artifacts
 -lib kit.file
 -lib toml
--D breeze.output=cwd:dist/public/assets/styles-v0_0_1
+-D breeze.output=cwd:dist/public/assets/styles_v0_0_1
 --macro blok.bridge.macro.IslandIntrospector.run()
 -main BridgeGenerate

@@ -1,6 +1,7 @@
 package blok.bridge;
 
 import haxe.macro.Compiler;
+import haxe.io.Path;
 
 class AppConfig implements Config {
 	public static function fromCompiler() {
@@ -20,8 +21,6 @@ class AppConfig implements Config {
 		});
 	}
 
-	// @:prop public final version:SemVer;
-	// @:prop public final strategy:HtmlGenerationStrategy = DirectoryWithIndexHtmlFile;
 	@:prop public final generator:GeneratorConfig;
 	@:prop public final paths:PathsConfig = new PathsConfig({});
 
@@ -33,6 +32,14 @@ class AppConfig implements Config {
 	}
 
 	public function getClientAppName() {
-		return '__app_' + generator.version.toFileNameSafeString() + '.js';
+		return applyVersionToFileName('__app.js');
+	}
+
+	public function applyVersionToFileName(path:String) {
+		return path.pipe(
+			Path.withoutExtension(_),
+			path -> path + '_' + generator.version.toFileNameSafeString(),
+			Path.withExtension(_, Path.extension(path))
+		);
 	}
 }

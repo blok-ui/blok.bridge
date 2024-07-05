@@ -7,8 +7,7 @@ import hotdish.node.*;
 // to create a Blok Bridge app.
 //
 // Note that this is a bit of a mess: Hotdish is not really ready
-// for use yet. You can also run Bridge without this step -- it should
-// still work.
+// for use yet.
 function main() {
 	var version = new SemVer(0, 0, 1);
 	var project = new Project({
@@ -36,7 +35,7 @@ function main() {
 					new BlokBridge({
 						config: new AppConfig({
 							generator: new GeneratorConfig({
-								bootstrap: 'Routes',
+								bootstrap: 'blog.Routes',
 								version: version
 							})
 						}),
@@ -47,7 +46,7 @@ function main() {
 								{name: 'toml'}
 							],
 							flags: {
-								'breeze.output': 'cwd:dist/public/assets/styles-${version.toFileNameSafeString()}'
+								'breeze.output': 'cwd:dist/public/assets/styles_${version.toFileNameSafeString()}'
 							},
 							children: [
 								// We could output our build script somewhere,

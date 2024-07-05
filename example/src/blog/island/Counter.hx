@@ -1,8 +1,6 @@
-package ex.island;
+package blog.island;
 
 import blok.bridge.*;
-import blok.html.Html;
-import blok.ui.*;
 
 using Breeze;
 

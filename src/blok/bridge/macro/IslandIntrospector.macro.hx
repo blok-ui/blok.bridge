@@ -1,14 +1,12 @@
 package blok.bridge.macro;
 
 import haxe.Json;
-import sys.io.File;
-import haxe.macro.Type.ModuleType;
-import haxe.macro.Compiler;
-import haxe.macro.Expr;
 import haxe.macro.Context;
+import haxe.macro.Type.ModuleType;
+import sys.io.File;
 
-using haxe.macro.Tools;
 using haxe.io.Path;
+using haxe.macro.Tools;
 using sys.FileSystem;
 
 private var initialized:Bool = false;

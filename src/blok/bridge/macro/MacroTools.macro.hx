@@ -1,8 +1,5 @@
 package blok.bridge.macro;
 
-import haxe.macro.Expr;
-import haxe.macro.Context;
-
 using blok.macro.MacroTools;
 
 @:noUsing function isClient() {
