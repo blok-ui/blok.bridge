@@ -43,7 +43,8 @@ function main() {
 						server: new BuildStatic({
 							dependencies: [
 								{name: 'kit.file'},
-								{name: 'toml'}
+								{name: 'toml'},
+								{name: 'markdown'},
 							],
 							flags: {
 								'breeze.output': 'cwd:dist/public/assets/styles_${version.toFileNameSafeString()}'

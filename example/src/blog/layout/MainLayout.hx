@@ -12,7 +12,7 @@ class MainLayout extends Component {
 
 		return Fragment.of([
 			Html.head().child([
-				Html.title().child(['Blogish', pageTitle]),
+				Html.title().child(['Blogish ', pageTitle]),
 				Html.link()
 					.attr('href', app.config.paths.createAssetPath(app.config.applyVersionToFileName('styles.css')))
 					.attr('rel', 'stylesheet')
@@ -42,15 +42,17 @@ class MainLayout extends Component {
 										Flex.gap(3),
 									))
 									.child([
+										Html.li()
+											.child(
+												Archive.link({
+													page: 1
+												}).child('Archive')
+											),
 										Html.li().child(
-											Archive.link({
-												page: 1
-											}).child('Archive')
+											Counter.link({initial: 2}).child('Counter')
 										),
 										Html.li().child(
-											Counter.link({
-												initial: 2
-											}).child('Counter')
+											Post.link({id: '01-first-post'}).child('Post 1')
 										)
 									])
 							])

@@ -2,28 +2,26 @@ package blog.island;
 
 import blok.bridge.*;
 
-using Breeze;
-
 class Counter extends Island {
 	@:signal final count:Int = 0;
 
 	function render():Child {
-		return Html.div({
-			className: Breeze.compose(
+		return Html.div()
+			.style(Breeze.compose(
 				Background.color('black', 0),
 				Typography.textColor('white', 0),
 				Typography.fontWeight('bold'),
 				Spacing.pad(3),
 				Spacing.margin(10),
 				Border.radius(3)
-			)
-		}).child([
-			Html.div().child(count),
-			CounterButton.node({
-				onClick: () -> count.update(i -> i + 1),
-				children: '+'
-			})
-		]);
+			))
+			.child([
+				Html.div().child(count),
+				CounterButton.node({
+					onClick: () -> count.update(i -> i + 1),
+					children: '+'
+				})
+			]);
 	}
 }
 
@@ -33,7 +31,7 @@ class CounterButton extends Component {
 
 	function render() {
 		return Html.button()
-			.attr(ClassName, Breeze.compose(
+			.style(Breeze.compose(
 				Background.color('white', 0),
 				Typography.textColor('red', 500),
 				Typography.fontWeight('bold'),

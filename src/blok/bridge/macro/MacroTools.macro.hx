@@ -1,13 +1,33 @@
 package blok.bridge.macro;
 
-using blok.macro.MacroTools;
+import haxe.macro.Expr;
+import haxe.macro.Context;
 
-@:noUsing function isClient() {
+using StringTools;
+using kit.macro.Tools;
+
+function isClient() {
 	return Context.defined('blok.client');
 }
 
-@:noUsing function isServer() {
+function isServer() {
 	return !isClient();
+}
+
+function getDataDirectory() {
+	return Context.definedValue('blok.paths.data') ?? 'data';
+}
+
+function getPrivateDirectory() {
+	return Context.definedValue('blok.paths.private') ?? 'dist';
+}
+
+function getPublicDirectory() {
+	return Context.definedValue('blok.paths.public') ?? 'dist/public';
+}
+
+function getArtifactsDirectory() {
+	return Context.definedValue('blok.generator.artifacts') ?? 'artifacts';
 }
 
 function extractString(expr:Expr):String {

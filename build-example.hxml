@@ -10,13 +10,14 @@
 -D blok.generator.strategy=DirectoryWithIndexHtmlFile
 -D blok.generator.manifest=blok-bridge-manifest
 -D blok.generator.artifacts=artifacts
--D blok.paths.private=artifacts
+-D blok.paths.private=dist
 -D blok.paths.assets=assets
 -D blok.generator.version=0.0.1
 -D blok.paths.public=dist/public
 -cp artifacts
 -lib kit.file
 -lib toml
+-lib markdown
 -D breeze.output=cwd:dist/public/assets/styles_v0_0_1
 --macro blok.bridge.macro.IslandIntrospector.run()
 -main BridgeGenerate

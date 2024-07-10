@@ -1,5 +1,6 @@
 package blok.bridge.macro;
 
+import blok.bridge.macro.MacroTools;
 import haxe.Json;
 import haxe.macro.Context;
 import haxe.macro.Type.ModuleType;
@@ -29,7 +30,7 @@ function loadManifest():Array<String> {
 
 private function getManifestPath() {
 	var name = Context.definedValue('blok.generator.manifest') ?? '__blok_bridge_manifest';
-	var artifacts = Context.definedValue('blok.generator.artifacts') ?? '__blok_bridge_artifacts';
+	var artifacts = getArtifactsDirectory();
 	return Path.join([getRootPath(), artifacts, name]).withExtension('json');
 }
 
