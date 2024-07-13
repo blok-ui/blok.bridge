@@ -19,6 +19,6 @@
 -lib kit.file
 -lib toml
 -lib markdown
--D breeze.output=cwd:dist/public/assets/styles_v0_0_1
 --macro blok.bridge.macro.IslandIntrospector.run()
+-D breeze.output=cwd:dist/public/assets/styles_v0_0_1
 -main BridgeGenerate

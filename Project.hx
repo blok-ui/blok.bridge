@@ -3,11 +3,10 @@ import blok.bridge.hotdish.*;
 import hotdish.*;
 import hotdish.node.*;
 
+using Kit;
+
 // This is an example of how to use the Hotdish build system
 // to create a Blok Bridge app.
-//
-// Note that this is a bit of a mess: Hotdish is not really ready
-// for use yet.
 function main() {
 	var version = new SemVer(0, 0, 1);
 	var project = new Project({
@@ -47,27 +46,32 @@ function main() {
 								{name: 'toml'},
 								{name: 'markdown'},
 							],
-							flags: {
-								'breeze.output': 'cwd:dist/public/assets/styles_${version.toFileNameSafeString()}'
-							},
 							children: [
-								// We could output our build script somewhere,
-								// but it's simpler just to *Run* it.
-								new Run({}),
-								// We need to also output an HXML file for our
-								// IDE to point at. We want all our dependencies for
-								// server builds here, NOT for client-side stuff.
-								new Hxml({
-									name: 'build-example'
+								new IncludeBreezeCss({
+									children: [
+										// We could output our build script somewhere,
+										// but it's simpler just to *Run* it.
+										new Run({}),
+										// We need to also output a HXML file for our
+										// IDE to point at. We want all our dependencies for
+										// server builds here, NOT for client-side stuff.
+										new Hxml({
+											name: 'build-example'
+										})
+									]
 								})
 							]
 						}),
 						// Configure our client build step. Note that this is optional,
 						// and only needed if we have client-only flags.
 						client: new BuildClient({
-							flags: {
-								'breeze.output': 'none'
-							}
+							children: [
+								new IncludeBreezeCss({
+									children: [
+										new ClientOutput({})
+									]
+								})
+							]
 						})
 					})
 				]
@@ -79,4 +83,38 @@ function main() {
 		case Ok(_): trace('Completed');
 		case Error(error): trace(error.message);
 	});
+}
+
+// This is a simple custom node to show how you might hook your own build steps
+// into Hotdish. In this case, we're adding a node to handle Breeze output.
+class IncludeBreezeCss extends Node {
+	@:prop final children:Array<Node>;
+
+	function build():Array<Node> {
+		// Only output CSS in BuildStatic mode! We can check which build mode we're
+		// in by seeing if there is a parent BuildStatic node.
+		var outputCss = BuildStatic.maybeFrom(this).map(_ -> true).or(false);
+
+		if (!outputCss) return [
+			new Build({
+				flags: {
+					'breeze.output': 'none'
+				},
+				children: children
+			})
+		];
+
+		var config = BlokBridge.from(this).config;
+		var version = config.generator.version;
+		var path = config.paths.createAssetOutputPath('styles_${version.toFileNameSafeString()}');
+
+		return [
+			new Build({
+				flags: {
+					'breeze.output': 'cwd:$path'
+				},
+				children: children
+			})
+		];
+	}
 }

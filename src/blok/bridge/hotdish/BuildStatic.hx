@@ -12,7 +12,7 @@ class BuildStatic extends Node {
 	@:prop final sources:Array<String> = [];
 	@:prop final dependencies:Array<Dependency> = [];
 	@:prop final flags:BuildFlags = new BuildFlags();
-	@:prop final children:Array<Node>;
+	@:prop final children:Array<Node> = [new Run({})];
 
 	public function build():Array<Node> {
 		var config = BlokBridge.from(this).config;

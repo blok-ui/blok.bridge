@@ -7,13 +7,12 @@ import hotdish.node.Build;
 using StringTools;
 using haxe.io.Path;
 
-// @todo: run a minifier here if we're not in dev mode? Might be an option
-// for a child node?
 class BuildClient extends Node {
 	@:prop final main:String = 'BridgeIslands';
 	@:prop final sources:Array<String> = [];
 	@:prop final dependencies:Array<Dependency> = [];
 	@:prop final flags:BuildFlags = new BuildFlags();
+	@:prop final children:Array<Node> = [new ClientOutput({})];
 
 	public function build():Array<Node> {
 		var config = BlokBridge.from(this).config;
@@ -33,12 +32,7 @@ class BuildClient extends Node {
 						flags: flags.merge({
 							'blok.client': true
 						}),
-						children: [
-							new Output({
-								type: Js,
-								output: config.paths.createAssetOutputPath(config.getClientAppName())
-							})
-						]
+						children: children
 					})
 				]
 			})
