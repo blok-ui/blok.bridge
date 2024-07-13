@@ -3,8 +3,6 @@ import blok.bridge.hotdish.*;
 import hotdish.*;
 import hotdish.node.*;
 
-using Kit;
-
 // This is an example of how to use the Hotdish build system
 // to create a Blok Bridge app.
 function main() {

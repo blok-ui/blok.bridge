@@ -1,9 +1,8 @@
 package blog.layout;
 
-import blok.bridge.Island;
+import blog.route.*;
 import blog.ui.Dropdown;
 import blok.bridge.AppContext;
-import blog.route.*;
 
 class MainLayout extends Component {
 	@:attribute final pageTitle:Null<String>;

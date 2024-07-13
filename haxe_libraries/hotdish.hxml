@@ -1,7 +1,7 @@
-# @install: lix --silent download "gh://github.com/wartman/hotdish#83163c8fc636b5ba5289251c3743d43717480efd" into hotdish/0.0.1/github/83163c8fc636b5ba5289251c3743d43717480efd
+# @install: lix --silent download "gh://github.com/wartman/hotdish#b0751d73a6ad83446dfa9d818a340780f1ed10d3" into hotdish/0.0.1/github/b0751d73a6ad83446dfa9d818a340780f1ed10d3
 -lib kit
 -lib kit.cli
 -lib kit.file
 -lib kit.macro
--cp ${HAXE_LIBCACHE}/hotdish/0.0.1/github/83163c8fc636b5ba5289251c3743d43717480efd/src
+-cp ${HAXE_LIBCACHE}/hotdish/0.0.1/github/b0751d73a6ad83446dfa9d818a340780f1ed10d3/src
 -D hotdish=0.0.1
