@@ -14,6 +14,13 @@ function build() {
 				case macro :blok.signal.Signal<$wrappedType>:
 					var name = options.name;
 					Some(options.parser(macro this.$name.get(), name, wrappedType));
+				case macro :blok.ui.Children:
+					var name = options.name;
+					Some({
+						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
+						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
+					});
+				// @todo: handle `blok.ui.Child` as well
 				default:
 					None;
 			},

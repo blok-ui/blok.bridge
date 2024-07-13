@@ -4,6 +4,7 @@ import blog.data.PostStore;
 import blog.layout.MainLayout;
 import blog.post.PostPage;
 import blog.route.*;
+import blog.ui.*;
 import blok.bridge.Bootstrap;
 import blok.context.Provider;
 import blok.router.Router;
@@ -19,7 +20,16 @@ class Routes extends Bootstrap {
 				routes: [
 					new Home(_ -> MainLayout.node({
 						pageTitle: 'Home',
-						children: 'Home page'
+						children: [
+							Collapse.node({
+								header: 'Home',
+								children: [
+									Heading.node({children: 'Hey world!'}),
+									Html.p().child('This is the home page!'),
+									Html.p().child('It can be collapsed.')
+								]
+							})
+						]
 					})),
 					new Archive(params -> MainLayout.node({
 						pageTitle: 'Archives | ${params.page}',

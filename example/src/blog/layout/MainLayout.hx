@@ -1,5 +1,7 @@
 package blog.layout;
 
+import blok.bridge.Island;
+import blog.ui.Dropdown;
 import blok.bridge.AppContext;
 import blog.route.*;
 
@@ -18,6 +20,7 @@ class MainLayout extends Component {
 					.attr('rel', 'stylesheet')
 			]).node(),
 			Html.body().child([
+				Html.div().attr(Id, 'portal'),
 				Html.header()
 					.style(Breeze.compose(
 						Flex.display(),
@@ -52,7 +55,13 @@ class MainLayout extends Component {
 											Counter.link({initial: 2}).child('Counter')
 										),
 										Html.li().child(
-											Post.link({id: '01-first-post'}).child('Post 1')
+											Dropdown.node({
+												label: 'Posts',
+												children: [
+													Post.link({id: '01-first-post'}).child('Post 1').node(),
+													Post.link({id: '02-other-post'}).child('Post 2').node()
+												]
+											})
 										)
 									])
 							])

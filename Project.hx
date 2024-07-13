@@ -28,7 +28,8 @@ function main() {
 					'debug': true
 				},
 				dependencies: [
-					{name: 'breeze'}
+					{name: 'breeze'},
+					{name: 'blok.foundation'}
 				],
 				children: [
 					// Use the BlokBridge node to set up the Bridge app.
