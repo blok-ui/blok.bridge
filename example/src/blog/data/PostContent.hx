@@ -2,10 +2,9 @@ package blog.data;
 
 import blog.ui.Heading;
 import blok.signal.Signal;
-import blok.html.TagCollection;
 
-using StringTools;
 using Markdown;
+using StringTools;
 
 abstract PostContent(Child) from Child to Child {
 	public static function fromJson(data:String):PostContent {
@@ -63,7 +62,7 @@ private function xmlToBlok(node:Xml):Result<Child> {
 			}
 
 			if (allowedHtmlTags.contains(name)) {
-				var type = getTypeForTag(name);
+				var type = Primitive.getTypeForTag(name);
 				var props:{} = {};
 				for (name => value in attrs) {
 					Reflect.setField(props, name, new ReadOnlySignal(value));

@@ -1,7 +1,6 @@
 package blok.bridge;
 
 import blok.signal.Signal;
-import blok.html.TagCollection;
 import blok.ui.*;
 import haxe.Json;
 
@@ -40,11 +39,8 @@ class IslandElement extends Component {
 		#if blok.client
 		return child;
 		#else
-		// IslandContext
-		// 	.maybeFrom(this)
-		// 	.inspect(islands -> islands.registerIsland(component));
 		return new VPrimitive(
-			getTypeForTag(tag),
+			Primitive.getTypeForTag(tag),
 			tag,
 			{
 				'data-component': Signal.ofValue(component),
