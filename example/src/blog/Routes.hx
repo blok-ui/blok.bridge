@@ -2,7 +2,7 @@ package blog;
 
 import blog.data.PostStore;
 import blog.layout.MainLayout;
-import blog.post.PostPage;
+import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
 import blok.bridge.Bootstrap;
@@ -31,17 +31,12 @@ class Routes extends Bootstrap {
 							})
 						]
 					})),
-					new Archive(params -> MainLayout.node({
-						pageTitle: 'Archives | ${params.page}',
-						children: 'Archive page ${params.page}'
-					})),
 					new Counter(params -> MainLayout.node({
 						pageTitle: 'Counter | ${params.initial}',
 						children: blog.island.Counter.node({count: params.initial})
 					})),
-					new Post(params -> PostPage.node({
-						id: params.id
-					}))
+					new Archive(params -> ArchivePage.node({})),
+					new Post(params -> PostPage.node({id: params.id}))
 				],
 				// @todo: we need a real 404 page, as we'll have to output that to the server.
 				fallback: _ -> 'Not found'

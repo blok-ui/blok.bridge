@@ -93,8 +93,7 @@ class IncludeBreezeCss extends Node {
 		var output = switch BuildStatic.maybeFrom(this) {
 			case Some(_):
 				var config = BlokBridge.from(this).config;
-				var version = config.generator.version;
-				var path = config.paths.createAssetOutputPath('styles_${version.toFileNameSafeString()}');
+				var path = config.paths.createAssetOutputPath(config.applyVersionToFileName('styles.css'));
 				'cwd:$path';
 			case None:
 				'none';

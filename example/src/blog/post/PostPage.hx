@@ -5,7 +5,7 @@ import blog.data.*;
 
 class PostPage extends Component {
 	@:attribute final id:String;
-	@:resource final post:Post = PostStore.from(this).getPost(id);
+	@:resource final post:Post = PostStore.from(this).get(id);
 
 	function render():Child {
 		return MainLayout.node({

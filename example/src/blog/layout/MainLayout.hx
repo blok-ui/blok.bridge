@@ -1,12 +1,14 @@
 package blog.layout;
 
 import blog.route.*;
+import blog.data.*;
 import blog.ui.Dropdown;
 import blok.bridge.AppContext;
 
 class MainLayout extends Component {
 	@:attribute final pageTitle:Null<String>;
 	@:attribute final children:Children;
+	@:resource final posts:Array<Post> = PostStore.from(this).all();
 
 	function render():Child {
 		var app = AppContext.from(this);
@@ -18,6 +20,7 @@ class MainLayout extends Component {
 					.attr('href', app.config.paths.createAssetPath(app.config.applyVersionToFileName('styles.css')))
 					.attr('rel', 'stylesheet')
 			]).node(),
+
 			Html.body().child([
 				Html.div().attr(Id, 'portal'),
 				Html.header()
@@ -42,6 +45,8 @@ class MainLayout extends Component {
 										Flex.display(),
 										Flex.direction('row'),
 										Flex.gap(3),
+										Flex.alignItems('center'),
+										Sizing.height('full')
 									))
 									.child([
 										Html.li()
@@ -56,9 +61,8 @@ class MainLayout extends Component {
 										Html.li().child(
 											Dropdown.node({
 												label: 'Posts',
-												children: [
-													Post.link({id: '01-first-post'}).child('Post 1').node(),
-													Post.link({id: '02-other-post'}).child('Post 2').node()
+												children: [for (post in posts())
+													blog.route.Post.link({id: post.slug}).child(post.title).node()
 												]
 											})
 										)

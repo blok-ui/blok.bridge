@@ -1,5 +1,5 @@
 ---
-slug = "first-post"
+slug = "01-first-post"
 title = "First Post"
 published = "true"
 date = "2024/07/05"
