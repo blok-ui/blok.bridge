@@ -1,7 +1,6 @@
 # THIS IS A GENERATED FILE. DO NOT EDIT.
 
 -cp example/src
--lib breeze
 -lib blok.foundation
 -D analyzer-optimize
 -dce full
@@ -20,5 +19,6 @@
 -lib toml
 -lib markdown
 --macro blok.bridge.macro.IslandIntrospector.run()
+-lib breeze
 -D breeze.output=cwd:dist/public/assets/styles_v0_0_1
 -main BridgeGenerate

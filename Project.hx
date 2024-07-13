@@ -25,7 +25,6 @@ function main() {
 					'debug': true
 				},
 				dependencies: [
-					{name: 'breeze'},
 					{name: 'blok.foundation'}
 				],
 				children: [
@@ -91,25 +90,23 @@ class IncludeBreezeCss extends Node {
 	function build():Array<Node> {
 		// Only output CSS in BuildStatic mode! We can check which build mode we're
 		// in by seeing if there is a parent BuildStatic node.
-		var outputCss = BuildStatic.maybeFrom(this).map(_ -> true).or(false);
-
-		if (!outputCss) return [
-			new Build({
-				flags: {
-					'breeze.output': 'none'
-				},
-				children: children
-			})
-		];
-
-		var config = BlokBridge.from(this).config;
-		var version = config.generator.version;
-		var path = config.paths.createAssetOutputPath('styles_${version.toFileNameSafeString()}');
+		var output = switch BuildStatic.maybeFrom(this) {
+			case Some(_):
+				var config = BlokBridge.from(this).config;
+				var version = config.generator.version;
+				var path = config.paths.createAssetOutputPath('styles_${version.toFileNameSafeString()}');
+				'cwd:$path';
+			case None:
+				'none';
+		}
 
 		return [
 			new Build({
+				dependencies: [
+					{name: 'breeze'},
+				],
 				flags: {
-					'breeze.output': 'cwd:$path'
+					'breeze.output': output
 				},
 				children: children
 			})
