@@ -75,12 +75,21 @@ class Generator {
 			}
 
 			function sendHtml(path:String, document:ElementPrimitive) {
-				var head = document.children.find(el -> el.as(ElementPrimitive)?.tag == 'head')?.toString({includeTextMarkers: false}) ?? '<head></head>';
-				var body = document.children.find(el -> el.as(ElementPrimitive)?.tag == 'body')?.toString({includeTextMarkers: true}) ?? '<body></body>';
-				var html = new HtmlAsset(path, '<!doctype html><html>${head}${body}</html>');
+				var html = document.children.find(el -> el.as(ElementPrimitive)?.tag == 'html') ?? document;
+				var head = html.children.find(el -> el.as(ElementPrimitive)?.tag == 'head')?.toString({includeTextMarkers: false}) ?? '<head></head>';
+				var body = html.children
+					.find(el -> el.as(ElementPrimitive)?.tag == 'body')
+					.toMaybe()
+					.map(body -> body.as(ElementPrimitive))
+					.map(injectClientScript)
+					.map(body -> body.toString({
+						includeTextMarkers: true
+					}))
+					.or('<body></body>');
+				var output = new HtmlAsset(path, '<!doctype html><html>${head}${body}</html>');
 
 				root?.dispose();
-				activate(Ok(html));
+				activate(Ok(output));
 			}
 
 			root = mount(document, () -> Provider
@@ -103,6 +112,15 @@ class Generator {
 				sendHtml(path, document);
 			}
 		});
+	}
+
+	function injectClientScript(body:ElementPrimitive) {
+		var script = new ElementPrimitive('script', {
+			defer: true,
+			src: config.paths.createAssetPath(config.getClientAppName())
+		});
+		body.append(script);
+		return body;
 	}
 
 	inline function createAppContext() {

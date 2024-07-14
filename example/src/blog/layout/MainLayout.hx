@@ -13,7 +13,7 @@ class MainLayout extends Component {
 	function render():Child {
 		var app = AppContext.from(this);
 
-		return Fragment.of([
+		return Html.html().child([
 			Html.head().child([
 				Html.title().child(['Blogish ', pageTitle]),
 				Html.link()
@@ -77,9 +77,7 @@ class MainLayout extends Component {
 						Sizing.width('100%'),
 						Breakpoint.viewport('900px', Sizing.width('900px'))
 					))
-					.child(children),
-				Html.script()
-					.attr('src', app.config.paths.createAssetPath(app.config.getClientAppName()))
+					.child(children)
 			])
 		]);
 	}

@@ -60,7 +60,7 @@ function main() {
 							]
 						}),
 						// Configure our client build step. Note that this is optional,
-						// and only needed if we have client-only flags.
+						// and only needed if we have client-only setup we want to do.
 						client: new BuildClient({
 							children: [
 								new IncludeBreezeCss({
@@ -76,10 +76,8 @@ function main() {
 		]
 	});
 
-	project.run().handle(result -> switch result {
-		case Ok(_): trace('Completed');
-		case Error(error): trace(error.message);
-	});
+	project.run()
+		.handle(result -> result.inspect(_ -> trace('Compiled')).orThrow());
 }
 
 // This is a simple custom node to show how you might hook your own build steps
@@ -88,24 +86,19 @@ class IncludeBreezeCss extends Node {
 	@:prop final children:Array<Node>;
 
 	function build():Array<Node> {
-		// Only output CSS in BuildStatic mode! We can check which build mode we're
-		// in by seeing if there is a parent BuildStatic node.
-		var output = switch BuildStatic.maybeFrom(this) {
-			case Some(_):
-				var config = BlokBridge.from(this).config;
-				var path = config.paths.createAssetOutputPath(config.applyVersionToFileName('styles.css'));
-				'cwd:$path';
-			case None:
-				'none';
-		}
-
 		return [
 			new Build({
 				dependencies: [
 					{name: 'breeze'},
 				],
 				flags: {
-					'breeze.output': output
+					// Only output CSS when we're building the static app! We can check which build mode we're
+					// in by seeing if there is a parent BuildStatic node.
+					'breeze.output': BuildStatic.maybeFrom(this).map(_ -> {
+						var config = BlokBridge.from(this).config;
+						var path = config.paths.createAssetOutputPath(config.applyVersionToFileName('styles.css'));
+						'cwd:$path';
+					}).or('none')
 				},
 				children: children
 			})

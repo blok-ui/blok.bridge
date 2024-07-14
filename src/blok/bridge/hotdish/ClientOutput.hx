@@ -1,6 +1,6 @@
 package blok.bridge.hotdish;
 
-import hotdish.node.Output;
+import hotdish.node.*;
 import hotdish.Node;
 
 class ClientOutput extends Node {
@@ -9,10 +9,17 @@ class ClientOutput extends Node {
 	public function build():Array<Node> {
 		var config = BlokBridge.from(this).config;
 		return [
-			new Output({
-				type: Js,
-				output: config.paths.createAssetOutputPath(config.getClientAppName()),
-				children: children
+			new Build({
+				flags: {
+					'js-es': '6'
+				},
+				children: [
+					new Output({
+						type: Js,
+						output: config.paths.createAssetOutputPath(config.getClientAppName()),
+						children: children
+					})
+				]
 			})
 		];
 	}

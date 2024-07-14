@@ -21,7 +21,7 @@ class AppConfig implements Config {
 		});
 	}
 
-	@:prop public final generator:GeneratorConfig;
+	@:prop public final generator:GeneratorConfig = new GeneratorConfig({});
 	@:prop public final paths:PathsConfig = new PathsConfig({});
 
 	@:json(from = SerializableMap.fromJson(value), to = value.toJson())

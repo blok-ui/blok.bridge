@@ -4,7 +4,7 @@ import hotdish.node.*;
 import hotdish.Node;
 
 class BlokBridge extends Node {
-	@:prop public final config:AppConfig;
+	@:prop public final config:AppConfig = new AppConfig({});
 
 	@:prop final server:BuildStatic;
 	@:prop final client:BuildClient = new BuildClient({});
