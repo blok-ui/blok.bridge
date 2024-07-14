@@ -19,10 +19,10 @@ In the future it might also be possible to use Bridge with server-side rendering
 Behind the scenes, Bridge apps are not straightforward to compile. Here's a basic overview of the steps it needs to complete each time you build an app:
 
 - Run (or compile) Haxe code.
-	- Generate and output static HTML.
-	- Gather all Islands used during compilation using a macro.
-		- Generate a `main` function for the client that hydrates all the Islands found in the app.
-			- Compile the client-side code using this generated `main` function.
+  - Generate and output static HTML.
+  - Gather all Islands used during compilation using a macro.
+    - Generate a `main` function for the client that hydrates all the Islands found in the app.
+      - Compile the client-side code using this generated `main` function.
 
 This is in addition to handling any other assets the user may have added, like CSS and images, and placing them in the right place.
 
@@ -46,32 +46,32 @@ import hotdish.*;
 import hotdish.node.*;
 
 function main() {
-	var project = new Project({
-		name: 'example',
-		version: new SemVer(0, 0, 1),
-		url: '',
-		contributors: ['wartman'],
-		license: 'MIT',
-		description: 'Some example app',
-		releasenote: 'Some note about this release',
-		children: [
-			new Build({
-				sources: ['src'],
-				children: [
-					new BlokBridge({
-						server: new BuildStatic({
-							children: [
-								new Hxml({ name: 'build-app' }),
-								new HaxeLib({}),
-								new Run({})
-							]
-						})
-					})
-				]
-			})
-		]
-	});
-	project.run();
+  var project = new Project({
+    name: 'example',
+    version: new SemVer(0, 0, 1),
+    url: '',
+    contributors: ['wartman'],
+    license: 'MIT',
+    description: 'Some example app',
+    releasenote: 'Some note about this release',
+    children: [
+      new Build({
+        sources: ['src'],
+        children: [
+          new BlokBridge({
+            server: new BuildStatic({
+              children: [
+                new Hxml({ name: 'build-app' }),
+                new HaxeLib({}),
+                new Run({})
+              ]
+            })
+          })
+        ]
+      })
+    ]
+  });
+  project.run();
 }
 ```
 
@@ -83,17 +83,17 @@ import blok.html.Html;
 import blok.bridge.Bootstrap;
 
 class Routes extends Bootstrap {
-	public function start():Child {
-		return Html.view(<html>
-			<head>
-				<title>"Example"</title>
-			</head>
-			<body>
-				<h1>"Hello world"</h1>
-				<p>"Hey world."</p>
-			</body>
-		</html>);
-	}
+  public function start():Child {
+    return Html.view(<html>
+      <head>
+        <title>"Example"</title>
+      </head>
+      <body>
+        <h1>"Hello world"</h1>
+        <p>"Hey world."</p>
+      </body>
+    </html>);
+  }
 }
 ```
 
@@ -112,39 +112,39 @@ import blok.router.*;
 import blok.bridge.Bootstrap;
 
 class Routes extends Bootstrap {
-	function start():Child {
-		return Html.view(<html>
-			<head>
-				<title>"Example"</title>
-			</head>
-			<body>
-				<header>
-					<h3><Link url="/">"Example"</Link></h3>
-					<nav>
-						<ul>
-							<li><Link url="/counter/1">"Start at 1"</Link></li>
-							<li><Link url="/counter/2">"Start at 2"</Link></li>
-						</ul>
-					</nav>
-				</header>
-				<Router>
-					<Route to="/">
-						{_ -> <div>
-							<h1>"Home"</h1>
-							<p>"Hello world"</p>
-						</div>}
-					</Route>
-					<Route to="/counter/{count:Int}">
-						{params -> <div>
-							<h1>"Counting " {params.count}</h1>
-							<p>"Counter"</p>
-						</div>}
-					</Route>
-					<fallback>{_ -> "Not found"}</fallback>
-				</Router>
-			</body>
-		</html>);
-	}
+  function start():Child {
+    return Html.view(<html>
+      <head>
+        <title>"Example"</title>
+      </head>
+      <body>
+        <header>
+          <h3><Link url="/">"Example"</Link></h3>
+          <nav>
+            <ul>
+              <li><Link url="/counter/1">"Start at 1"</Link></li>
+              <li><Link url="/counter/2">"Start at 2"</Link></li>
+            </ul>
+          </nav>
+        </header>
+        <Router>
+          <Route to="/">
+            {_ -> <div>
+              <h1>"Home"</h1>
+              <p>"Hello world"</p>
+            </div>}
+          </Route>
+          <Route to="/counter/{count:Int}">
+            {params -> <div>
+              <h1>"Counting " {params.count}</h1>
+              <p>"Counter"</p>
+            </div>}
+          </Route>
+          <fallback>{_ -> "Not found"}</fallback>
+        </Router>
+      </body>
+    </html>);
+  }
 }
 ```
 
@@ -164,14 +164,14 @@ import blok.ui.*;
 import blok.html.Html;
 
 class Counter extends Island {
-	@:signal final count:Int = 0;
+  @:signal final count:Int = 0;
 
-	function render():Child {
-		return Html.view(<div>
-			<p>count</p>
-			<button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
-		</div>);
-	}
+  function render():Child {
+    return Html.view(<div>
+      <p>count</p>
+      <button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
+    </div>);
+  }
 }
 ```
 
@@ -184,40 +184,40 @@ import blok.router.*;
 import blok.bridge.Bootstrap;
 
 class Routes extends Bootstrap {
-	function start():Child {
-		return Html.view(<html>
-			<head>
-				<title>"Example"</title>
-			</head>
-			<body>
-				<header>
-					<h3><Link url="/">"Example"</Link></h3>
-					<nav>
-						<ul>
-							<li><Link url="/counter/1">"Start at 1"</Link></li>
-							<li><Link url="/counter/2">"Start at 2"</Link></li>
-						</ul>
-					</nav>
-				</header>
-				<Router>
-					<Route to="/">
-						{_ -> <div>
-							<h1>"Home"</h1>
-							<p>"Hello world"</p>
-						</div>}
-					</Route>
-					<Route to="/counter/{count:Int}">
-						{params -> <div>
-							<h1>"Counting " {params.count}</h1>
-							// Add our Counter here:
-							<Counter count={params.count} />
-						</div>}
-					</Route>
-					<fallback>{_ -> "Not found"}</fallback>
-				</Router>
-			</body>
-		</html>);
-	}
+  function start():Child {
+    return Html.view(<html>
+      <head>
+        <title>"Example"</title>
+      </head>
+      <body>
+        <header>
+          <h3><Link url="/">"Example"</Link></h3>
+          <nav>
+            <ul>
+              <li><Link url="/counter/1">"Start at 1"</Link></li>
+              <li><Link url="/counter/2">"Start at 2"</Link></li>
+            </ul>
+          </nav>
+        </header>
+        <Router>
+          <Route to="/">
+            {_ -> <div>
+              <h1>"Home"</h1>
+              <p>"Hello world"</p>
+            </div>}
+          </Route>
+          <Route to="/counter/{count:Int}">
+            {params -> <div>
+              <h1>"Counting " {params.count}</h1>
+              // Add our Counter here:
+              <Counter count={params.count} />
+            </div>}
+          </Route>
+          <fallback>{_ -> "Not found"}</fallback>
+        </Router>
+      </body>
+    </html>);
+  }
 }
 ```
 
@@ -235,15 +235,15 @@ import blok.ui.*;
 import blok.html.Html;
 
 class Counter extends Island {
-	@:signal final count:Int = 0;
-	@:attribute final label:Children;
+  @:signal final count:Int = 0;
+  @:attribute final label:Children;
 
-	function render():Child {
-		return Html.view(<div>
-			<p>{label} ": " {count}</p>
-			<button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
-		</div>);
-	}
+  function render():Child {
+    return Html.view(<div>
+      <p>{label} ": " {count}</p>
+      <button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
+    </div>);
+  }
 }
 ```
 
@@ -254,11 +254,11 @@ import blok.ui.*;
 import blok.html.Html;
 
 class Label extends Component {
-	@:children @:attribute final child:Child;
-	
-	function render() {
-		return Html.view(<b>child</b>);
-	}
+  @:children @:attribute final child:Child;
+  
+  function render() {
+    return Html.view(<b>child</b>);
+  }
 }
 ```
 
@@ -266,10 +266,10 @@ Now lets update our counter route:
 
 ```haxe
 <Route to="/counter/{count:Int}">
-	{params -> <div>
-		<h1>"Counting " {params.count}</h1>
-		<Counter label={<Label>"Starting count at:" {params.count}</Label>} count={params.count} />
-	</div>}
+  {params -> <div>
+    <h1>"Counting " {params.count}</h1>
+    <Counter label={<Label>"Starting count at:" {params.count}</Label>} count={params.count} />
+  </div>}
 </Route>
 ```
 
