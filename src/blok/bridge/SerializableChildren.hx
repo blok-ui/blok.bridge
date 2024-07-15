@@ -44,15 +44,17 @@ function toJson(parent:View, children:Children):Array<SerializedPrimitive> {
 }
 #else
 function toJson(parent:View, children:Children):Array<SerializedPrimitive> {
-	var adaptor = parent.getAdaptor();
-	var node:blok.html.server.NodePrimitive = adaptor.createContainerNode({});
-	var portal = Portal.wrap(node, () -> children).createComponent();
+	var node = new ElementPrimitive('#fragment', {});
+	var root = Root.node({
+		target: node,
+		child: () -> children
+	}).createComponent();
 
-	portal.mount(adaptor, parent, null);
+	root.mount(new ServerAdaptor(), parent, null);
 
 	var serialized:Array<SerializedPrimitive> = node.children.map(serializePrimitive).filter(n -> n != null);
 
-	portal.dispose();
+	root.dispose();
 
 	return serialized;
 }
