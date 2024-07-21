@@ -18,7 +18,7 @@ class Routes extends Bootstrap {
 			.provide(() -> new PostStore(fs.directory('example/data/post')))
 			.child(_ -> Router.node({
 				routes: [
-					new Home(_ -> MainLayout.node({
+					new HomeRoute(_ -> MainLayout.node({
 						pageTitle: 'Home',
 						children: [
 							Collapse.node({
@@ -31,12 +31,12 @@ class Routes extends Bootstrap {
 							})
 						]
 					})),
-					new Counter(params -> MainLayout.node({
+					new CounterRoute(params -> MainLayout.node({
 						pageTitle: 'Counter | ${params.initial}',
 						children: blog.island.Counter.node({count: params.initial})
 					})),
-					new Archive(params -> ArchivePage.node({})),
-					new Post(params -> PostPage.node({id: params.id}))
+					new ArchiveRoute(params -> ArchivePage.node({})),
+					new PostRoute({})
 				],
 				// @todo: we need a real 404 page, as we'll have to output that to the server.
 				fallback: _ -> 'Not found'

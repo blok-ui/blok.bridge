@@ -35,7 +35,7 @@ class MainLayout extends Component {
 						Typography.textColor('white', 0),
 					))
 					.child([
-						Home.link({})
+						HomeRoute.link({})
 							.child(Html.h3().child('Blogish')),
 
 						Html.nav()
@@ -51,18 +51,18 @@ class MainLayout extends Component {
 									.child([
 										Html.li()
 											.child(
-												Archive.link({
+												ArchiveRoute.link({
 													page: 1
 												}).child('Archive')
 											),
 										Html.li().child(
-											Counter.link({initial: 2}).child('Counter')
+											CounterRoute.link({initial: 2}).child('Counter')
 										),
 										Html.li().child(
 											Dropdown.node({
 												label: 'Posts',
 												children: [for (post in posts())
-													blog.route.Post.link({id: post.slug}).child(post.title).node()
+													PostRoute.link({id: post.slug}).child(post.title).node()
 												]
 											})
 										)
