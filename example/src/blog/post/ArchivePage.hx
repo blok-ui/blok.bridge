@@ -5,7 +5,8 @@ import blog.layout.MainLayout;
 import blog.route.PostRoute;
 
 class ArchivePage extends Component {
-	@:resource final posts:Array<Post> = PostStore.from(this).all();
+	@:context final store:PostStore;
+	@:resource final posts:Array<Post> = store.all();
 
 	function render():Child {
 		return MainLayout.node({
