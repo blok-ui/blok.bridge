@@ -1,4 +1,3 @@
-import blok.bridge.*;
 import blok.bridge.hotdish.*;
 import hotdish.*;
 import hotdish.node.*;
@@ -8,23 +7,21 @@ import hotdish.node.*;
 class IncludeBreezeCss extends Node {
 	@:prop final children:Array<Node>;
 
-	function build():Array<Node> {
-		return [
-			new Build({
-				dependencies: [
-					{name: 'breeze'},
-				],
-				flags: {
-					// Only output CSS when we're building the static app! We can check which build mode we're
-					// in by seeing if there is a parent BuildStatic node.
-					'breeze.output': BuildStatic.maybeFrom(this).map(_ -> {
-						var config = BlokBridge.from(this).config;
-						var path = config.paths.createAssetOutputPath(config.applyVersionToFileName('styles.css'));
-						'cwd:$path';
-					}).or('none')
-				},
-				children: children
-			})
-		];
-	}
+	function build():Array<Node> return [
+		new Build({
+			dependencies: [
+				{name: 'breeze'},
+			],
+			flags: {
+				// Only output CSS when we're building the static app! We can check which build mode we're
+				// in by seeing if there is a parent BuildStatic node.
+				'breeze.output': BuildStatic.maybeFrom(this).map(_ -> {
+					var config = BlokBridge.from(this).config;
+					var path = config.paths.createAssetOutputPath(config.applyVersionToFileName('styles.css'));
+					'cwd:$path';
+				}).or('none')
+			},
+			children: children
+		})
+	];
 }
