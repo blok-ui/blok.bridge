@@ -9,8 +9,8 @@ using haxe.macro.Tools;
 
 function build() {
 	return ClassBuilder.fromContext()
-		.use(new ComponentBuilder())
-		.step(new JsonSerializerBuildStep({
+		.addBundle(new ComponentBuilder())
+		.addStep(new JsonSerializerBuildStep({
 			customParser: options -> switch options.type.toType().toComplexType() {
 				case macro :blok.signal.Signal<$wrappedType>:
 					var name = options.name;
@@ -28,7 +28,7 @@ function build() {
 			constructorAccessor: macro node,
 			returnType: macro :blok.ui.Child
 		}))
-		.step(new IslandBuilder())
+		.addStep(new IslandBuilder())
 		.export();
 }
 

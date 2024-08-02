@@ -7,7 +7,7 @@ import kit.macro.step.*;
 using kit.macro.Tools;
 
 function build() {
-	return ClassBuilder.fromContext().use(new ConfigBuilder()).export();
+	return ClassBuilder.fromContext().addBundle(new ConfigBuilder()).export();
 }
 
 class ConfigBuilder implements BuildBundle implements BuildStep {
