@@ -7,17 +7,19 @@ import kit.macro.step.*;
 using kit.macro.Tools;
 
 function build() {
-	return ClassBuilder.fromContext()
-		.step(new ConfigBuilder())
-		.step(new JsonSerializerBuildStep({}))
-		.step(new ConstructorBuildStep({}))
-		.export();
+	return ClassBuilder.fromContext().use(new ConfigBuilder()).export();
 }
 
-class ConfigBuilder implements BuildStep {
+class ConfigBuilder implements BuildBundle implements BuildStep {
 	public final priority:Priority = Normal;
 
 	public function new() {}
+
+	public function steps():Array<BuildStep> return [
+		new JsonSerializerBuildStep({}),
+		new ConstructorBuildStep({}),
+		this
+	];
 
 	public function apply(builder:ClassBuilder) {
 		for (field in builder.findFieldsByMeta(':prop')) {

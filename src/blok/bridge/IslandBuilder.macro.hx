@@ -2,13 +2,14 @@ package blok.bridge;
 
 import kit.macro.*;
 import kit.macro.step.*;
-import blok.ui.ComponentBuilder.createComponentBuilder;
+import blok.ui.ComponentBuilder;
 
 using Lambda;
 using haxe.macro.Tools;
 
 function build() {
-	return createComponentBuilder()
+	return ClassBuilder.fromContext()
+		.use(new ComponentBuilder())
 		.step(new JsonSerializerBuildStep({
 			customParser: options -> switch options.type.toType().toComplexType() {
 				case macro :blok.signal.Signal<$wrappedType>:
