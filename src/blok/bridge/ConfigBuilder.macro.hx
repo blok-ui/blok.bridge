@@ -6,14 +6,12 @@ import kit.macro.step.*;
 
 using kit.macro.Tools;
 
-final factory = new ClassBuilderFactory([
-	new ConfigBuilder(),
-	new JsonSerializerBuildStep({}),
-	new ConstructorBuildStep({})
-]);
-
 function build() {
-	return factory.fromContext().export();
+	return ClassBuilder.fromContext()
+		.step(new ConfigBuilder())
+		.step(new JsonSerializerBuildStep({}))
+		.step(new ConstructorBuildStep({}))
+		.export();
 }
 
 class ConfigBuilder implements BuildStep {

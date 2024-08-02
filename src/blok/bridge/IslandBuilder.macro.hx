@@ -2,14 +2,14 @@ package blok.bridge;
 
 import kit.macro.*;
 import kit.macro.step.*;
-import blok.ui.ComponentBuilder.factory;
+import blok.ui.ComponentBuilder.createComponentBuilder;
 
 using Lambda;
 using haxe.macro.Tools;
 
 function build() {
-	return factory.withSteps(
-		new JsonSerializerBuildStep({
+	return createComponentBuilder()
+		.step(new JsonSerializerBuildStep({
 			customParser: options -> switch options.type.toType().toComplexType() {
 				case macro :blok.signal.Signal<$wrappedType>:
 					var name = options.name;
@@ -26,9 +26,9 @@ function build() {
 			},
 			constructorAccessor: macro node,
 			returnType: macro :blok.ui.Child
-		}),
-		new IslandBuilder()
-	).fromContext().export();
+		}))
+		.step(new IslandBuilder())
+		.export();
 }
 
 class IslandBuilder implements BuildStep {

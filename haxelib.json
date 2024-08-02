@@ -4,14 +4,13 @@
   "classPath": "src",
   "tags": ["ui"],
   "contributors": ["wartman"],
-  "version": "0.0.1",
-  "releasenote": "First release",
+  "version": "0.0.2",
+  "releasenote": "Update kit",
   "dependencies": {
     "hotdish": "0.0.1",
     "blok.core": "0.9.0",
     "blok.router": "0.0.0",
     "kit.file": "0.1.0",
-    "kit.cli": "0.0.1",
     "toml": "0.0.1"
   }
 }

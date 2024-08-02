@@ -33,9 +33,7 @@ function fromJson(data:Array<SerializedPrimitive>):Children {
 				props,
 				fromJson(child.children)
 			);
-	}
-
-	];
+	}];
 }
 
 #if blok.client
