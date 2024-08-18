@@ -1,9 +1,11 @@
-package blok.bridge.asset;
+package blok.bridge.generate;
+
+import kit.file.Directory;
 
 using StringTools;
 using haxe.io.Path;
 
-class HtmlAsset implements Asset {
+class GeneratedHtml {
 	final path:String;
 	final html:String;
 
@@ -12,29 +14,25 @@ class HtmlAsset implements Asset {
 		this.html = html;
 	}
 
-	public function getIdentifier():Null<String> {
-		return '__blok.html<${path}>';
-	}
-
 	public function toString() {
 		return html;
 	}
 
-	public function process(app:AppContext):Task<Nothing> {
+	public function output(strategy:HtmlGenerationStrategy, output:Directory):Task<Nothing> {
 		var path = path.trim().normalize();
 		if (path.startsWith('/')) path = path.substr(1);
 
-		return switch app.config.generator.strategy {
+		return switch strategy {
 			case DirectoryWithIndexHtmlFile:
-				app.publicDirectory
+				output
 					.file(Path.join([path, 'index.html']))
 					.write(toString());
 			case NamedHtmlFile if (path == ''):
-				app.publicDirectory
-					.file('index.hxml')
+				output
+					.file('index.html')
 					.write(toString());
 			case NamedHtmlFile:
-				app.publicDirectory
+				output
 					.file(path.withExtension('html'))
 					.write(toString());
 		}

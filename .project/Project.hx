@@ -1,5 +1,5 @@
-import blok.bridge.*;
 import blok.bridge.hotdish.*;
+import blok.bridge.plugin.*;
 import hotdish.*;
 import hotdish.node.*;
 
@@ -28,15 +28,11 @@ function main() {
 					{name: 'blok.foundation'}
 				],
 				children: [
-					// Use the BlokBridge node to set up the Bridge app.
-					new BlokBridge({
-						config: new AppConfig({
-							generator: new GeneratorConfig({
-								bootstrap: 'blog.Routes',
-								version: version
-							})
-						}),
-						// Configure our Static file build.
+					// Use the BuildBridge node to set up the Bridge app.
+					new BuildBridge({
+						bootstrap: 'blog.Blog',
+						version: version,
+						// Configure our Static build.
 						server: new BuildStatic({
 							dependencies: [
 								{name: 'kit.file'},

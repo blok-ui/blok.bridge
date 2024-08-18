@@ -6,7 +6,7 @@
 # Instead, use the `build-example.hxml` file generated during
 # the build process.
 
--cp project
+-cp .project
 
 --debug
 

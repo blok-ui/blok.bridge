@@ -1,6 +1,6 @@
 package blok.bridge.macro;
 
-import blok.bridge.macro.MacroTools;
+import blok.bridge.Constants;
 import haxe.Json;
 import haxe.macro.Context;
 import haxe.macro.Type.ModuleType;
@@ -29,17 +29,11 @@ function loadManifest():Array<String> {
 }
 
 private function getManifestPath() {
-	var name = Context.definedValue('blok.generator.manifest') ?? '__blok_bridge_manifest';
-	var artifacts = getArtifactsDirectory();
-	return Path.join([getRootPath(), artifacts, name]).withExtension('json');
-}
-
-private function getRootPath() {
-	var output = Sys.getCwd();
-	if (output.extension().length != 0) {
-		return output.directory();
+	var root = Sys.getCwd();
+	if (root.extension().length != 0) {
+		root = root.directory();
 	}
-	return output;
+	return Path.join([root, DotBridge, Manifest]).withExtension('json');
 }
 
 private function gatherIslands(types:Array<ModuleType>) {
@@ -61,10 +55,6 @@ private function exportManifest(islands:Array<String>) {
 	File.saveContent(path, Json.stringify({
 		islands: islands
 	}));
-}
-
-private function getExportFilename() {
-	var name = Context.definedValue('blok.bridge.manifest') ?? '__blok_bridge_manifest';
 }
 
 private function ensureDir(path:String) {

@@ -1,9 +1,9 @@
 package blog.layout;
 
+import blok.bridge.App;
 import blog.route.*;
 import blog.data.*;
 import blog.ui.Dropdown;
-import blok.bridge.AppContext;
 
 class MainLayout extends Component {
 	@:attribute final pageTitle:Null<String>;
@@ -11,13 +11,14 @@ class MainLayout extends Component {
 	@:resource final posts:Array<Post> = PostStore.from(this).all();
 
 	function render():Child {
-		var app = AppContext.from(this);
+		var app = App.from(this);
 
 		return Html.html().child([
 			Html.head().child([
 				Html.title().child(['Blogish ', pageTitle]),
+				// @todo: Try to come up with a way this can be injected by the Hotdish build step.
 				Html.link()
-					.attr('href', app.config.paths.createAssetPath(app.config.applyVersionToFileName('styles.css')))
+					.attr('href', app.paths.formatAssetPath('styles-${app.version.toFileNameSafeString()}.css'))
 					.attr('rel', 'stylesheet')
 			]).node(),
 

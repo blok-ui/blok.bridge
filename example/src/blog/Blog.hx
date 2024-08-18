@@ -5,17 +5,16 @@ import blog.layout.MainLayout;
 import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
-import blok.bridge.Bootstrap;
+import blok.bridge.App;
 import blok.context.Provider;
 import blok.router.Router;
-import kit.file.FileSystem;
-import kit.file.adaptor.SysAdaptor;
 
-class Routes extends Bootstrap {
-	public function start():Child {
-		var fs = new FileSystem(new SysAdaptor(Sys.getCwd()));
+class Blog extends Component {
+	@:context final app:App;
+
+	public function render():Child {
 		return Provider
-			.provide(() -> new PostStore(fs.directory('example/data/post')))
+			.provide(() -> new PostStore(app.fs.directory('example/data/post')))
 			.child(_ -> Router.node({
 				routes: [
 					new HomeRoute(_ -> MainLayout.node({

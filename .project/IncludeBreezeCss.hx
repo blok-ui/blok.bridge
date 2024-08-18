@@ -8,6 +8,7 @@ class IncludeBreezeCss extends Node {
 	@:prop final children:Array<Node>;
 
 	function build():Array<Node> return [
+		// @todo: It would be really cool if we could add plugins here.
 		new Build({
 			dependencies: [
 				{name: 'breeze'},
@@ -16,8 +17,8 @@ class IncludeBreezeCss extends Node {
 				// Only output CSS when we're building the static app! We can check which build mode we're
 				// in by seeing if there is a parent BuildStatic node.
 				'breeze.output': BuildStatic.maybeFrom(this).map(_ -> {
-					var config = BlokBridge.from(this).config;
-					var path = config.paths.createAssetOutputPath(config.applyVersionToFileName('styles.css'));
+					var bridge = BuildBridge.from(this);
+					var path = bridge.formatAssetOutputPath('styles-${bridge.version.toFileNameSafeString()}.css');
 					'cwd:$path';
 				}).or('none')
 			},

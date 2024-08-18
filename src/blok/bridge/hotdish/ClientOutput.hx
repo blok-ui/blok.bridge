@@ -7,7 +7,7 @@ class ClientOutput extends Node {
 	@:prop final children:Array<Node> = [];
 
 	public function build():Array<Node> {
-		var config = BlokBridge.from(this).config;
+		var bridge = BuildBridge.from(this);
 		return [
 			new Build({
 				flags: {
@@ -16,7 +16,7 @@ class ClientOutput extends Node {
 				children: [
 					new Output({
 						type: Js,
-						output: config.paths.createAssetOutputPath(config.getClientAppName()),
+						output: bridge.getClientAppOutputPath(),
 						children: children
 					})
 				]

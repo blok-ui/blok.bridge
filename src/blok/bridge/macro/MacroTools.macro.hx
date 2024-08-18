@@ -1,5 +1,6 @@
 package blok.bridge.macro;
 
+import blok.bridge.Constants;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
@@ -12,22 +13,6 @@ function isClient() {
 
 function isServer() {
 	return !isClient();
-}
-
-function getDataDirectory() {
-	return Context.definedValue('blok.paths.data') ?? 'data';
-}
-
-function getPrivateDirectory() {
-	return Context.definedValue('blok.paths.private') ?? 'dist';
-}
-
-function getPublicDirectory() {
-	return Context.definedValue('blok.paths.public') ?? 'dist/public';
-}
-
-function getArtifactsDirectory() {
-	return Context.definedValue('blok.generator.artifacts') ?? 'artifacts';
 }
 
 function extractString(expr:Expr):String {

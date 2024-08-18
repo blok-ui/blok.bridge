@@ -1,68 +1,51 @@
-package blok.bridge;
+package blok.bridge.generate;
 
-import blok.bridge.asset.HtmlAsset;
+import hotdish.SemVer;
 import blok.context.Provider;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
 import blok.suspense.SuspenseBoundary;
 import blok.ui.*;
-import kit.file.FileSystem;
-import kit.file.adaptor.SysAdaptor;
+import kit.file.*;
 
 using Lambda;
 
 // @todo: Ideally we could do cool things with threads here, but for now...
-class Generator {
-	final config:AppConfig;
-	final render:() -> Child;
-	final fs:FileSystem;
+// @todo: We really need to figure out how configuration is going to work for this thing.
+class Generator implements Config {
+	@:auto final app:App;
+	@:auto final strategy:HtmlGenerationStrategy;
+	@:auto final render:() -> Child;
 
-	public function new(config, render, ?fs) {
-		this.config = config;
-		this.render = render;
-		this.fs = fs ?? new FileSystem(new SysAdaptor(Sys.getCwd()));
-	}
-
-	public function generate():Task<AppContext> {
-		var app = createAppContext();
+	public function generate():Task<Nothing> {
 		var visitor = new RouteVisitor();
 
 		visitor.enqueue('/');
 
-		return renderUntilComplete(app, visitor).next(documents -> {
-			for (asset in documents) app.addAsset(asset);
-			return app;
-		});
+		return renderUntilComplete(visitor)
+			.next(documents -> Task.parallel(...documents.map(html -> html.output(strategy, app.output))));
 	}
 
-	public function generatePage(path:String):Task<{
-		html:HtmlAsset,
-		app:AppContext
-	}> {
-		var app = createAppContext();
+	public function generatePage(path:String):Task<Nothing> {
 		var visitor = new RouteVisitor();
-
-		return renderPath(path, app, visitor).next(html -> {
-			html: html,
-			app: app
-		});
+		return renderPath(path, visitor).next(document -> document.output(strategy, app.output));
 	}
 
-	function renderUntilComplete(app:AppContext, visitor:RouteVisitor):Task<Array<HtmlAsset>> {
+	function renderUntilComplete(visitor:RouteVisitor):Task<Array<GeneratedHtml>> {
 		var paths = visitor.drain();
 		return Task
-			.parallel(...paths.map(path -> renderPath(path, app, visitor)))
+			.parallel(...paths.map(path -> renderPath(path, visitor)))
 			.next(documents -> {
 				if (visitor.hasPending()) {
-					return renderUntilComplete(app, visitor)
+					return renderUntilComplete(visitor)
 						.next(moreDocuments -> documents.concat(moreDocuments));
 				}
 				return documents;
 			});
 	}
 
-	function renderPath(path:String, app:AppContext, visitor:RouteVisitor):Task<HtmlAsset> {
+	function renderPath(path:String, visitor:RouteVisitor):Task<GeneratedHtml> {
 		return new Task(activate -> {
 			var document = new ElementPrimitive('#document', {});
 			var root:Null<View> = null;
@@ -81,21 +64,28 @@ class Generator {
 					.find(el -> el.as(ElementPrimitive)?.tag == 'body')
 					.toMaybe()
 					.map(body -> body.as(ElementPrimitive))
-					.map(injectClientScript)
-					.map(body -> body.toString({
-						includeTextMarkers: true
-					}))
+					.map(body -> {
+						var script = new ElementPrimitive('script', {
+							defer: true,
+							src: app.paths.clientApp
+						});
+						body.append(script);
+						return body.toString({includeTextMarkers: true});
+					})
 					.or('<body></body>');
-				var output = new HtmlAsset(path, '<!doctype html><html>${head}${body}</html>');
+				var output = new GeneratedHtml(path, '<!doctype html><html>${head}${body}</html>');
 
 				root?.dispose();
+
 				activate(Ok(output));
 			}
 
 			root = mount(document, () -> Provider
-				.provide(() -> app)
 				.provide(() -> visitor)
-				.provide(() -> new Navigator({url: path}))
+				.provide(() -> app)
+				.provide(() -> new Navigator({
+					url: path
+				}))
 				.child(_ -> SuspenseBoundary.node({
 					child: render(),
 					onSuspended: () -> suspended = true,
@@ -112,19 +102,5 @@ class Generator {
 				sendHtml(path, document);
 			}
 		});
-	}
-
-	function injectClientScript(body:ElementPrimitive) {
-		var script = new ElementPrimitive('script', {
-			defer: true,
-			src: config.paths.createAssetPath(config.getClientAppName())
-		});
-		body.append(script);
-		return body;
-	}
-
-	inline function createAppContext() {
-		var paths = config.paths;
-		return new AppContext(config, fs.directory(paths.privateDirectory), fs.directory(paths.publicDirectory));
 	}
 }
