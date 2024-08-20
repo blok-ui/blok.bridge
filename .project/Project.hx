@@ -1,5 +1,4 @@
 import blok.bridge.hotdish.*;
-import blok.bridge.plugin.*;
 import hotdish.*;
 import hotdish.node.*;
 
@@ -33,7 +32,7 @@ function main() {
 						bootstrap: 'blog.Blog',
 						version: version,
 						// Configure our Static build.
-						server: new BuildStatic({
+						server: new BuildServer({
 							dependencies: [
 								{name: 'kit.file'},
 								{name: 'toml'},
@@ -42,14 +41,18 @@ function main() {
 							children: [
 								new IncludeBreezeCss({
 									children: [
-										// We could output our build script somewhere,
-										// but it's simpler just to *Run* it.
-										new Run({}),
-										// We need to also output a HXML file for our
-										// IDE to point at. We want all our dependencies for
-										// server builds here, NOT for client-side stuff.
-										new Hxml({
-											name: 'build-example'
+										new StaticOutput({
+											children: [
+												// We could output our build script somewhere,
+												// but it's simpler just to *Run* it.
+												new Run({}),
+												// We need to also output a HXML file for our
+												// IDE to point at. We want all our dependencies for
+												// server builds here, NOT for client-side stuff.
+												new Hxml({
+													name: 'build-example'
+												})
+											]
 										})
 									]
 								})

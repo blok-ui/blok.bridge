@@ -1,22 +1,20 @@
 package blok.bridge.generate;
 
-import hotdish.SemVer;
 import blok.context.Provider;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
 import blok.suspense.SuspenseBoundary;
 import blok.ui.*;
-import kit.file.*;
 
 using Lambda;
 
 // @todo: Ideally we could do cool things with threads here, but for now...
-// @todo: We really need to figure out how configuration is going to work for this thing.
 class Generator implements Config {
 	@:auto final app:App;
 	@:auto final strategy:HtmlGenerationStrategy;
 	@:auto final render:() -> Child;
+	@:auto final links:Array<AssetLink> = [];
 
 	public function generate():Task<Nothing> {
 		var visitor = new RouteVisitor();
@@ -47,10 +45,13 @@ class Generator implements Config {
 
 	function renderPath(path:String, visitor:RouteVisitor):Task<GeneratedHtml> {
 		return new Task(activate -> {
+			var localLinks = links.copy();
 			var document = new ElementPrimitive('#document', {});
 			var root:Null<View> = null;
 			var suspended = false;
 			var activated = false;
+
+			localLinks.push(ScriptLink(app.paths.clientApp));
 
 			function checkActivation() {
 				if (activated) throw 'Activated more than once on a render';
@@ -59,21 +60,12 @@ class Generator implements Config {
 
 			function sendHtml(path:String, document:ElementPrimitive) {
 				var html = document.children.find(el -> el.as(ElementPrimitive)?.tag == 'html') ?? document;
-				var head = html.children.find(el -> el.as(ElementPrimitive)?.tag == 'head')?.toString({includeTextMarkers: false}) ?? '<head></head>';
-				var body = html.children
-					.find(el -> el.as(ElementPrimitive)?.tag == 'body')
-					.toMaybe()
-					.map(body -> body.as(ElementPrimitive))
-					.map(body -> {
-						var script = new ElementPrimitive('script', {
-							defer: true,
-							src: app.paths.clientApp
-						});
-						body.append(script);
-						return body.toString({includeTextMarkers: true});
-					})
-					.or('<body></body>');
-				var output = new GeneratedHtml(path, '<!doctype html><html>${head}${body}</html>');
+				var head = html.children.find(el -> el.as(ElementPrimitive)?.tag == 'head') ?? new ElementPrimitive('head');
+				var body = html.children.find(el -> el.as(ElementPrimitive)?.tag == 'body') ?? new ElementPrimitive('body');
+
+				applyLinks(cast head, cast body, localLinks);
+
+				var output = new GeneratedHtml(path, '<!doctype html><html>${head.toString({ includeTextMarkers: false })}${body.toString()}</html>');
 
 				root?.dispose();
 
@@ -102,5 +94,20 @@ class Generator implements Config {
 				sendHtml(path, document);
 			}
 		});
+	}
+
+	function applyLinks(head:ElementPrimitive, body:ElementPrimitive, links:Array<AssetLink>) {
+		for (link in links) switch link {
+			case CssLink(path):
+				head.append(new ElementPrimitive('link', {
+					href: path,
+					rel: 'stylesheet'
+				}));
+			case ScriptLink(path):
+				body.append(new ElementPrimitive('script', {
+					defer: true,
+					src: path
+				}));
+		}
 	}
 }

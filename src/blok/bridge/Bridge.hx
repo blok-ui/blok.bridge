@@ -2,7 +2,7 @@ package blok.bridge;
 
 class Bridge {
 	#if blok.client
-	public macro static function startIslands();
+	public macro static function hydrateIslands();
 	#else
 	public static function generate(options) {
 		var generator = new blok.bridge.generate.Generator(options);

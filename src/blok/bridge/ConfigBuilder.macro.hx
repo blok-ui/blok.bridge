@@ -6,7 +6,9 @@ import kit.macro.step.*;
 using kit.macro.Tools;
 
 function build() {
-	return ClassBuilder.fromContext().addBundle(new ConfigBuilder()).export();
+	return ClassBuilder.fromContext()
+		.addBundle(new ConfigBuilder())
+		.export();
 }
 
 function buildWithJsonSerializer() {

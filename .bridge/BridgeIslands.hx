@@ -3,6 +3,6 @@
 
 function main() {
 	#if blok.client
-	blok.bridge.Bridge.startIslands();
+	blok.bridge.Bridge.hydrateIslands();
 	#end
 }

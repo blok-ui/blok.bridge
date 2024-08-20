@@ -15,6 +15,7 @@ function main() {
 	});
 	blok.bridge.Bridge.generate({
 		app: app,
+		links: [blok.bridge.generate.AssetLink.CssLink("/assets/styles-v0_0_1.css")],
 		render: () -> blog.Blog.node({}),
 		strategy: DirectoryWithIndexHtmlFile
 	});

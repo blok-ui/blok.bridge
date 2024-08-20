@@ -1,9 +1,10 @@
 package blok.bridge.hotdish;
 
-import haxe.io.Path;
+import blok.bridge.generate.AssetLink;
 import blok.bridge.generate.HtmlGenerationStrategy;
-import hotdish.node.*;
+import haxe.io.Path;
 import hotdish.*;
+import hotdish.node.*;
 
 class BuildBridge extends Node {
 	@:prop public final bootstrap:String = 'Boot';
@@ -11,11 +12,11 @@ class BuildBridge extends Node {
 	@:prop public final outputDirectory:String = 'dist/www';
 	@:prop public final assetPrefix:String = 'assets';
 	@:prop public final strategy:HtmlGenerationStrategy = DirectoryWithIndexHtmlFile;
+	@:prop public final links:Array<AssetLink> = [];
 
-	@:prop final server:BuildStatic;
+	@:prop final server:BuildServer;
 	@:prop final client:BuildClient = new BuildClient({});
 
-	// @todo: merge this with Paths?
 	public function formatOutputPath(path:String) {
 		return Path.join([outputDirectory, path]);
 	}
@@ -40,18 +41,16 @@ class BuildBridge extends Node {
 		return formatAssetOutputPath(getClientAppName());
 	}
 
+	public function addLink(link:AssetLink) {
+		this.links.push(link);
+		return this;
+	}
+
 	public function build():Array<Node> return [
 		new Build({
 			dependencies: [
 				{name: 'blok.bridge'}
 			],
-			// flags: {
-			// 	'blok.bridge.version': version.toString(),
-			// 	'blok.bridge.output': outputDirectory,
-			// 	'blok.bridge.strategy': strategy,
-			// 	'blok.bridge.asset-prefix': assetPrefix,
-			// 	'blok.bridge.client-app': getClientAppName()
-			// },
 			children: [
 				new Step({
 					children: [server],

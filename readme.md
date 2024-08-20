@@ -45,7 +45,7 @@ import blok.bridge.hotdish.*;
 import hotdish.*;
 import hotdish.node.*;
 
-function main() {
+function main() { 
   var project = new Project({
     name: 'example',
     version: new SemVer(0, 0, 1),
@@ -59,6 +59,8 @@ function main() {
         sources: ['src'],
         children: [
           new BlokBridge({
+            bootstrap: 'example.Example',
+            version: '0.0.1',
             server: new BuildStatic({
               children: [
                 new Hxml({ name: 'build-app' }),
@@ -74,16 +76,17 @@ function main() {
   project.run();
 }
 ```
-
-Note that this will use default conventions, including looking for a class named `Routes` as the entrypoint. Let's create that now:
+The entrypoint of our Bridge app is just a normal Component (called "Example" in this case):
 
 ```haxe
+package example;
+
 import blok.ui.*;
 import blok.html.Html;
 import blok.bridge.Bootstrap;
 
-class Routes extends Bootstrap {
-  public function start():Child {
+class Example extends Component {
+  public function render():Child {
     return Html.view(<html>
       <head>
         <title>"Example"</title>
@@ -97,8 +100,6 @@ class Routes extends Bootstrap {
 }
 ```
 
-This is Bridge's `main` function, basically.
-
 If you run `$ haxe project.hx`, you should see a few things happen: first, Hotdish will generate `haxelib.json` and `build-app.hxml` files for you (due to the `Hxml` and `HaxeLib` nodes added in the `Project.hx` file). For code completion, you should now point your IDE at `build-app.hxml`, not at `project.hxml`. Next, it will have generated a few files in a folder called `artifacts` (these are the main functions for the client and server and a json manifest that will list all the Islands your app uses, if there are any) and -- finally -- it will have output `dist/public/index.html` with the HTML we generated in our `start` method. 
 
 ### Adding Routes
@@ -106,13 +107,15 @@ If you run `$ haxe project.hx`, you should see a few things happen: first, Hotdi
 Bridge uses the Blok Router package to handle routes. It will automatically follow any links created using the `blok.router.Link` component and output static HTML for each. Here's what our app looks like with some routes:
 
 ```haxe
+package example;
+
 import blok.html.Html;
 import blok.ui.Child;
 import blok.router.*;
 import blok.bridge.Bootstrap;
 
-class Routes extends Bootstrap {
-  function start():Child {
+class Example extends Component {
+  function render():Child {
     return Html.view(<html>
       <head>
         <title>"Example"</title>
@@ -159,6 +162,8 @@ This is starting to become useful, but still isn't much more exciting than just 
 An `Island` is almost exactly like a standard Blok component, but it has a little extra magic that allows it to work on both the client and the server. Let's create a Counter component for our counter route:
 
 ```haxe
+package example;
+
 import blok.bridge.*;
 import blok.ui.*;
 import blok.html.Html;
@@ -178,13 +183,15 @@ class Counter extends Island {
 ...and update our start method:
 
 ```haxe
+package example;
+
 import blok.html.Html;
 import blok.ui.Child;
 import blok.router.*;
 import blok.bridge.Bootstrap;
 
-class Routes extends Bootstrap {
-  function start():Child {
+class Example extends Component {
+  function render():Child {
     return Html.view(<html>
       <head>
         <title>"Example"</title>

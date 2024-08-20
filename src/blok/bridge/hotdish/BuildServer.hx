@@ -3,27 +3,28 @@ package blok.bridge.hotdish;
 import blok.bridge.Constants;
 import hotdish.Node;
 import hotdish.node.Build;
+import hotdish.node.*;
 
-using StringTools;
 using haxe.io.Path;
+using haxe.Json;
 
-class BuildClient extends Node {
-	@:prop public final main:String = 'BridgeIslands';
+class BuildServer extends Node {
+	@:prop public final main:String = 'BridgeGenerate';
 	@:prop public final sources:Array<String> = [];
 	@:prop public final dependencies:Array<Dependency> = [];
 	@:prop public final flags:BuildFlags = new BuildFlags();
-	@:prop public final children:Array<Node> = [new ClientOutput({})];
+	@:prop public final children:Array<Node> = [new Run({})];
 
 	public function build():Array<Node> {
 		return [
 			new Build({
-				sources: sources.concat([DotBridge]),
 				main: main,
+				sources: sources.concat([DotBridge]),
 				dependencies: dependencies,
-				flags: flags.merge({
-					'blok.client': true,
-					'js-es': 6
-				}),
+				flags: flags,
+				macros: [
+					'blok.bridge.macro.IslandIntrospector.run()'
+				],
 				children: children
 			})
 		];

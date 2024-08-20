@@ -7,22 +7,27 @@ import hotdish.node.*;
 class IncludeBreezeCss extends Node {
 	@:prop final children:Array<Node>;
 
-	function build():Array<Node> return [
-		// @todo: It would be really cool if we could add plugins here.
-		new Build({
-			dependencies: [
-				{name: 'breeze'},
-			],
-			flags: {
-				// Only output CSS when we're building the static app! We can check which build mode we're
-				// in by seeing if there is a parent BuildStatic node.
-				'breeze.output': BuildStatic.maybeFrom(this).map(_ -> {
-					var bridge = BuildBridge.from(this);
-					var path = bridge.formatAssetOutputPath('styles-${bridge.version.toFileNameSafeString()}.css');
-					'cwd:$path';
-				}).or('none')
-			},
-			children: children
-		})
-	];
+	function build():Array<Node> {
+		return [
+			new Build({
+				dependencies: [
+					{name: 'breeze'},
+				],
+				flags: {
+					// Only output CSS when we're building the static app! We can check which build mode we're
+					// in by seeing if there is a parent BuildServer node.
+					'breeze.output': BuildServer.maybeFrom(this).map(_ -> {
+						var bridge = BuildBridge.from(this);
+						var path = 'styles-${bridge.version.toFileNameSafeString()}.css';
+						var fullPath = bridge.formatAssetOutputPath(path);
+
+						bridge.addLink(CssLink(bridge.formatAssetPath(path)));
+
+						'cwd:$fullPath';
+					}).or('none')
+				},
+				children: children
+			})
+		];
+	}
 }

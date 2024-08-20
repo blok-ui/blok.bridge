@@ -4,7 +4,7 @@ import haxe.macro.Expr;
 import blok.bridge.macro.IslandIntrospector;
 
 class Bridge {
-	public static function startIslands() {
+	public static function hydrateIslands() {
 		var islands = loadManifest();
 		var islandHydration:Array<Expr> = islands.map(islandPath -> {
 			var path = islandPath.split('.');
