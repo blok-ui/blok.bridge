@@ -21,6 +21,8 @@ class IncludeBreezeCss extends Node {
 						var path = 'styles-${bridge.version.toFileNameSafeString()}.css';
 						var fullPath = bridge.formatAssetOutputPath(path);
 
+						// Configure bridge to automatically link to the generated
+						// css file in our HTML output.
 						bridge.addLink(CssLink(bridge.formatAssetPath(path)));
 
 						'cwd:$fullPath';

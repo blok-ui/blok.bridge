@@ -15,11 +15,7 @@ class MainLayout extends Component {
 
 		return Html.html().child([
 			Html.head().child([
-				Html.title().child(['Blogish ', pageTitle]),
-				// @todo: Try to come up with a way this can be injected by the Hotdish build step.
-				// Html.link()
-				// 	.attr('href', app.paths.formatAssetPath('styles-${app.version.toFileNameSafeString()}.css'))
-				// 	.attr('rel', 'stylesheet')
+				Html.title().child(['Blogish ', pageTitle])
 			]).node(),
 
 			Html.body().child([

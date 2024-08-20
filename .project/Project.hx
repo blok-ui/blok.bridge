@@ -31,7 +31,7 @@ function main() {
 					new BuildBridge({
 						bootstrap: 'blog.Blog',
 						version: version,
-						// Configure our Static build.
+						// Configure our Server build.
 						server: new BuildServer({
 							dependencies: [
 								{name: 'kit.file'},
