@@ -34,7 +34,6 @@ class ClientOutput extends Node {
 
 private final contents = '// THIS IS A GENERATED FILE.
 // DO NOT EDIT.
-
 function main() {
 	#if blok.client
 	blok.bridge.Bridge.hydrateIslands();

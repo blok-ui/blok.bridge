@@ -1,6 +1,5 @@
 // THIS IS A GENERATED FILE.
 // DO NOT EDIT.
-
 function main() {
 	#if !blok.client
 	var fs = new kit.file.FileSystem(new kit.file.adaptor.SysAdaptor(Sys.getCwd()));
@@ -13,11 +12,10 @@ function main() {
 			clientApp: "/assets/app_v0_0_1.js"
 		})
 	});
-	blok.bridge.Bridge.generate({
-		app: app,
-		links: [blok.bridge.generate.AssetLink.CssLink("/assets/styles-v0_0_1.css")],
-		render: () -> blog.Blog.node({}),
-		strategy: DirectoryWithIndexHtmlFile
-	});
+	blok.bridge.Bridge.generate(app, () -> blog.Blog.node({}), [
+		blok.bridge.plugin.LinkAssets.fromJson({"links":[{"path":"/assets/styles-v0_0_1.css","type":"CssLink"}]}),
+    new blok.bridge.plugin.IncludeClientApp({minify: false}),
+    new blok.bridge.plugin.OutputHtml({strategy: DirectoryWithIndexHtmlFile})
+	]);
 	#end
 }

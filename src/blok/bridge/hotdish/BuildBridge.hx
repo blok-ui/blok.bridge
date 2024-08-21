@@ -1,7 +1,7 @@
 package blok.bridge.hotdish;
 
-import blok.bridge.generate.AssetLink;
-import blok.bridge.generate.HtmlGenerationStrategy;
+import blok.bridge.plugin.Asset;
+import blok.bridge.plugin.OutputHtml.HtmlGenerationStrategy;
 import haxe.io.Path;
 import hotdish.*;
 import hotdish.node.*;
@@ -12,7 +12,7 @@ class BuildBridge extends Node {
 	@:prop public final outputDirectory:String = 'dist/www';
 	@:prop public final assetPrefix:String = 'assets';
 	@:prop public final strategy:HtmlGenerationStrategy = DirectoryWithIndexHtmlFile;
-	@:prop public final links:Array<AssetLink> = [];
+	@:prop public final plugins:Array<Plugin> = [];
 
 	@:prop final server:BuildServer;
 	@:prop final client:BuildClient = new BuildClient({});
@@ -41,8 +41,8 @@ class BuildBridge extends Node {
 		return formatAssetOutputPath(getClientAppName());
 	}
 
-	public function addLink(link:AssetLink) {
-		this.links.push(link);
+	public function addPlugin(plugin) {
+		this.plugins.push(plugin);
 		return this;
 	}
 

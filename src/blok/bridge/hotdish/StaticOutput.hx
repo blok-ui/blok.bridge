@@ -24,10 +24,14 @@ class StaticOutput extends Node {
 							bootstrap: bridge.bootstrap,
 							output: bridge.outputDirectory,
 							assets: bridge.assetPrefix,
-							links: bridge.links.map(link -> link.serialize()).join(','),
+							plugins: bridge.plugins
+								.map(plugin -> '${plugin.getPluginIdentifier()}.fromJson(${plugin.toJson().stringify()})')
+								.concat([
+									'new blok.bridge.plugin.IncludeClientApp({minify: false})',
+									'new blok.bridge.plugin.OutputHtml({strategy: ${bridge.strategy}})'
+								]).join(',\n    '),
 							version: bridge.version.toString(),
-							clientAppPath: bridge.getClientAppPath(),
-							strategy: bridge.strategy
+							clientAppPath: bridge.getClientAppPath()
 						})
 					})
 				],
@@ -39,7 +43,6 @@ class StaticOutput extends Node {
 
 private final template = new Template('// THIS IS A GENERATED FILE.
 // DO NOT EDIT.
-
 function main() {
 	#if !blok.client
 	var fs = new kit.file.FileSystem(new kit.file.adaptor.SysAdaptor(Sys.getCwd()));
@@ -52,12 +55,9 @@ function main() {
 			clientApp: "::clientAppPath::"
 		})
 	});
-	blok.bridge.Bridge.generate({
-		app: app,
-		links: [::links::],
-		render: () -> ::bootstrap::.node({}),
-		strategy: ::strategy::
-	});
+	blok.bridge.Bridge.generate(app, () -> ::bootstrap::.node({}), [
+		::plugins::
+	]);
 	#end
 }
 ');

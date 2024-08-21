@@ -1,4 +1,5 @@
 import blok.bridge.hotdish.*;
+import blok.bridge.plugin.*;
 import hotdish.*;
 import hotdish.node.*;
 
@@ -23,7 +24,16 @@ class IncludeBreezeCss extends Node {
 
 						// Configure bridge to automatically link to the generated
 						// css file in our HTML output.
-						bridge.addLink(CssLink(bridge.formatAssetPath(path)));
+						bridge.addPlugin(
+							new LinkAssets({
+								links: [
+									new Asset({
+										type: CssLink,
+										path: bridge.formatAssetPath(path)
+									})
+								]
+							})
+						);
 
 						'cwd:$fullPath';
 					}).or('none')

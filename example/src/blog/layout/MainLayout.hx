@@ -1,6 +1,5 @@
 package blog.layout;
 
-// import blok.bridge.App;
 import blog.route.*;
 import blog.data.*;
 import blog.ui.Dropdown;
@@ -11,8 +10,6 @@ class MainLayout extends Component {
 	@:resource final posts:Array<Post> = PostStore.from(this).all();
 
 	function render():Child {
-		// var app = App.from(this);
-
 		return Html.html().child([
 			Html.head().child([
 				Html.title().child(['Blogish ', pageTitle])
