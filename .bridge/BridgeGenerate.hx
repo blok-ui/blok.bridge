@@ -9,12 +9,12 @@ function main() {
 		version: "0.0.1",
 		paths: new blok.bridge.Paths({
 			assetPrefix: "assets", 
-			clientApp: "/assets/app_v0_0_1.js"
+			clientApp: "/assets/app-v0_0_1.js"
 		})
 	});
 	blok.bridge.Bridge.generate(app, () -> blog.Blog.node({}), [
 		blok.bridge.plugin.LinkAssets.fromJson({"links":[{"path":"/assets/styles-v0_0_1.css","type":"CssLink"}]}),
-    new blok.bridge.plugin.IncludeClientApp({minify: false}),
+    new blok.bridge.plugin.IncludeClientApp({src: "/assets/app-v0_0_1.js", minify: false}),
     new blok.bridge.plugin.OutputHtml({strategy: DirectoryWithIndexHtmlFile})
 	]);
 	#end

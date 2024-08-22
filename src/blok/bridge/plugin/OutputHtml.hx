@@ -1,5 +1,6 @@
 package blok.bridge.plugin;
 
+import blok.ui.Child;
 import blok.html.server.*;
 
 using StringTools;
@@ -10,19 +11,28 @@ enum abstract HtmlGenerationStrategy(String) to String from String {
 	final NamedHtmlFile;
 }
 
+typedef OutputHtmlEntry = {
+	public final path:String;
+	public final document:NodePrimitive;
+}
+
 class OutputHtml implements Plugin {
 	@:auto final strategy:HtmlGenerationStrategy;
-	@:json(from = null, to = null)
-	@:auto final entries:Array<{path:String, document:NodePrimitive}> = [];
 
-	public function handleGeneratedPath(app:App, path:String, document:NodePrimitive) {
+	final entries:Array<OutputHtmlEntry> = [];
+
+	public function render(app:App, root:Child):Child {
+		return root;
+	}
+
+	public function visited(app:App, path:String, document:NodePrimitive) {
 		var path = path.trim().normalize();
 		if (path.startsWith('/')) path = path.substr(1);
 
 		entries.push({path: path, document: document});
 	}
 
-	public function handleOutput(app:App):Task<Nothing> {
+	public function output(app:App):Task<Nothing> {
 		return Task.parallel(...entries.map(entry -> {
 			var head = entry.document
 				.find(el -> el.as(ElementPrimitive)?.tag == 'head', true)
@@ -47,5 +57,9 @@ class OutputHtml implements Plugin {
 						.write(html);
 			}
 		}));
+	}
+
+	public function cleanup() {
+		entries.resize(0);
 	}
 }

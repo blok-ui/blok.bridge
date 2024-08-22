@@ -24,16 +24,11 @@ class IncludeBreezeCss extends Node {
 
 						// Configure bridge to automatically link to the generated
 						// css file in our HTML output.
-						bridge.addPlugin(
-							new LinkAssets({
-								links: [
-									new Asset({
-										type: CssLink,
-										path: bridge.formatAssetPath(path)
-									})
-								]
-							})
-						);
+						var asset = new Asset({
+							type: CssLink,
+							path: bridge.formatAssetPath(path)
+						});
+						bridge.addPlugin(new LinkAssets({links: [asset]}));
 
 						'cwd:$fullPath';
 					}).or('none')

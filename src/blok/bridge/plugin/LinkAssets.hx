@@ -1,11 +1,16 @@
 package blok.bridge.plugin;
 
+import blok.ui.Child;
 import blok.html.server.*;
 
 class LinkAssets implements Plugin {
 	@:auto final links:Array<Asset>;
 
-	public function handleGeneratedPath(app:App, path:String, document:NodePrimitive) {
+	public function render(app:App, root:Child):Child {
+		return root;
+	}
+
+	public function visited(app:App, path:String, document:NodePrimitive) {
 		var head = document
 			.find(el -> el.as(ElementPrimitive)?.tag == 'head', true)
 			.or(() -> new ElementPrimitive('head'));
@@ -27,7 +32,9 @@ class LinkAssets implements Plugin {
 		}
 	}
 
-	public function handleOutput(app:App):Task<Nothing> {
+	public function output(app:App):Task<Nothing> {
 		return Task.nothing();
 	}
+
+	public function cleanup() {}
 }

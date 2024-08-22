@@ -27,7 +27,7 @@ class StaticOutput extends Node {
 							plugins: bridge.plugins
 								.map(plugin -> '${plugin.getPluginIdentifier()}.fromJson(${plugin.toJson().stringify()})')
 								.concat([
-									'new blok.bridge.plugin.IncludeClientApp({minify: false})',
+									'new blok.bridge.plugin.IncludeClientApp({src: "${bridge.getClientAppPath()}", minify: false})',
 									'new blok.bridge.plugin.OutputHtml({strategy: ${bridge.strategy}})'
 								]).join(',\n    '),
 							version: bridge.version.toString(),

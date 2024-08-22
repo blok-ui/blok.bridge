@@ -1,7 +1,6 @@
 package blok.bridge.hotdish;
 
-import blok.bridge.plugin.Asset;
-import blok.bridge.plugin.OutputHtml.HtmlGenerationStrategy;
+import blok.bridge.plugin.OutputHtml;
 import haxe.io.Path;
 import hotdish.*;
 import hotdish.node.*;
@@ -30,7 +29,7 @@ class BuildBridge extends Node {
 	}
 
 	public function getClientAppName() {
-		return 'app_' + version.toFileNameSafeString() + '.js';
+		return 'app-' + version.toFileNameSafeString() + '.js';
 	}
 
 	public function getClientAppPath() {

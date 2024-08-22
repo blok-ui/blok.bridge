@@ -12,7 +12,7 @@ using Lambda;
 class Generator {
 	final app:App;
 	final render:() -> Child;
-	final plugins:Array<Plugin>;
+	final plugins:Plugins;
 
 	public function new(app, render, plugins) {
 		this.app = app;
@@ -26,12 +26,21 @@ class Generator {
 		visitor.enqueue('/');
 
 		return renderUntilComplete(visitor)
-			.next(_ -> Task.parallel(...plugins.map(plugin -> plugin.handleOutput(app))));
+			.next(_ -> plugins.output(app))
+			.next(_ -> {
+				plugins.cleanup();
+				Task.nothing();
+			});
 	}
 
 	public function generatePage(path:String):Task<Nothing> {
 		var visitor = new RouteVisitor();
-		return renderPath(path, visitor).next(_ -> plugins.map(plugin -> plugin.handleOutput(app)));
+		return renderPath(path, visitor)
+			.next(_ -> plugins.output(app))
+			.next(_ -> {
+				plugins.cleanup();
+				Task.nothing();
+			});
 	}
 
 	function renderUntilComplete(visitor:RouteVisitor):Task<Nothing> {
@@ -49,44 +58,34 @@ class Generator {
 	function renderPath(path:String, visitor:RouteVisitor):Task<Nothing> {
 		return new Task(activate -> {
 			var document = new ElementPrimitive('#document', {});
-			var root:Null<View> = null;
 			var suspended = false;
 			var activated = false;
 
-			function checkActivation() {
+			function finish(document:ElementPrimitive) {
 				if (activated) throw 'Activated more than once on a render';
 				activated = true;
-			}
-
-			function sendHtml(path:String, document:ElementPrimitive) {
-				for (plugin in plugins) plugin.handleGeneratedPath(app, path, document);
-
-				root?.dispose();
-
+				plugins.visited(app, path, document);
 				activate(Ok(Nothing));
 			}
 
-			root = mount(document, () -> Provider
+			// @todo: We need to dispose of this thing :/
+			// Or, better yet, figure out how to just reuse it
+			// and render when our Navigator changes the URL.
+			var root = mount(document, () -> Provider
 				.provide(() -> visitor)
 				.provide(() -> app)
 				.provide(() -> new Navigator({
 					url: path
 				}))
 				.child(_ -> SuspenseBoundary.node({
-					child: render(),
+					child: plugins.render(app, render()),
 					onSuspended: () -> suspended = true,
-					onComplete: () -> {
-						checkActivation();
-						sendHtml(path, document);
-					},
+					onComplete: () -> finish(document),
 					fallback: () -> Placeholder.node()
 				}))
 			);
 
-			if (suspended == false) {
-				checkActivation();
-				sendHtml(path, document);
-			}
+			if (suspended == false) finish(document);
 		});
 	}
 }
