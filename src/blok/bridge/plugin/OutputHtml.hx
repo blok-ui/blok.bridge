@@ -17,7 +17,7 @@ typedef OutputHtmlEntry = {
 }
 
 class OutputHtml implements Plugin {
-	@:auto final strategy:HtmlGenerationStrategy;
+	@:constant final strategy:HtmlGenerationStrategy;
 
 	final entries:Array<OutputHtmlEntry> = [];
 

@@ -1,13 +1,14 @@
 package blok.bridge;
 
-import kit.macro.step.JsonSerializerBuildStep;
+import blok.data.StructureBuilder;
 import kit.macro.*;
+import kit.macro.step.JsonSerializerBuildStep;
 
 using kit.macro.Tools;
 
 function build() {
 	return ClassBuilder.fromContext()
-		.addBundle(new ConfigBuilder())
+		.addBundle(new StructureBuilder())
 		.addStep(new JsonSerializerBuildStep({}))
 		.addStep(new PluginBuilder())
 		.export();

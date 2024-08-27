@@ -4,8 +4,8 @@ import blok.ui.Child;
 import blok.html.server.*;
 
 class IncludeClientApp implements Plugin {
-	@:auto public final src:String;
-	@:auto public final minify:Bool = false;
+	@:constant public final src:String;
+	@:constant public final minify:Bool = false;
 
 	public function render(app:App, root:Child):Child {
 		return root;

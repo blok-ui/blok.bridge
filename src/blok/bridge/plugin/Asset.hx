@@ -1,12 +1,13 @@
 package blok.bridge.plugin;
 
+import blok.data.Model;
+
 enum abstract AssetType(String) from String to String {
 	final CssLink;
 	final ScriptLink;
 }
 
-@:build(blok.bridge.ConfigBuilder.buildWithJsonSerializer())
-class Asset {
-	@:auto public final type:AssetType;
-	@:auto public final path:String;
+class Asset extends Model {
+	@:constant public final type:AssetType;
+	@:constant public final path:String;
 }

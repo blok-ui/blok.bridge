@@ -4,7 +4,7 @@ import blok.ui.Child;
 import blok.html.server.*;
 
 class LinkAssets implements Plugin {
-	@:auto final links:Array<Asset>;
+	@:constant final links:Array<Asset>;
 
 	public function render(app:App, root:Child):Child {
 		return root;
