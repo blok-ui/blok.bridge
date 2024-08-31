@@ -16,15 +16,7 @@ In the future it might also be possible to use Bridge with server-side rendering
 
 > Note: I'm still investigating ways to make setting up a Bridge project easier. There are some benefits to using the Hotdish build system, but it's unavoidably a bit awkward. 
 
-Behind the scenes, Bridge apps are not straightforward to compile. Here's a basic overview of the steps it needs to complete each time you build an app:
-
-- Run (or compile) Haxe code.
-  - Generate and output static HTML.
-  - Gather all Islands used during compilation using a macro.
-    - Generate a `main` function for the client that hydrates all the Islands found in the app.
-      - Compile the client-side code using this generated `main` function.
-
-This is in addition to handling any other assets the user may have added, like CSS and images, and placing them in the right place.
+Behind the scenes, Bridge apps are not straightforward to compile. It needs to run (or compile) the server-side Haxe code, generate the HTML for all the pages in your site, gather any Islands it encountered during rendering, and then generate the client-side code to hydrate those islands. This is in addition to handling any other assets the user may have added, like CSS and images, and placing them in the right place.
 
 To make handling all of this a little easier, Bridge uses a library called [Hotdish](https://github.com/wartman/hotdish). This gives you a single place to handle configuration using a composable api similar to Blok's components. First, set up a `project.hxml` file (or whatever you want to name it) that looks like this:
 
@@ -61,7 +53,7 @@ function main() {
           new BlokBridge({
             bootstrap: 'example.Example',
             version: '0.0.1',
-            server: new BuildStatic({
+            server: new BuildServer({
               children: [
                 new Hxml({ name: 'build-app' }),
                 new HaxeLib({}),

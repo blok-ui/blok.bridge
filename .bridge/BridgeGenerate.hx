@@ -6,11 +6,7 @@ function main() {
 	var app = new blok.bridge.App({
 		fs: fs,
 		output: fs.directory("dist/www"),
-		version: "0.0.1",
-		paths: new blok.bridge.Paths({
-			assetPrefix: "assets", 
-			clientApp: "/assets/app-v0_0_1.js"
-		})
+		version: "0.0.1"
 	});
 	blok.bridge.Bridge.generate(app, () -> blog.Blog.node({}), [
 		blok.bridge.plugin.LinkAssets.fromJson({"links":[{"path":"/assets/styles-v0_0_1.css","type":"CssLink"}]}),

@@ -13,7 +13,6 @@ class App extends Structure implements Context {
 	@:constant public final version:SemVer;
 	@:constant public final fs:FileSystem;
 	@:constant public final output:Directory;
-	@:constant public final paths:Paths;
 
 	public function dispose() {}
 }

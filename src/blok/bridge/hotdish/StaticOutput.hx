@@ -49,11 +49,7 @@ function main() {
 	var app = new blok.bridge.App({
 		fs: fs,
 		output: fs.directory("::output::"),
-		version: "::version::",
-		paths: new blok.bridge.Paths({
-			assetPrefix: "::assets::", 
-			clientApp: "::clientAppPath::"
-		})
+		version: "::version::"
 	});
 	blok.bridge.Bridge.generate(app, () -> ::bootstrap::.node({}), [
 		::plugins::
