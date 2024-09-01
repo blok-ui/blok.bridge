@@ -2,6 +2,5 @@
 
 -lib blok.core
 -lib blok.router
--lib hotdish
 
 -D blok.bridge=0.0.1

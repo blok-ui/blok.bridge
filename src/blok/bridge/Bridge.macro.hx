@@ -4,6 +4,7 @@ import haxe.macro.Expr;
 import blok.bridge.macro.IslandIntrospector;
 
 class Bridge {
+	#if blok.client
 	public static function hydrateIslands() {
 		var islands = loadManifest();
 		var islandHydration:Array<Expr> = islands.map(islandPath -> {
@@ -15,4 +16,10 @@ class Bridge {
 			$b{islandHydration};
 		};
 	}
+	#else
+	public static function trackIslands() {
+		registerIslandTracker();
+		return macro null;
+	}
+	#end
 }

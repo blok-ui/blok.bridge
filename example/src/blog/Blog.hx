@@ -5,16 +5,16 @@ import blog.layout.MainLayout;
 import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
-import blok.bridge.App;
+import blok.bridge.BridgeContext;
 import blok.context.Provider;
 import blok.router.Router;
 
 class Blog extends Component {
-	@:context final app:App;
+	@:context final bridge:BridgeContext;
 
 	public function render():Child {
 		return Provider
-			.provide(() -> new PostStore(app.fs.directory('example/data/post')))
+			.provide(() -> new PostStore(bridge.fs.directory('example/data/post')))
 			.child(_ -> Router.node({
 				routes: [
 					new HomeRoute(_ -> MainLayout.node({

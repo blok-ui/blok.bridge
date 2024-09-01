@@ -12,7 +12,7 @@ using sys.FileSystem;
 
 private var initialized:Bool = false;
 
-function run() {
+function registerIslandTracker() {
 	if (initialized) return;
 	initialized = true;
 

@@ -1,0 +1,16 @@
+-cp example/src
+
+-dce full
+--debug
+
+-lib blok.foundation
+-lib blok.bridge
+-lib kit.file
+-lib toml
+-lib markdown
+-lib breeze
+
+-D analyzer-optimize
+-D breeze.output=cwd:dist/www/assets/styles.css
+
+--run Run
