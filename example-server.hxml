@@ -3,8 +3,7 @@
 example-shared.hxml
 
 -lib kit.file
--lib toml
--lib markdown
+-lib boxup
 
 -D breeze.output=cwd:dist/www/assets/styles.css
 
