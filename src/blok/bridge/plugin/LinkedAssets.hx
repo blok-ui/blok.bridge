@@ -25,22 +25,22 @@ class LinkedAssets implements Plugin {
 
 			for (asset in assets) switch asset {
 				case CssAsset(path, cacheBust):
-					var href = switch cacheBust {
+					var href = '/' + switch cacheBust {
 						case true: path.withExtension('css') + '?' + kit.Hash.hash(path + bridge.version.toFileNameSafeString());
 						default: path.withExtension('css');
 					}
 					head.append(new ElementPrimitive('link', {
-						href: href,
+						href: href.normalize(),
 						rel: 'stylesheet'
 					}));
 				case JsAsset(path, cacheBust):
-					var src = switch cacheBust {
+					var src = '/' + switch cacheBust {
 						case true: path.withExtension('js') + '?' + kit.Hash.hash(path + bridge.version.toFileNameSafeString());
 						default: path.withExtension('js');
 					}
 					head.append(new ElementPrimitive('script', {
 						defer: true,
-						src: src
+						src: src.normalize()
 					}));
 			}
 		});

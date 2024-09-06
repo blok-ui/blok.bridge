@@ -1,5 +1,7 @@
 package blog.data;
 
+import boxup.reporter.VisualReporter;
+import boxup.*;
 import blok.context.Context;
 import blok.debug.Debug;
 import kit.file.*;
@@ -26,37 +28,28 @@ class PostStore implements Context {
 	public function all():Task<Array<Post>> {
 		return dir.listFiles()
 			.next(files -> Task.parallel(...files.map(file -> file.getMeta())))
-			.next(metas -> metas.filter(meta -> meta.path.extension() == 'md'))
+			.next(metas -> metas.filter(meta -> meta.path.extension() == 'box'))
 			.next(metas -> Task.parallel(...metas.map(meta -> get(meta.name))));
 	}
 
 	public function get(id:String):Task<Post> {
-		return dir
-			.file(id.withExtension('md'))
-			.read()
-			.next(contents -> switch parseFrontMatter(contents) {
-				case Ok(frontMatter, body):
-					Post.fromJson({
-						slug: frontMatter.slug,
-						title: frontMatter.title,
-						body: body
-					});
-				case Error(error):
-					error;
-			});
+		return dir.file(id.withExtension('box')).getMeta().next(meta -> {
+			dir.file(id.withExtension('box'))
+				.read()
+				.next(contents -> parse({file: meta.fullPath, content: contents}));
+		});
 	}
 
-	function parseFrontMatter(contents:String):MarkdownResult {
-		if (!contents.startsWith('---')) {
-			return Ok({}, contents.trim());
-		}
-
-		var contents = contents.substr(3);
-		var end = contents.indexOf('---');
-		var frontMatter = contents.substr(0, end);
-		var body = contents.substr(end + 3);
-
-		return Ok(Toml.parse(frontMatter), body.trim());
+	function parse(source:Source) {
+		return Parser.fromSource(source)
+			.parse()
+			.flatMap(new PostDecoder().decode)
+			.mapError(e -> {
+				var out = [];
+				var reporter = new VisualReporter(err -> out.push(err));
+				reporter.report(e, source);
+				new Error(InternalError, out.join('\n'));
+			});
 	}
 
 	public function dispose() {}

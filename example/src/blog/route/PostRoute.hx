@@ -11,7 +11,7 @@ class PostRoute extends PageRoute<'/post/{id:String}'> {
 	public function render():Child {
 		return MainLayout.node({
 			pageTitle: 'Post ${post().title}',
-			children: post().body.unwrap()
+			children: post().body
 		});
 	}
 }

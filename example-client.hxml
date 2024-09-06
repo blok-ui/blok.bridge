@@ -1,0 +1,3 @@
+example-shared.hxml
+
+-D breeze.output=none

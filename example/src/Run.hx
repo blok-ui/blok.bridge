@@ -11,18 +11,11 @@ function main() {
 				strategy: DirectoryWithIndexHtmlFile
 			}),
 			new ClientApp({
-				flags: ['-D breeze.output=none'],
-				dependencies: InheritDependencies
-				// sources: ['example/src'],
-				// dependencies: UseCustom([
-				// 	{name: 'breeze'},
-				// 	{name: 'blok.foundation'}
-				// ])
+				dependencies: UseHxml('example-client.hxml')
 			}),
 			new LinkedAssets([
-				CssAsset('dist/www/assets/styles.css', true)
+				CssAsset('/assets/styles.css', true)
 			])
-				// new BreezeCss({})
 		])
 		.generate(() -> blog.Blog.node({}))
 		.handle(result -> switch result {

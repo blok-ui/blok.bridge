@@ -1,0 +1,13 @@
+[post]
+slug = 02-second-post
+title = Second Post
+published = true
+date = 2024/07/05
+
+[content]
+This is the second post!
+
+  [button link="/post/01-first-post"]
+  This is a button
+
+Yay

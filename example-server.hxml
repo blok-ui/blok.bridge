@@ -1,0 +1,11 @@
+# Important: build with this HXML file.
+
+example-shared.hxml
+
+-lib kit.file
+-lib toml
+-lib markdown
+
+-D breeze.output=cwd:dist/www/assets/styles.css
+
+--run Run

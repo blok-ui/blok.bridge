@@ -21,23 +21,23 @@ import blok.bridge.*;
 import blok.bridge.plugin.*;
 
 function main() {
-	Bridge.start({
-		version: '0.0.1',
-		outputPath: 'dist/www'
-	})
-		.plugins([
-			new StaticHtml({
-				strategy: DirectoryWithIndexHtmlFile
-			}),
-			new ClientApp({
-				dependencies: InheritDependencies
-			})
-		])
-		.generate(() -> example.Example.node({}))
-		.handle(result -> switch result {
-			case Ok(_): trace('Done!');
-			case Error(error): trace(error.message);
-		});
+  Bridge.start({
+    version: '0.0.1',
+    outputPath: 'dist/www'
+  })
+    .plugins([
+      new StaticHtml({
+        strategy: DirectoryWithIndexHtmlFile
+      }),
+      new ClientApp({
+        dependencies: InheritDependencies
+      })
+    ])
+    .generate(() -> example.Example.node({}))
+    .handle(result -> switch result {
+      case Ok(_): trace('Done!');
+      case Error(error): trace(error.message);
+    });
 }
 ```
 
@@ -51,17 +51,17 @@ import blok.html.Html;
 import blok.bridge.Bootstrap;
 
 class Example extends Component {
-	public function render():Child {
-		return Html.view(<html>
-			<head>
-				<title>"Example"</title>
-			</head>
-			<body>
-				<h1>"Hello world"</h1>
-				<p>"Hey world."</p>
-			</body>
-		</html>);
-	}
+  public function render():Child {
+    return Html.view(<html>
+      <head>
+        <title>"Example"</title>
+      </head>
+      <body>
+        <h1>"Hello world"</h1>
+        <p>"Hey world."</p>
+      </body>
+    </html>);
+  }
 }
 ```
 
@@ -91,39 +91,39 @@ import blok.router.*;
 import blok.bridge.Bootstrap;
 
 class Example extends Component {
-	function render():Child {
-		return Html.view(<html>
-			<head>
-				<title>"Example"</title>
-			</head>
-			<body>
-				<header>
-					<h3><Link url="/">"Example"</Link></h3>
-					<nav>
-						<ul>
-							<li><Link url="/counter/1">"Start at 1"</Link></li>
-							<li><Link url="/counter/2">"Start at 2"</Link></li>
-						</ul>
-					</nav>
-				</header>
-				<Router>
-					<Route to="/">
-						{_ -> <div>
-							<h1>"Home"</h1>
-							<p>"Hello world"</p>
-						</div>}
-					</Route>
-					<Route to="/counter/{count:Int}">
-						{params -> <div>
-							<h1>"Counting " {params.count}</h1>
-							<p>"Counter"</p>
-						</div>}
-					</Route>
-					<fallback>{_ -> "Not found"}</fallback>
-				</Router>
-			</body>
-		</html>);
-	}
+  function render():Child {
+    return Html.view(<html>
+      <head>
+        <title>"Example"</title>
+      </head>
+      <body>
+        <header>
+          <h3><Link url="/">"Example"</Link></h3>
+          <nav>
+            <ul>
+              <li><Link url="/counter/1">"Start at 1"</Link></li>
+              <li><Link url="/counter/2">"Start at 2"</Link></li>
+            </ul>
+          </nav>
+        </header>
+        <Router>
+          <Route to="/">
+            {_ -> <div>
+              <h1>"Home"</h1>
+              <p>"Hello world"</p>
+            </div>}
+          </Route>
+          <Route to="/counter/{count:Int}">
+            {params -> <div>
+              <h1>"Counting " {params.count}</h1>
+              <p>"Counter"</p>
+            </div>}
+          </Route>
+          <fallback>{_ -> "Not found"}</fallback>
+        </Router>
+      </body>
+    </html>);
+  }
 }
 ```
 
@@ -145,14 +145,14 @@ import blok.ui.*;
 import blok.html.Html;
 
 class Counter extends Island {
-	@:signal final count:Int = 0;
+  @:signal final count:Int = 0;
 
-	function render():Child {
-		return Html.view(<div>
-			<p>count</p>
-			<button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
-		</div>);
-	}
+  function render():Child {
+    return Html.view(<div>
+      <p>count</p>
+      <button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
+    </div>);
+  }
 }
 ```
 
@@ -167,40 +167,40 @@ import blok.router.*;
 import blok.bridge.Bootstrap;
 
 class Example extends Component {
-	function render():Child {
-		return Html.view(<html>
-			<head>
-				<title>"Example"</title>
-			</head>
-			<body>
-				<header>
-					<h3><Link url="/">"Example"</Link></h3>
-					<nav>
-						<ul>
-							<li><Link url="/counter/1">"Start at 1"</Link></li>
-							<li><Link url="/counter/2">"Start at 2"</Link></li>
-						</ul>
-					</nav>
-				</header>
-				<Router>
-					<Route to="/">
-						{_ -> <div>
-							<h1>"Home"</h1>
-							<p>"Hello world"</p>
-						</div>}
-					</Route>
-					<Route to="/counter/{count:Int}">
-						{params -> <div>
-							<h1>"Counting " {params.count}</h1>
-							// Add our Counter here:
-							<Counter count={params.count} />
-						</div>}
-					</Route>
-					<fallback>{_ -> "Not found"}</fallback>
-				</Router>
-			</body>
-		</html>);
-	}
+  function render():Child {
+    return Html.view(<html>
+      <head>
+        <title>"Example"</title>
+      </head>
+      <body>
+        <header>
+          <h3><Link url="/">"Example"</Link></h3>
+          <nav>
+            <ul>
+              <li><Link url="/counter/1">"Start at 1"</Link></li>
+              <li><Link url="/counter/2">"Start at 2"</Link></li>
+            </ul>
+          </nav>
+        </header>
+        <Router>
+          <Route to="/">
+            {_ -> <div>
+              <h1>"Home"</h1>
+              <p>"Hello world"</p>
+            </div>}
+          </Route>
+          <Route to="/counter/{count:Int}">
+            {params -> <div>
+              <h1>"Counting " {params.count}</h1>
+              // Add our Counter here:
+              <Counter count={params.count} />
+            </div>}
+          </Route>
+          <fallback>{_ -> "Not found"}</fallback>
+        </Router>
+      </body>
+    </html>);
+  }
 }
 ```
 
@@ -218,15 +218,15 @@ import blok.ui.*;
 import blok.html.Html;
 
 class Counter extends Island {
-	@:signal final count:Int = 0;
-	@:attribute final label:Children;
+  @:signal final count:Int = 0;
+  @:attribute final label:Children;
 
-	function render():Child {
-		return Html.view(<div>
-			<p>{label} ": " {count}</p>
-			<button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
-		</div>);
-	}
+  function render():Child {
+    return Html.view(<div>
+      <p>{label} ": " {count}</p>
+      <button onClick={_ -> count.update(i -> i + 1)}>"+"</button>
+    </div>);
+  }
 }
 ```
 
@@ -237,11 +237,11 @@ import blok.ui.*;
 import blok.html.Html;
 
 class Label extends Component {
-	@:children @:attribute final child:Child;
-	
-	function render() {
-		return Html.view(<b>child</b>);
-	}
+  @:children @:attribute final child:Child;
+  
+  function render() {
+    return Html.view(<b>child</b>);
+  }
 }
 ```
 
@@ -249,16 +249,20 @@ Now lets update our counter route:
 
 ```haxe
 <Route to="/counter/{count:Int}">
-	{params -> <div>
-		<h1>"Counting " {params.count}</h1>
-		<Counter label={<Label>"Starting count at:" {params.count}</Label>} count={params.count} />
-	</div>}
+  {params -> <div>
+    <h1>"Counting " {params.count}</h1>
+    <Counter label={<Label>"Starting count at:" {params.count}</Label>} count={params.count} />
+  </div>}
 </Route>
 ```
 
 When you compile the app again, this should just work! If you take a peek at the html again, you'll see that the children in the `label` attribute have been serialized to a very simple JSON representation. Importantly, however, there is no sign of the `Label` component -- Bridge has pre-rendered it and _only_ sent the resulting HTML. This means that Components passed to Islands in this way will simply be rendered away, meaning they'll never need to get sent to the client as code.
 
 > Note: this feature is still pretty new and may not work well yet.
+
+### Plugins
+
+
 
 ## More Information
 

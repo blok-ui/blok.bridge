@@ -1,0 +1,10 @@
+-cp example/src
+-D analyzer-optimize
+
+-dce full
+--debug
+
+-lib blok.foundation
+-lib blok.bridge
+-lib breeze
+-lib boxup
