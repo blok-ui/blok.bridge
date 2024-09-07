@@ -53,10 +53,7 @@ class PostDecoder implements Decoder<Post> {
 				})).orReturn();
 				switch node.tryProperty('link') {
 					case Ok(value):
-						out.push(Link.node({
-							url: value,
-							children: children
-						}));
+						out.push(Link.to(value).child(children));
 					case Error(_):
 						out.push(Button.node({
 							action: e -> null,
