@@ -99,6 +99,9 @@ class Generator {
 					url: path
 				}))
 				.provide(() -> new SuspenseBoundaryContext({
+					onSuspended: () -> {
+						bridge.events.renderSuspended.dispatch(path, document);
+					},
 					onComplete: () -> {
 						if (activated) throw 'Activated more than once on a render';
 						activated = true;

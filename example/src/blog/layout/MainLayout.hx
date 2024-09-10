@@ -53,6 +53,9 @@ class MainLayout extends Component {
 											CounterRoute.link({initial: 2}).child('Counter')
 										),
 										Html.li().child(
+											DelayRoute.link({}).child('Delay')
+										),
+										Html.li().child(
 											Dropdown.node({
 												label: 'Posts',
 												children: [for (post in posts())

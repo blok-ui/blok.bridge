@@ -16,7 +16,8 @@ function main() {
 			new LinkedAssets([
 				CssAsset('/assets/styles.css', true)
 			]),
-			new RemoveUnusedFiles()
+			new RemoveUnusedFiles(),
+			new Logging()
 		])
 		.generate(() -> blog.Blog.node({}))
 		.handle(result -> switch result {

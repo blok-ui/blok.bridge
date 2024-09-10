@@ -9,6 +9,7 @@ class Events {
 	public final init = new Event<Void>();
 	public final visited = new Event<String>();
 	public final rendering = new Event<RenderEvent>();
+	public final renderSuspended = new Event<String, NodePrimitive>();
 	public final renderComplete = new Event<RenderCompleteEvent>();
 	public final outputting = new Event<OutputEvent>();
 	public final cleanup = new Event<CleanupEvent>();
