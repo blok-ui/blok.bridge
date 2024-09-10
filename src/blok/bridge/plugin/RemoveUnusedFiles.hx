@@ -25,21 +25,26 @@ class RemoveUnusedFiles implements Plugin {
 		// with Kit Tasks?
 		return dir
 			.listFiles()
-			.next(files -> Task.parallel(...files.map(file -> file
-				.getMeta()
-				.next(meta -> if (!manifest.contains(meta.path)) {
-					trace('REMOVE: ${meta.path}');
-					// file.remove(); // @todo: We're turning this off until I'm more sure about this
-					Task.nothing();
-				} else {
-					trace('OK: ${meta.path}');
-					Task.nothing();
-				})
-			)))
+			.next(files -> {
+				if (files.length == 0) return Task.nothing();
+
+				Task.parallel(...files.map(file -> file
+					.getMeta()
+					.next(meta -> if (!manifest.contains(meta.path)) {
+						trace('REMOVE: ${meta.path}');
+						// file.remove(); // @todo: We're turning this off until I'm more sure about this
+						Task.nothing();
+					} else {
+						trace('OK: ${meta.path}');
+						Task.nothing();
+					})
+				));
+			})
 			.next(_ -> dir
 				.listDirectories()
 				.next(dirs -> {
 					if (dirs.length == 0) return Task.nothing();
+
 					Task.parallel(...dirs.map(dir -> cleanupDir(dir, manifest)));
 				})
 			)

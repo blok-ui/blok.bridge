@@ -1,5 +1,6 @@
 package blok.bridge;
 
+import blok.suspense.SuspenseBoundaryContext;
 import blok.bridge.Events;
 import blok.context.Provider;
 import blok.html.Server;
@@ -50,7 +51,6 @@ class Generator {
 
 	function cleanup(manifest) {
 		var cleanup = new CleanupEvent(manifest);
-		trace(cleanup.getManifest());
 
 		bridge.events.cleanup.dispatch(cleanup);
 
@@ -98,22 +98,21 @@ class Generator {
 				.provide(() -> new Navigator({
 					url: path
 				}))
-				.child(_ -> SuspenseBoundary.node({
-					child: rendered.unwrap(),
-					// onSuspended: () -> suspended = true,
+				.provide(() -> new SuspenseBoundaryContext({
 					onComplete: () -> {
 						if (activated) throw 'Activated more than once on a render';
 						activated = true;
 						bridge.events.renderComplete.dispatch(new RenderCompleteEvent(path, document));
 						activate(Ok(Nothing));
-					},
+					}
+				}))
+				.child(_ -> SuspenseBoundary.node({
+					child: rendered.unwrap(),
 					fallback: () -> Placeholder.node()
 				}))
 			);
 
 			bridge.events.cleanup.add(disposables -> disposables.addDisposable(root));
-
-			// if (suspended == false) finish(document);
 		});
 	}
 }

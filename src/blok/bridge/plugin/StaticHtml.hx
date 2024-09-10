@@ -47,10 +47,12 @@ class StaticHtml extends Structure implements Plugin {
 						bridge.output.file(entry.path.withExtension('html'));
 				}
 
-				file.getMeta().next(meta -> {
-					event.includeFile(meta.path);
-					file.write(html);
-				});
+				file.write(html)
+					.next(_ -> file.getMeta())
+					.next(meta -> {
+						event.includeFile(meta.path);
+						Task.nothing();
+					});
 			}))
 		));
 
