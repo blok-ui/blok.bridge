@@ -28,7 +28,7 @@ class StaticHtml extends Structure implements Plugin {
 			entries.push({path: path, document: event.document});
 		});
 
-		bridge.events.outputting.add(queue -> queue.enqueue(
+		bridge.events.outputting.add(event -> event.enqueue(
 			Task.parallel(...entries.map(entry -> {
 				var head = entry.document
 					.find(el -> el.as(ElementPrimitive)?.tag == 'head', true)
@@ -38,20 +38,19 @@ class StaticHtml extends Structure implements Plugin {
 					.or(() -> new ElementPrimitive('body'));
 				var html = '<!doctype html><html>${head.toString({ includeTextMarkers: false })}${body.toString()}</html>';
 
-				switch strategy {
+				var file = switch strategy {
 					case DirectoryWithIndexHtmlFile:
-						bridge.output
-							.file(Path.join([entry.path, 'index.html']))
-							.write(html);
+						bridge.output.file(Path.join([entry.path, 'index.html']));
 					case NamedHtmlFile if (entry.path == ''):
-						bridge.output
-							.file('index.html')
-							.write(html);
+						bridge.output.file('index.html');
 					case NamedHtmlFile:
-						bridge.output
-							.file(entry.path.withExtension('html'))
-							.write(html);
+						bridge.output.file(entry.path.withExtension('html'));
 				}
+
+				file.getMeta().next(meta -> {
+					event.includeFile(meta.path);
+					file.write(html);
+				});
 			}))
 		));
 

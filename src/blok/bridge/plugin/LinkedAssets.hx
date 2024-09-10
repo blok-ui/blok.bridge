@@ -44,5 +44,17 @@ class LinkedAssets implements Plugin {
 					}));
 			}
 		});
+
+		bridge.events.outputting.add(event -> {
+			event.enqueue(bridge.output.getMeta().next(meta -> {
+				for (asset in assets) switch asset {
+					case CssAsset(path, _):
+						event.includeFile(Path.join([meta.path, path]).normalize());
+					case JsAsset(path, _):
+						event.includeFile(Path.join([meta.path, path]).normalize());
+				}
+				Task.nothing();
+			}));
+		});
 	}
 }

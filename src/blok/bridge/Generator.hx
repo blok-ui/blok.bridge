@@ -1,9 +1,7 @@
 package blok.bridge;
 
 import blok.bridge.Events;
-import blok.bridge.util.TaskQueue;
 import blok.context.Provider;
-import blok.core.DisposableCollection;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
@@ -29,7 +27,7 @@ class Generator {
 
 		return renderUntilComplete(visitor)
 			.next(_ -> handleOutput())
-			.next(_ -> cleanup());
+			.next(cleanup);
 	}
 
 	public function generatePage(path:String):Task<Nothing> {
@@ -39,24 +37,27 @@ class Generator {
 
 		return renderPath(path, visitor)
 			.next(_ -> handleOutput())
-			.next(_ -> cleanup());
+			.next(cleanup);
 	}
 
 	function handleOutput() {
-		var tasks = new TaskQueue();
+		var output = new OutputEvent();
 
-		bridge.events.outputting.dispatch(tasks);
+		bridge.events.outputting.dispatch(output);
 
-		return tasks.parallel();
+		return output.run().next(_ -> output.getManifest());
 	}
 
-	function cleanup() {
-		var disposables = new DisposableCollection();
+	function cleanup(manifest) {
+		var cleanup = new CleanupEvent(manifest);
+		trace(cleanup.getManifest());
 
-		bridge.events.cleanup.dispatch(disposables);
-		disposables.dispose();
+		bridge.events.cleanup.dispatch(cleanup);
 
-		return Task.nothing();
+		return cleanup.run().next(_ -> {
+			cleanup.dispose();
+			Task.nothing();
+		});
 	}
 
 	function renderUntilComplete(visitor:RouteVisitor):Task<Nothing> {
@@ -74,7 +75,7 @@ class Generator {
 	function renderPath(path:String, visitor:RouteVisitor):Task<Nothing> {
 		return new Task(activate -> {
 			var document = new ElementPrimitive('#document', {});
-			var suspended = false;
+			// var suspended = false;
 			var activated = false;
 
 			// @todo: Maybe include a time stamp for when the visit starts and
@@ -99,15 +100,20 @@ class Generator {
 				}))
 				.child(_ -> SuspenseBoundary.node({
 					child: rendered.unwrap(),
-					onSuspended: () -> suspended = true,
-					onComplete: () -> finish(document),
+					// onSuspended: () -> suspended = true,
+					onComplete: () -> {
+						if (activated) throw 'Activated more than once on a render';
+						activated = true;
+						bridge.events.renderComplete.dispatch(new RenderCompleteEvent(path, document));
+						activate(Ok(Nothing));
+					},
 					fallback: () -> Placeholder.node()
 				}))
 			);
 
 			bridge.events.cleanup.add(disposables -> disposables.addDisposable(root));
 
-			if (suspended == false) finish(document);
+			// if (suspended == false) finish(document);
 		});
 	}
 }

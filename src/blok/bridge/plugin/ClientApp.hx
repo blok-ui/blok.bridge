@@ -27,8 +27,12 @@ class ClientApp extends Structure implements Plugin {
 	@:constant final minify:Bool = false;
 
 	public function register(bridge:Bridge) {
-		var assets = new LinkedAssets([JsAsset(getAppName(bridge), true)]);
-		assets.register(bridge);
+		bridge.plugin(new LinkedAssets([
+			JsAsset(getAppName(bridge), true),
+			#if debug
+			JsAsset(getAppName(bridge) + '.map')
+			#end
+		]));
 
 		bridge.events.outputting.add(queue -> {
 			var mainPath = Path.join([DotBridge, main]).withExtension('hx');
