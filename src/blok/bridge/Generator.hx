@@ -1,5 +1,6 @@
 package blok.bridge;
 
+import blok.debug.Debug.warn;
 import blok.suspense.SuspenseBoundaryContext;
 import blok.bridge.Events;
 import blok.context.Provider;
@@ -90,6 +91,7 @@ class Generator {
 			}
 
 			var rendered = new RenderEvent(path, render());
+
 			bridge.events.rendering.dispatch(rendered);
 
 			var root = mount(document, () -> Provider
@@ -103,7 +105,10 @@ class Generator {
 						bridge.events.renderSuspended.dispatch(path, document);
 					},
 					onComplete: () -> {
-						if (activated) throw 'Activated more than once on a render';
+						if (activated) {
+							warn('Activated more than once on a render: $path');
+							return;
+						}
 						activated = true;
 						bridge.events.renderComplete.dispatch(new RenderCompleteEvent(path, document));
 						activate(Ok(Nothing));
