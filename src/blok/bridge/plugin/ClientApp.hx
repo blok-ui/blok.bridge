@@ -28,10 +28,7 @@ class ClientApp extends Structure implements Plugin {
 
 	public function register(bridge:Bridge) {
 		bridge.plugin(new LinkedAssets([
-			JsAsset(getAppName(bridge), true),
-			#if debug
-			JsAsset(getAppName(bridge) + '.map')
-			#end
+			JsAsset(getAppName(bridge), true)
 		]));
 
 		bridge.events.outputting.add(queue -> {
