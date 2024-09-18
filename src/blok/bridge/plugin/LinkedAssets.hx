@@ -8,6 +8,7 @@ using haxe.io.Path;
 enum Asset {
 	CssAsset(path:String, ?cacheBuster:Bool);
 	JsAsset(path:String, ?cacheBuster:Bool);
+	InlineJs(contents:String, ?defer:Bool);
 }
 
 class LinkedAssets implements Plugin {
@@ -31,6 +32,7 @@ class LinkedAssets implements Plugin {
 					}
 					head.append(new ElementPrimitive('link', {
 						href: href.normalize(),
+						type: 'text/css',
 						rel: 'stylesheet'
 					}));
 				case JsAsset(path, cacheBust):
@@ -42,6 +44,12 @@ class LinkedAssets implements Plugin {
 						defer: true,
 						src: src.normalize()
 					}));
+				case InlineJs(contents, defer):
+					var script = new ElementPrimitive('script', {
+						defer: defer == true
+					});
+					script.append(new UnescapedTextPrimitive(contents));
+					head.append(script);
 			}
 		});
 
@@ -52,6 +60,7 @@ class LinkedAssets implements Plugin {
 						event.includeFile(Path.join([meta.path, path]).normalize());
 					case JsAsset(path, _):
 						event.includeFile(Path.join([meta.path, path]).normalize());
+					default:
 				}
 				Task.nothing();
 			}));
