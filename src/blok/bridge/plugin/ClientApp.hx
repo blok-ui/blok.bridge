@@ -18,6 +18,7 @@ enum ClientAppNamingStrategy {
 	UseCustom(name:String);
 }
 
+// @todo: implement minify
 class ClientApp extends Structure implements Plugin {
 	@:constant final main:String = 'BridgeIslands';
 	@:constant final sources:Array<String> = ['src'];
@@ -31,7 +32,7 @@ class ClientApp extends Structure implements Plugin {
 			JsAsset(getAppName(bridge), true)
 		]));
 
-		bridge.events.outputting.add(queue -> {
+		bridge.events.outputting.add(event -> {
 			var mainPath = Path.join([DotBridge, main]).withExtension('hx');
 			var createMain = bridge.fs.file(mainPath).write('// THIS IS A GENERATED FILE.
 // DO NOT EDIT.
@@ -40,7 +41,7 @@ function main() {
 	blok.bridge.Bridge.hydrateIslands();
   #end
 }');
-			queue.enqueue(createMain.next(_ -> switch Sys.command(createHaxeCommand(bridge)) {
+			event.enqueue(createMain.next(_ -> switch Sys.command(createHaxeCommand(bridge)) {
 				case 0: Nothing;
 				case _: new Error(InternalError, 'Failed to generate haxe file');
 			}));

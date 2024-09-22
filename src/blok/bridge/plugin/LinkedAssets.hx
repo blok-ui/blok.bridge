@@ -5,6 +5,7 @@ import blok.html.server.*;
 using haxe.io.Path;
 
 // @todo: Allow copying and stuff
+// @todo: Allow priority
 enum Asset {
 	CssAsset(path:String, ?cacheBuster:Bool);
 	JsAsset(path:String, ?cacheBuster:Bool);

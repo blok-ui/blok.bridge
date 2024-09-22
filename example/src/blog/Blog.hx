@@ -35,8 +35,8 @@ class Blog extends Component {
 						children: blog.island.Counter.node({count: params.initial})
 					})),
 					new ArchiveRoute(params -> ArchivePage.node({})),
-					new PostRoute({}),
-					new DelayRoute({})
+					PostRoute.route({}),
+					DelayRoute.route({})
 				],
 				// @todo: we need a real 404 page, as we'll have to output that to the server.
 				fallback: _ -> 'Not found'
