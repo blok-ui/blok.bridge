@@ -10,12 +10,12 @@ function main() {
 			new StaticHtml({
 				strategy: DirectoryWithIndexHtmlFile
 			}),
-			new ClientApp({
-				dependencies: UseHxml('example-client.hxml')
-			}),
 			new LinkedAssets([
 				CssAsset('/assets/styles.css', true)
 			]),
+			new ClientApp({
+				dependencies: UseHxml('example-client.hxml')
+			}),
 			new RemoveUnusedFiles(),
 			new Logging()
 		])

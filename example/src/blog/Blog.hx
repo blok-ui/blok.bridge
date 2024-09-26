@@ -17,7 +17,7 @@ class Blog extends Component {
 			.provide(() -> new PostStore(bridge.fs.directory('example/data/post')))
 			.child(_ -> Router.node({
 				routes: [
-					new HomeRoute(_ -> MainLayout.node({
+					HomeRoute.route(_ -> MainLayout.node({
 						pageTitle: 'Home',
 						children: [
 							Collapse.node({
@@ -30,11 +30,11 @@ class Blog extends Component {
 							})
 						]
 					})),
-					new CounterRoute(params -> MainLayout.node({
+					CounterRoute.route(params -> MainLayout.node({
 						pageTitle: 'Counter | ${params.initial}',
 						children: blog.island.Counter.node({count: params.initial})
 					})),
-					new ArchiveRoute(params -> ArchivePage.node({})),
+					ArchiveRoute.route(params -> ArchivePage.node({})),
 					PostRoute.route({}),
 					DelayRoute.route({})
 				],

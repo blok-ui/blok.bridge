@@ -40,6 +40,32 @@ class IslandBuilder implements BuildStep {
 	public function apply(builder:ClassBuilder) {
 		var path = builder.getType().follow().toComplexType().toString();
 
+		// Wrap our render result in an IslandElement if needed.
+		builder.findField('render').inspect(field -> switch field.kind {
+			case FFun(f):
+				var render = f.expr;
+				f.expr = macro {
+					#if blok.client
+					$render;
+					#else
+					var child:() -> blok.ui.Child = () -> $render;
+					return switch findAncestorOfType(blok.bridge.Island) {
+						case None:
+							blok.bridge.IslandElement.node({
+								component: __islandName(),
+								props: toJson(),
+								child: child()
+							});
+						case Some(_):
+							// We don't want to wrap nested Islands! Only top-level
+							// Islands will need hydration.
+							child();
+					}
+					#end
+				}
+			default:
+		});
+
 		builder.add(macro class {
 			public static final islandName = $v{path};
 
@@ -53,7 +79,7 @@ class IslandBuilder implements BuildStep {
 						var root = blok.ui.Root.node({
 							target: el,
 							child: () -> fromJson(props)
-						}).createComponent();
+						}).createView();
 						root.hydrate(cursor, adaptor, null, null);
 						root;
 					}

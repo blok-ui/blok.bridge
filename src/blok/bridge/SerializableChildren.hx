@@ -27,8 +27,8 @@ function fromJson(data:Array<SerializedPrimitive>):Children {
 			for (name in Reflect.fields(child.data)) {
 				Reflect.setField(props, name, new ReadOnlySignal(Reflect.field(child.data, name)));
 			}
-			new VPrimitive(
-				Primitive.getTypeForTag(child.tag),
+			new VPrimitiveView(
+				PrimitiveView.getTypeForTag(child.tag),
 				child.tag,
 				props,
 				fromJson(child.children)
@@ -46,7 +46,7 @@ function toJson(parent:View, children:Children):Array<SerializedPrimitive> {
 	var root = Root.node({
 		target: node,
 		child: () -> children
-	}).createComponent();
+	}).createView();
 
 	root.mount(new ServerAdaptor(), parent, null);
 
