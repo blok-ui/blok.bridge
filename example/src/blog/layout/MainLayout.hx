@@ -29,7 +29,7 @@ class MainLayout extends Component {
 						Typography.textColor('white', 0),
 					))
 					.child([
-						HomeRoute.link({})
+						HomeRoute.link()
 							.child(Html.h3().child('Blogish')),
 
 						Html.nav()
@@ -53,7 +53,7 @@ class MainLayout extends Component {
 											CounterRoute.link({initial: 2}).child('Counter')
 										),
 										Html.li().child(
-											DelayRoute.link({}).child('Delay')
+											DelayRoute.link().child('Delay')
 										),
 										Html.li().child(
 											Dropdown.node({

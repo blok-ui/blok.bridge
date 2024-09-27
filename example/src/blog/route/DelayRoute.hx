@@ -3,9 +3,9 @@ package blog.route;
 import blok.suspense.SuspenseBoundary;
 import blog.layout.MainLayout;
 import haxe.Timer;
-import blok.router.RouteView;
+import blok.router.RouteComponent;
 
-class DelayRoute extends RouteView<'/delay'> {
+class DelayRoute extends RouteComponent<'/delay'> {
 	@:resource final delay:String = new Task(activate -> {
 		Timer.delay(() -> activate(Ok('Completed')), 100);
 	});
