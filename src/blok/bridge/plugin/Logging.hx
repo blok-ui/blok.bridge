@@ -27,6 +27,8 @@ class Logging implements Plugin {
 
 		bridge.events.renderComplete.add(event -> logger.log(Info, 'Completed ${event.path}'));
 
+		bridge.events.renderFailed.add(exception -> logger.log(Error, exception.toString()));
+
 		bridge.events.cleanup.add(event -> logger.log(Info, [
 			'Generation complete. Output:'
 		].concat(event.getManifest()).join('\n')));

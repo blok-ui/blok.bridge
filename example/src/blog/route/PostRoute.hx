@@ -9,6 +9,7 @@ class PostRoute extends RouteComponent<'/post/{id:String}'> {
 	@:resource final post:Post = store.get(id());
 
 	public function render():Child {
+		// blok.debug.Debug.error('fail');
 		return MainLayout.node({
 			pageTitle: 'Post ${post().title}',
 			children: post().body

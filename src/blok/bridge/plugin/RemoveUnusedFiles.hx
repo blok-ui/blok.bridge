@@ -14,15 +14,7 @@ class RemoveUnusedFiles implements Plugin {
 		});
 	}
 
-	// function cleanup(bridge:Bridge, manifest:Array<String>):Task<Nothing> {
-	// 	return bridge.output.listDirectories()
-	// 		.next(dirs -> Task.parallel(...dirs.map(dir -> cleanupDir(dir, manifest))))
-	// 		.next(_ -> Nothing);
-	// }
-
 	function cleanupDir(dir:Directory, manifest:Array<String>) {
-		// @todo: for some reason this is not investigating all directories. Maybe a problem
-		// with Kit Tasks?
 		return dir
 			.listFiles()
 			.next(files -> {

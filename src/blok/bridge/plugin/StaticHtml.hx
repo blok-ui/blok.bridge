@@ -22,13 +22,13 @@ class StaticHtml extends Structure implements Plugin {
 	public function register(bridge:Bridge) {
 		final entries:Array<OutputHtmlEntry> = [];
 
-		bridge.events.renderComplete.add(event -> {
-			var path = event.path.trim().normalize();
+		bridge.events.renderComplete.add(rendered -> {
+			var path = rendered.path.trim().normalize();
 			if (path.startsWith('/')) path = path.substr(1);
-			entries.push({path: path, document: event.document});
+			entries.push({path: path, document: rendered.document});
 		});
 
-		bridge.events.outputting.add(event -> event.enqueue(
+		bridge.events.outputting.add(output -> output.enqueue(
 			Task.parallel(...entries.map(entry -> {
 				var head = entry.document
 					.find(el -> el.as(ElementPrimitive)?.tag == 'head', true)
@@ -50,14 +50,14 @@ class StaticHtml extends Structure implements Plugin {
 				file.write(html)
 					.next(_ -> file.getMeta())
 					.next(meta -> {
-						event.includeFile(meta.path);
+						output.includeFile(meta.path);
 						Task.nothing();
 					});
 			}))
 		));
 
-		bridge.events.cleanup.add(collection -> {
-			collection.addDisposable(() -> entries.resize(0));
+		bridge.events.cleanup.add(cleanup -> {
+			cleanup.addDisposable(() -> entries.resize(0));
 		});
 	}
 }

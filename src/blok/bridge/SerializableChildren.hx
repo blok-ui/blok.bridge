@@ -1,5 +1,6 @@
 package blok.bridge;
 
+import blok.debug.Debug;
 import blok.signal.Signal;
 import blok.ui.*;
 #if !blok.client
@@ -85,6 +86,6 @@ function serializePrimitive(primitive:NodePrimitive):Null<SerializedPrimitive> {
 		};
 	}
 
-	throw 'Unrecognized primitive: ${Type.getClassName(Type.getClass(primitive))}';
+	error('Unrecognized primitive: ${Type.getClassName(Type.getClass(primitive))}');
 }
 #end

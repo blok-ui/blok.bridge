@@ -1,16 +1,19 @@
 package blok.bridge;
 
-import blok.debug.Debug.warn;
-import blok.suspense.SuspenseBoundaryContext;
+import blok.core.Scheduler;
 import blok.bridge.Events;
 import blok.context.Provider;
+import blok.core.BlokException;
+import blok.debug.Debug.warn;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
-import blok.suspense.SuspenseBoundary;
+import blok.suspense.SuspenseBoundaryContext;
 import blok.ui.*;
 
 using Lambda;
+using blok.boundary.BoundaryModifiers;
+using blok.suspense.SuspenseModifiers;
 
 class Generator {
 	final bridge:Bridge;
@@ -51,12 +54,12 @@ class Generator {
 	}
 
 	function cleanup(manifest) {
-		var cleanup = new CleanupEvent(manifest);
+		var cleanupEvent = new CleanupEvent(manifest);
 
-		bridge.events.cleanup.dispatch(cleanup);
+		bridge.events.cleanup.dispatch(cleanupEvent);
 
-		return cleanup.run().next(_ -> {
-			cleanup.dispose();
+		return cleanupEvent.run().next(_ -> {
+			cleanupEvent.dispose();
 			Task.nothing();
 		});
 	}
@@ -76,19 +79,9 @@ class Generator {
 	function renderPath(path:String, visitor:RouteVisitor):Task<Nothing> {
 		return new Task(activate -> {
 			var document = new ElementPrimitive('#document', {});
-			// var suspended = false;
 			var activated = false;
 
-			// @todo: Maybe include a time stamp for when the visit starts and
-			// a timestamp for when it ends on the renderComplete event?
 			bridge.events.visited.dispatch(path);
-
-			function finish(document:ElementPrimitive) {
-				if (activated) throw 'Activated more than once on a render';
-				activated = true;
-				bridge.events.renderComplete.dispatch(new RenderCompleteEvent(path, document));
-				activate(Ok(Nothing));
-			}
 
 			var rendered = new RenderEvent(path, render());
 
@@ -114,10 +107,28 @@ class Generator {
 						activate(Ok(Nothing));
 					}
 				}))
-				.child(_ -> SuspenseBoundary.node({
-					child: rendered.unwrap(),
-					fallback: () -> Placeholder.node()
-				}))
+				.child(_ -> rendered
+					.unwrap()
+					.inSuspense(() -> Placeholder.node())
+					.node()
+				)
+				.node()
+				.inErrorBoundary((component, e) -> {
+					if (e is BlokException) {
+						bridge.events.renderFailed.dispatch(cast e);
+					} else {
+						bridge.events.renderFailed.dispatch(new BlokComponentException(e.message, component));
+					}
+
+					if (!activated) {
+						activated = true;
+						activate(Error(new Error(InternalError, e.message)));
+					} else {
+						warn('A component failed but activated anyway');
+					}
+
+					Placeholder.node(); // @todo: An actual failure view?
+				})
 			);
 
 			bridge.events.cleanup.add(disposables -> disposables.addDisposable(root));
