@@ -4,7 +4,7 @@ import blok.bridge.log.DefaultLogger;
 import blok.context.Provider;
 
 // @todo: This is very basic for now. We'll add time stamps and stuff later.
-class Logging implements Plugin {
+class UseLogging implements Plugin {
 	final logger:Logger;
 
 	public function new(?logger) {

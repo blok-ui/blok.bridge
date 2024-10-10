@@ -19,7 +19,7 @@ enum ClientAppNamingStrategy {
 }
 
 // @todo: implement minify
-class ClientApp extends Structure implements Plugin {
+class GenerateClientApp extends Structure implements Plugin {
 	@:constant final main:String = 'BridgeIslands';
 	@:constant final sources:Array<String> = ['src'];
 	@:constant final namingStrategy:ClientAppNamingStrategy = UseAppVersion('assets/app');
@@ -28,7 +28,8 @@ class ClientApp extends Structure implements Plugin {
 	@:constant final minify:Bool = false;
 
 	public function register(bridge:Bridge) {
-		bridge.plugin(new LinkedAssets([
+		bridge.plugin(new LinkAssets([
+			
 			JsAsset(getAppName(bridge), true)
 		]));
 

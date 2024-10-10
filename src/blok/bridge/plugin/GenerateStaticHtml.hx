@@ -16,7 +16,7 @@ typedef OutputHtmlEntry = {
 	public final document:NodePrimitive;
 }
 
-class StaticHtml extends Structure implements Plugin {
+class GenerateStaticHtml extends Structure implements Plugin {
 	@:constant final strategy:HtmlGenerationStrategy;
 
 	public function register(bridge:Bridge) {

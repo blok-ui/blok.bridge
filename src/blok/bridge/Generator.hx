@@ -1,10 +1,9 @@
 package blok.bridge;
 
-import blok.core.Scheduler;
 import blok.bridge.Events;
 import blok.context.Provider;
 import blok.core.BlokException;
-import blok.debug.Debug.warn;
+import blok.debug.Debug;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
@@ -83,7 +82,7 @@ class Generator {
 
 			bridge.events.visited.dispatch(path);
 
-			var rendered = new RenderEvent(path, render());
+			var rendered = new RenderEvent(path, document, render());
 
 			bridge.events.rendering.dispatch(rendered);
 
@@ -107,8 +106,7 @@ class Generator {
 						activate(Ok(Nothing));
 					}
 				}))
-				.child(_ -> rendered
-					.unwrap()
+				.child(_ -> rendered.unwrap()
 					.inSuspense(() -> Placeholder.node())
 					.node()
 				)
@@ -124,7 +122,7 @@ class Generator {
 						activated = true;
 						activate(Error(new Error(InternalError, e.message)));
 					} else {
-						warn('A component failed but activated anyway');
+						warn('A component failed but triggered onComplete');
 					}
 
 					Placeholder.node(); // @todo: An actual failure view?

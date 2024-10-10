@@ -21,15 +21,15 @@ class Bridge extends Structure {
 
 	@:constant public final fs:FileSystem = new FileSystem(new SysAdaptor(Sys.getCwd()));
 	@:constant public final outputPath:String = 'dist/www';
-	@:prop(get = {
-		static var _output = null;
-		if (_output == null) _output = fs.directory(outputPath);
-		_output;
-	}) public final output:Directory;
-	@:constant public final events:Events = new Events();
-	@:constant public final version:SemVer; // temp
+	@:constant public final version:SemVer;
 
-	public function new() {}
+	public final events:Events;
+	public final output:Directory;
+
+	public function new() {
+		events = new Events();
+		output = fs.directory(outputPath);
+	}
 
 	public function plugin(plugin:Plugin) {
 		plugin.register(this);
@@ -47,8 +47,7 @@ class Bridge extends Structure {
 	}
 
 	public function serve(render:() -> Child) {
-		// @todo
-		return Task.nothing();
+		return Task.reject(new Error(NotImplemented, 'Serving Bridge apps is not ready yet'));
 	}
 	#end
 }

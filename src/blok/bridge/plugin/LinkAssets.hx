@@ -12,7 +12,7 @@ enum Asset {
 	InlineJs(contents:String, ?defer:Bool);
 }
 
-class LinkedAssets implements Plugin {
+class LinkAssets implements Plugin {
 	final assets:Array<Asset>;
 
 	public function new(assets) {

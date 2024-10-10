@@ -21,11 +21,13 @@ class Events {
 
 class RenderEvent {
 	public final path:String;
+	public final document:NodePrimitive;
 
 	var child:Child;
 
-	public function new(path, child) {
+	public function new(path, document, child) {
 		this.path = path;
+		this.document = document;
 		this.child = child;
 	}
 

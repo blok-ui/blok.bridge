@@ -7,17 +7,17 @@ function main() {
 		outputPath: 'dist/www'
 	})
 		.plugins([
-			new StaticHtml({
-				strategy: DirectoryWithIndexHtmlFile
-			}),
-			new LinkedAssets([
+			new LinkAssets([
 				CssAsset('/assets/styles.css', true)
 			]),
-			new ClientApp({
+			new GenerateStaticHtml({
+				strategy: DirectoryWithIndexHtmlFile
+			}),
+			new GenerateClientApp({
 				dependencies: UseHxml('example-client.hxml')
 			}),
 			new RemoveUnusedFiles(),
-			new Logging()
+			new UseLogging()
 		])
 		.generate(() -> blog.Blog.node({}))
 		.handle(result -> switch result {
