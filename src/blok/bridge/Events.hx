@@ -1,13 +1,14 @@
 package blok.bridge;
 
-import haxe.Exception;
+import blok.bridge.util.*;
 import blok.core.*;
 import blok.html.server.NodePrimitive;
+import blok.router.RouteVisitor;
 import blok.ui.Child;
-import blok.bridge.util.*;
+import haxe.Exception;
 
 class Events {
-	public final init = new Event<Void>();
+	public final init = new Event<InitEvent>();
 	public final visited = new Event<String>();
 	public final rendering = new Event<RenderEvent>();
 	public final renderSuspended = new Event<String, NodePrimitive>();
@@ -17,6 +18,35 @@ class Events {
 	public final cleanup = new Event<CleanupEvent>();
 
 	public function new() {}
+}
+
+enum InitEventMode {
+	GeneratingFullSite;
+	GeneratingSinglePage(path:String);
+}
+
+class InitEvent {
+	public final mode:InitEventMode;
+
+	final visitor:RouteVisitor;
+	final queue = new TaskQueue();
+
+	public function new(mode, visitor) {
+		this.mode = mode;
+		this.visitor = visitor;
+	}
+
+	public function visit(path) {
+		visitor.enqueue(path);
+	}
+
+	public function enqueue(task) {
+		queue.enqueue(task);
+	}
+
+	public function run() {
+		return queue.parallel();
+	}
 }
 
 class RenderEvent {

@@ -8,7 +8,7 @@ function main() {
 	})
 		.plugins([
 			new LinkAssets([
-				CssAsset('/assets/styles.css', true)
+				CssAsset('/assets/styles.css')
 			]),
 			new GenerateStaticHtml({
 				strategy: DirectoryWithIndexHtmlFile
@@ -16,6 +16,9 @@ function main() {
 			new GenerateClientApp({
 				dependencies: UseHxml('example-client.hxml')
 			}),
+			new VisitNotFoundPage(),
+			new GenerateHtAccess({}),
+			new GenerateRobotsTxt(),
 			new RemoveUnusedFiles(),
 			new UseLogging()
 		])

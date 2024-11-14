@@ -19,7 +19,12 @@ class UseLogging implements Plugin {
 			);
 		});
 
-		bridge.events.init.add(() -> logger.log(Info, 'Generating app...'));
+		bridge.events.init.add(event -> switch event.mode {
+			case GeneratingFullSite:
+				logger.log(Info, 'Generating full site');
+			case GeneratingSinglePage(path):
+				logger.log(Info, 'Generating single page: $path');
+		});
 
 		bridge.events.visited.add(path -> logger.log(Info, 'Visiting $path'));
 

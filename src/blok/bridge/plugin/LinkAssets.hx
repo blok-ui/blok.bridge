@@ -7,10 +7,12 @@ using haxe.io.Path;
 // @todo: Allow copying and stuff
 // @todo: Allow priority
 enum Asset {
-	CssAsset(path:String, ?cacheBuster:Bool);
-	JsAsset(path:String, ?cacheBuster:Bool);
+	CssAsset(path:String);
+	JsAsset(path:String);
 	InlineJs(contents:String, ?defer:Bool);
 }
+
+typedef AssetFormatter = (path:String) -> String;
 
 class LinkAssets implements Plugin {
 	final assets:Array<Asset>;
@@ -26,24 +28,16 @@ class LinkAssets implements Plugin {
 				.or(() -> new ElementPrimitive('head'));
 
 			for (asset in assets) switch asset {
-				case CssAsset(path, cacheBust):
-					var href = '/' + switch cacheBust {
-						case true: path + '?' + kit.Hash.hash(path + bridge.version.toFileNameSafeString());
-						default: path;
-					}
+				case CssAsset(path):
 					head.append(new ElementPrimitive('link', {
-						href: href.normalize(),
+						href: path.normalize(),
 						type: 'text/css',
 						rel: 'stylesheet'
 					}));
-				case JsAsset(path, cacheBust):
-					var src = '/' + switch cacheBust {
-						case true: path + '?' + kit.Hash.hash(path + bridge.version.toFileNameSafeString());
-						default: path;
-					}
+				case JsAsset(path):
 					head.append(new ElementPrimitive('script', {
 						defer: true,
-						src: src.normalize()
+						src: path.normalize()
 					}));
 				case InlineJs(contents, defer):
 					var script = new ElementPrimitive('script', {
@@ -57,9 +51,9 @@ class LinkAssets implements Plugin {
 		bridge.events.outputting.add(event -> {
 			event.enqueue(bridge.output.getMeta().next(meta -> {
 				for (asset in assets) switch asset {
-					case CssAsset(path, _):
+					case CssAsset(path):
 						event.includeFile(Path.join([meta.path, path]).normalize());
-					case JsAsset(path, _):
+					case JsAsset(path):
 						event.includeFile(Path.join([meta.path, path]).normalize());
 					default:
 				}

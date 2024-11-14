@@ -15,7 +15,42 @@ Also! We'd make a Partial the default root of all applications, which is how we'
 ```haxe
 // This creates a PartialContext, so all children of a Partial know what target
 // they should swap.
-Partial.wrap(() -> Html.div()
-  .child(Partial.swapWith('/foo/bar').child('Click this'))
-);
+Partial.wrap(() -> {
+  // The current body of the partial:
+  Html.div()
+    // A Partial link will swap the current Partial wrapper with the 
+    // contents of the given link:
+    .child(Partial.link(Foo.createUrl({bar: 'bar'})).child('Click this'));
+});
 ```
+
+In order to work, the link will also need to have a Partial wrapper. For example, this is what our Foo route would look like:
+
+```haxe
+class Foo extends RouteComponent<'/foo/{bar:String}'> {
+  function render():Child {
+    return Html.view(<html>
+      <head>
+        <title>'Foo ' bar</title>
+      </head>
+      <body>
+        <SiteHeader />
+        // Only the contents of the wrapped partial will be sent if this is a 
+        // partial request!
+        <Partial>
+          <p>'Bar is currently: ' bar</p>
+          <PartialLink to={Home.createUrl()}>'Return home'</PartialLink>
+        </Partial>
+      </body>
+    </html>);
+  }
+}
+```
+
+Really, the way you want to do this is create a layout with a shared partial and then use that in any page which will use the partial feature. This way you can keep code that will never change -- like a site header -- outside of the partial, and only swap the parts that need swapping.
+
+As for implementation: for static sites, every route will now output the normal, full html, but will also output html fragments (probably in a `partials` subfolder) for any partials it encounters.
+
+## Implementation Ideas
+
+It might make the most sense to have the Partial provide a `blok.router.Navigator` and a `blok.router.RouteVisitor` that override the default ones. This could mean that we don't need a `PartialLink` -- instead, normal `Link` components will simply get intercepted by `Partials`, making this a very easy feature to implement.

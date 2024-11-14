@@ -1,14 +1,17 @@
 package blok.bridge;
 
 import blok.bridge.Events;
+import blok.bridge.component.DefaultErrorView;
 import blok.context.Provider;
 import blok.core.BlokException;
 import blok.debug.Debug;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
+import blok.router.navigation.*;
 import blok.suspense.SuspenseBoundaryContext;
 import blok.ui.*;
+import kit.Error;
 
 using Lambda;
 using blok.boundary.BoundaryModifiers;
@@ -17,27 +20,37 @@ using blok.suspense.SuspenseModifiers;
 class Generator {
 	final bridge:Bridge;
 	final render:() -> Child;
+	final error:(code:ErrorCode, message:String) -> Child;
 
-	public function new(bridge, render) {
+	public function new(bridge, render, ?error) {
 		this.bridge = bridge;
 		this.render = render;
+		this.error = error ?? (code, message) -> DefaultErrorView.node({
+			code: code,
+			message: message
+		});
 	}
 
 	public function generate():Task<Nothing> {
-		bridge.events.init.dispatch();
-
 		var visitor = new RouteVisitor();
-		visitor.enqueue('/');
+		var init = new InitEvent(GeneratingFullSite, visitor);
 
-		return renderUntilComplete(visitor)
-			.next(_ -> handleOutput())
-			.next(cleanup);
+		bridge.events.init.dispatch(init);
+
+		return init.run().next(_ -> {
+			visitor.enqueue('/');
+
+			return renderUntilComplete(visitor)
+				.next(_ -> handleOutput())
+				.next(cleanup);
+		});
 	}
 
 	public function generatePage(path:String):Task<Nothing> {
-		bridge.events.init.dispatch();
-
 		var visitor = new RouteVisitor();
+		var init = new InitEvent(GeneratingSinglePage(path), visitor);
+
+		bridge.events.init.dispatch(init);
 
 		return renderPath(path, visitor)
 			.next(_ -> handleOutput())
@@ -89,9 +102,7 @@ class Generator {
 			var root = mount(document, () -> Provider
 				.provide(() -> visitor)
 				.provide(() -> new BridgeContext({bridge: bridge}))
-				.provide(() -> new Navigator({
-					url: path
-				}))
+				.provide(() -> new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(() -> new SuspenseBoundaryContext({
 					onSuspended: () -> {
 						bridge.events.renderSuspended.dispatch(path, document);
@@ -125,7 +136,7 @@ class Generator {
 						warn('A component failed but triggered onComplete');
 					}
 
-					Placeholder.node(); // @todo: An actual failure view?
+					return error(InternalError, e.message);
 				})
 			);
 

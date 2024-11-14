@@ -6,6 +6,7 @@ import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
 import blok.bridge.BridgeContext;
+import blok.bridge.component.DefaultNotFoundRoute;
 import blok.context.Provider;
 import blok.router.Router;
 
@@ -36,10 +37,9 @@ class Blog extends Component {
 					})),
 					ArchiveRoute.route(params -> ArchivePage.node({})),
 					PostRoute.route({}),
-					DelayRoute.route({})
-				],
-				// @todo: we need a real 404 page, as we'll have to output that to the server.
-				fallback: _ -> 'Not found'
+					DelayRoute.route({}),
+					DefaultNotFoundRoute.route({})
+				]
 			}));
 	}
 }

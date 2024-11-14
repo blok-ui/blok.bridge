@@ -40,7 +40,11 @@ class GenerateStaticHtml extends Structure implements Plugin {
 
 				var file = switch strategy {
 					case DirectoryWithIndexHtmlFile:
-						bridge.output.file(Path.join([entry.path, 'index.html']));
+						bridge.output.file(if (entry.path.extension() == '') {
+							Path.join([entry.path, 'index.html']);
+						} else {
+							entry.path;
+						});
 					case NamedHtmlFile if (entry.path == ''):
 						bridge.output.file('index.html');
 					case NamedHtmlFile:

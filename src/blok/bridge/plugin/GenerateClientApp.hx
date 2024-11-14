@@ -29,8 +29,7 @@ class GenerateClientApp extends Structure implements Plugin {
 
 	public function register(bridge:Bridge) {
 		bridge.plugin(new LinkAssets([
-			
-			JsAsset(getAppName(bridge), true)
+			JsAsset(getAppName(bridge) + '?${bridge.version.toFileNameSafeString()}')
 		]));
 
 		bridge.events.outputting.add(event -> {
@@ -50,10 +49,12 @@ function main() {
 	}
 
 	function getAppName(bridge:Bridge) {
-		return switch namingStrategy {
-			case UseCustom(name): name.withExtension('js');
-			case UseAppVersion(prefix): (prefix + '-' + bridge.version.toFileNameSafeString()).withExtension('js');
-		}
+		return (switch namingStrategy {
+			case UseCustom(name):
+				'/' + name.withExtension('js');
+			case UseAppVersion(prefix):
+				'/' + prefix + '_' + bridge.version.toFileNameSafeString().withExtension('js');
+		}).normalize();
 	}
 
 	function createHaxeCommand(bridge:Bridge) {
@@ -107,4 +108,6 @@ function main() {
 
 		return cmd.join(' ');
 	}
+
+	function createMinifyCommand(bridge:Bridge) {}
 }
