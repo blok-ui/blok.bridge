@@ -21,6 +21,12 @@ function build() {
 						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
 						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
 					});
+				case macro :blok.ui.Child:
+					var name = options.name;
+					Some({
+						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
+						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
+					});
 				// @todo: handle `blok.ui.Child` as well
 				default:
 					None;
@@ -70,20 +76,23 @@ class IslandBuilder implements BuildStep {
 			public static final islandName = $v{path};
 
 			#if blok.client
-			public static function hydrateIslands(adaptor:blok.adaptor.Adaptor) {
-				var elements = blok.bridge.IslandElement.getIslandElementsForComponent(islandName);
-				return [
+			public static function hydrateIslands(adaptor:blok.adaptor.Adaptor, ?options):blok.core.Disposable {
+				var elements = blok.bridge.IslandElement.getIslandElementsForComponent(islandName, options);
+				var islands = [
 					for (el in elements) {
 						var props:{} = blok.bridge.IslandElement.getIslandProps(el);
 						var cursor = adaptor.createCursor(el);
 						var root = blok.ui.Root.node({
 							target: el,
-							child: () -> fromJson(props)
+							child: fromJson(props)
 						}).createView();
 						root.hydrate(cursor, adaptor, null, null);
 						root;
 					}
 				];
+				return blok.core.DisposableItem.ofCallback(() -> {
+					for (island in islands) island.dispose();
+				});
 			}
 			#end
 

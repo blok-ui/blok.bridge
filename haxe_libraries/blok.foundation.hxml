@@ -1,5 +1,5 @@
-# @install: lix --silent download "gh://github.com/blok-ui/blok.foundation#8b816b2774362513129ebded4f9076f20359b03b" into blok.foundation/0.1.0-alpha.1/github/8b816b2774362513129ebded4f9076f20359b03b
+# @install: lix --silent download "gh://github.com/blok-ui/blok.foundation#c627a152b7df80a722554fca7bf7e49a6845a41e" into blok.foundation/0.1.1/github/c627a152b7df80a722554fca7bf7e49a6845a41e
 -lib blok.core
 -lib kit
--cp ${HAXE_LIBCACHE}/blok.foundation/0.1.0-alpha.1/github/8b816b2774362513129ebded4f9076f20359b03b/src
--D blok.foundation=0.1.0-alpha.1
+-cp ${HAXE_LIBCACHE}/blok.foundation/0.1.1/github/c627a152b7df80a722554fca7bf7e49a6845a41e/src
+-D blok.foundation=0.1.1

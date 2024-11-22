@@ -11,8 +11,11 @@ class IslandElement extends Component {
 	public static inline extern final tag:String = 'blok-island';
 
 	#if blok.client
-	@:noUsing public static function getIslandElementsForComponent(name:String) {
-		var items = js.Browser.document.querySelectorAll('$tag[data-component="$name"]');
+	@:noUsing public static function getIslandElementsForComponent(name:String, ?options:{
+		?root:js.html.Element
+	}) {
+		var root:js.html.Element = options?.root ?? cast js.Browser.document;
+		var items = root.querySelectorAll('$tag[data-component="$name"]');
 		return [for (i in 0...items.length) items.item(i).as(js.html.Element)];
 	}
 
@@ -26,7 +29,9 @@ class IslandElement extends Component {
 		return [for (i in 0...items.length) items.item(i).as(js.html.Element)];
 	}
 	#else
-	@:noUsing public static function getIslandElementsForComponent(name:String) {
+	@:noUsing public static function getIslandElementsForComponent(name:String, ?options:{
+		?root:Dynamic
+	}) {
 		return [];
 	}
 	#end
@@ -44,7 +49,8 @@ class IslandElement extends Component {
 			tag,
 			{
 				'data-component': Signal.ofValue(component),
-				'data-props': Signal.ofValue(Json.stringify(props).htmlEscape(true))
+				'data-props': Signal.ofValue(Json.stringify(props).htmlEscape(true)),
+				'style': Signal.ofValue('display:contents')
 			},
 			[child]
 		);

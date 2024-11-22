@@ -2,13 +2,13 @@ package blok.bridge;
 
 import blok.bridge.util.SemVer;
 import blok.context.Context;
-import blok.data.Structure;
+import blok.data.Object;
 import blok.debug.Debug;
 import kit.file.*;
 
 @:fallback(error('No BridgeContext found'))
-class BridgeContext extends Structure implements Context {
-	@:constant final bridge:Bridge;
+class BridgeContext extends Object implements Context {
+	@:value final bridge:Bridge;
 
 	@:prop(get = bridge.fs) public final fs:FileSystem;
 	@:prop(get = bridge.output) public final output:Directory;

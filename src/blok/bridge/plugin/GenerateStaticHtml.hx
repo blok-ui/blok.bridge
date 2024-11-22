@@ -1,6 +1,6 @@
 package blok.bridge.plugin;
 
-import blok.data.Structure;
+import blok.data.Object;
 import blok.html.server.*;
 
 using StringTools;
@@ -16,8 +16,8 @@ typedef OutputHtmlEntry = {
 	public final document:NodePrimitive;
 }
 
-class GenerateStaticHtml extends Structure implements Plugin {
-	@:constant final strategy:HtmlGenerationStrategy;
+class GenerateStaticHtml extends Object implements Plugin {
+	@:value final strategy:HtmlGenerationStrategy;
 
 	public function register(bridge:Bridge) {
 		final entries:Array<OutputHtmlEntry> = [];

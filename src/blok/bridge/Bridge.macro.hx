@@ -5,15 +5,20 @@ import blok.bridge.macro.IslandIntrospector;
 
 class Bridge {
 	#if blok.client
-	public static function hydrateIslands() {
+	public static function hydrateIslands(?options) {
+		if (options == null) options = macro null;
+
 		var islands = loadManifest();
 		var islandHydration:Array<Expr> = islands.map(islandPath -> {
 			var path = islandPath.split('.');
-			macro $p{path}.hydrateIslands(adaptor);
+			macro $p{path}.hydrateIslands(adaptor, ${options});
 		});
 		return macro {
 			var adaptor = new blok.html.client.ClientAdaptor();
-			$b{islandHydration};
+			var disposables = [$a{islandHydration}];
+			blok.core.DisposableItem.ofCallback(() -> {
+				for (disposable in disposables) disposable.dispose();
+			});
 		};
 	}
 	#else

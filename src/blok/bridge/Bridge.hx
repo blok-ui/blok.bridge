@@ -6,11 +6,11 @@ import blok.ui.Child;
 import kit.file.*;
 import kit.file.adaptor.*;
 #end
-import blok.data.Structure;
+import blok.data.Object;
 
-class Bridge extends Structure {
+class Bridge extends Object {
 	#if blok.client
-	public macro static function hydrateIslands();
+	public macro static function hydrateIslands(?options);
 	#else
 	public macro static function trackIslands();
 
@@ -19,9 +19,9 @@ class Bridge extends Structure {
 		return new Bridge(props);
 	}
 
-	@:constant public final fs:FileSystem = new FileSystem(new SysAdaptor(Sys.getCwd()));
-	@:constant public final outputPath:String = 'dist/www';
-	@:constant public final version:SemVer;
+	@:value public final fs:FileSystem = new FileSystem(new SysAdaptor(Sys.getCwd()));
+	@:value public final outputPath:String = 'dist/www';
+	@:value public final version:SemVer;
 
 	public final events:Events;
 	public final output:Directory;

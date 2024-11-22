@@ -1,7 +1,7 @@
 package blog.data;
 
-class Post extends Structure {
-	@:constant public final slug:String;
-	@:constant public final title:String;
-	@:constant public final body:Child;
+class Post extends Object {
+	@:value public final slug:String;
+	@:value public final title:String;
+	@:value public final body:Child;
 }

@@ -1,9 +1,9 @@
 package blok.bridge.plugin;
 
-import blok.data.Structure;
+import blok.data.Object;
 
-class GenerateHtAccess extends Structure implements Plugin {
-	@:constant final blockAiScrapers:Bool = true;
+class GenerateHtAccess extends Object implements Plugin {
+	@:value final blockAiScrapers:Bool = true;
 
 	public function register(bridge:Bridge) {
 		bridge.events.outputting.add(output -> {

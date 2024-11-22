@@ -15,8 +15,8 @@ class Blog extends Component {
 
 	public function render():Child {
 		return Provider
-			.provide(() -> new PostStore(bridge.fs.directory('example/data/post')))
-			.child(_ -> Router.node({
+			.provide(new PostStore(bridge.fs.directory('example/data/post')))
+			.child(Router.node({
 				routes: [
 					HomeRoute.route(_ -> MainLayout.node({
 						pageTitle: 'Home',

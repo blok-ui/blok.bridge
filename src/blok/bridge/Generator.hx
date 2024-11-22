@@ -99,11 +99,11 @@ class Generator {
 
 			bridge.events.rendering.dispatch(rendered);
 
-			var root = mount(document, () -> Provider
-				.provide(() -> visitor)
-				.provide(() -> new BridgeContext({bridge: bridge}))
-				.provide(() -> new Navigator(new ServerHistory(path), new UrlPathResolver()))
-				.provide(() -> new SuspenseBoundaryContext({
+			var root = mount(document, Provider
+				.provide(visitor)
+				.provide(new BridgeContext({bridge: bridge}))
+				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
+				.provide(new SuspenseBoundaryContext({
 					onSuspended: () -> {
 						bridge.events.renderSuspended.dispatch(path, document);
 					},
@@ -117,7 +117,8 @@ class Generator {
 						activate(Ok(Nothing));
 					}
 				}))
-				.child(_ -> rendered.unwrap()
+				.child(rendered
+					.unwrap()
 					.inSuspense(() -> Placeholder.node())
 					.node()
 				)

@@ -46,7 +46,7 @@ function toJson(parent:View, children:Children):Array<SerializedPrimitive> {
 	var node = new ElementPrimitive('#fragment', {});
 	var root = Root.node({
 		target: node,
-		child: () -> children
+		child: children
 	}).createView();
 
 	root.mount(new ServerAdaptor(), parent, null);

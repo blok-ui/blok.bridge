@@ -14,8 +14,8 @@ class UseLogging implements Plugin {
 	public function register(bridge:Bridge) {
 		bridge.events.rendering.add(event -> {
 			event.apply(child -> Provider
-				.provide(() -> new LoggerContext(logger))
-				.child(_ -> child)
+				.provide(new LoggerContext(logger))
+				.child(child)
 			);
 		});
 

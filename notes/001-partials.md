@@ -13,13 +13,8 @@ Also! We'd make a Partial the default root of all applications, which is how we'
 ## Notional API:
 
 ```haxe
-// This creates a PartialContext, so all children of a Partial know what target
-// they should swap.
 Partial.wrap(() -> {
-  // The current body of the partial:
   Html.div()
-    // A Partial link will swap the current Partial wrapper with the 
-    // contents of the given link:
     .child(Partial.link(Foo.createUrl({bar: 'bar'})).child('Click this'));
 });
 ```
@@ -53,4 +48,4 @@ As for implementation: for static sites, every route will now output the normal,
 
 ## Implementation Ideas
 
-It might make the most sense to have the Partial provide a `blok.router.Navigator` and a `blok.router.RouteVisitor` that override the default ones. This could mean that we don't need a `PartialLink` -- instead, normal `Link` components will simply get intercepted by `Partials`, making this a very easy feature to implement.
+It might make the most sense to have the Partial provide a `blok.router.Navigator` and a `blok.router.RouteVisitor` that override the default ones. This could mean that we don't need a `PartialLink` -- instead, normal `Link` components will simply get intercepted by `Partials`, making this a very easy feature to switch to.

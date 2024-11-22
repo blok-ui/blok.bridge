@@ -2,7 +2,7 @@ package blok.bridge.plugin;
 
 import blok.bridge.Constants;
 import blok.bridge.util.Sources;
-import blok.data.Structure;
+import blok.data.Object;
 
 using blok.bridge.util.Commands;
 using haxe.io.Path;
@@ -19,13 +19,13 @@ enum ClientAppNamingStrategy {
 }
 
 // @todo: implement minify
-class GenerateClientApp extends Structure implements Plugin {
-	@:constant final main:String = 'BridgeIslands';
-	@:constant final sources:Array<String> = ['src'];
-	@:constant final namingStrategy:ClientAppNamingStrategy = UseAppVersion('assets/app');
-	@:constant final dependencies:ClientAppDependencies = InheritDependencies;
-	@:constant final flags:Array<String> = [];
-	@:constant final minify:Bool = false;
+class GenerateClientApp extends Object implements Plugin {
+	@:value final main:String = 'BridgeIslands';
+	@:value final sources:Array<String> = ['src'];
+	@:value final namingStrategy:ClientAppNamingStrategy = UseAppVersion('assets/app');
+	@:value final dependencies:ClientAppDependencies = InheritDependencies;
+	@:value final flags:Array<String> = [];
+	@:value final minify:Bool = false;
 
 	public function register(bridge:Bridge) {
 		bridge.plugin(new LinkAssets([
