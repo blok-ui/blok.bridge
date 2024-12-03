@@ -1,27 +1,25 @@
 import blok.bridge.*;
-import blok.bridge.plugin.*;
+import blok.bridge.CoreExtensions;
 
 function main() {
 	Bridge.start({
 		version: '0.0.1',
 		outputPath: 'dist/www'
 	})
-		.plugins([
-			new LinkAssets([
+		.use(
+			linkAssets([
 				CssAsset('/assets/styles.css')
 			]),
-			new GenerateStaticHtml({
-				strategy: DirectoryWithIndexHtmlFile
-			}),
-			new GenerateClientApp({
+			generateStaticHtml(DirectoryWithIndexHtmlFile),
+			generateClientApp({
 				dependencies: UseHxml('example-client.hxml')
 			}),
-			new VisitNotFoundPage(),
-			new GenerateHtAccess({}),
-			new GenerateRobotsTxt(),
-			new RemoveUnusedFiles(),
-			new UseLogging()
-		])
+			visitNotFoundPage(),
+			useLogging(),
+			outputHtAccess(),
+			outputRobotsTxt(),
+			cleanupUnusedFiles()
+		)
 		.generate(() -> blog.Blog.node({}))
 		.handle(result -> switch result {
 			case Ok(_): trace('Done!');

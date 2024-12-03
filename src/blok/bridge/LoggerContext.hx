@@ -12,9 +12,9 @@ class LoggerContext implements Context implements Logger {
 		this.logger = logger;
 	}
 
-	public function dispose() {}
-
 	public function log(level:LogLevel, message:String) {
 		logger.log(level, message);
 	}
+
+	public function dispose() {}
 }

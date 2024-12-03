@@ -31,11 +31,18 @@ class Bridge extends Object {
 		output = fs.directory(outputPath);
 	}
 
+	public function use(...extensions:Extension) {
+		for (extension in extensions) extension(this);
+		return this;
+	}
+
+	@:deprecated('Use extensions instead')
 	public function plugin(plugin:Plugin) {
 		plugin.register(this);
 		return this;
 	}
 
+	@:deprecated('Use extensions instead')
 	public function plugins(plugins:Array<Plugin>) {
 		for (plugin in plugins) this.plugin(plugin);
 		return this;
