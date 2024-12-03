@@ -32,7 +32,7 @@ class Bridge extends Object {
 	}
 
 	public function use(...extensions:Extension) {
-		for (extension in extensions) extension(this);
+		for (extension in extensions) extension.apply(this);
 		return this;
 	}
 

@@ -13,14 +13,12 @@ using blok.bridge.util.Commands;
 using haxe.io.Path;
 
 function useDefaults():Extension {
-	return bridge -> {
-		bridge.use(
-			generateStaticHtml(DirectoryWithIndexHtmlFile),
-			generateClientApp({dependencies: InheritDependencies}),
-			visitNotFoundPage(),
-			useLogging()
-		);
-	}
+	return [
+		generateStaticHtml(DirectoryWithIndexHtmlFile),
+		generateClientApp({dependencies: InheritDependencies}),
+		visitNotFoundPage(),
+		useLogging()
+	];
 }
 
 enum abstract HtmlGenerationStrategy(String) to String from String {

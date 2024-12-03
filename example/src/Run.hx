@@ -2,10 +2,11 @@ import blok.bridge.*;
 import blok.bridge.CoreExtensions;
 
 function main() {
-	Bridge.start({
-		version: '0.0.1',
-		outputPath: 'dist/www'
-	})
+	Bridge
+		.start({
+			version: '0.0.1',
+			outputPath: 'dist/www'
+		})
 		.use(
 			linkAssets([
 				CssAsset('/assets/styles.css')
