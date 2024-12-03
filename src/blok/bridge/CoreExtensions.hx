@@ -12,7 +12,7 @@ using StringTools;
 using blok.bridge.util.Commands;
 using haxe.io.Path;
 
-function useDefaults():Extension {
+function generateStaticSiteUsingDefaults():Extension {
 	return [
 		generateStaticHtml(DirectoryWithIndexHtmlFile),
 		generateClientApp({dependencies: InheritDependencies}),

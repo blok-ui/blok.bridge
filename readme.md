@@ -18,21 +18,15 @@ Bridge apps start with simple configuration and some optional plugins. Here's a 
 
 ```haxe
 import blok.bridge.*;
-import blok.bridge.plugin.*;
+import blok.bridge.CoreExtensions;
 
 function main() {
-  Bridge.start({
-    version: '0.0.1',
-    outputPath: 'dist/www'
-  })
-    .plugins([
-      new StaticHtml({
-        strategy: DirectoryWithIndexHtmlFile
-      }),
-      new ClientApp({
-        dependencies: InheritDependencies
-      })
-    ])
+  Bridge
+    .start({
+      version: '0.0.1',
+      outputPath: 'dist/www'
+    })
+    .use(generateStaticSiteUsingDefaults())
     .generate(() -> example.Example.node({}))
     .handle(result -> switch result {
       case Ok(_): trace('Done!');
@@ -196,7 +190,7 @@ class Example extends Component {
               <Counter count={params.count} />
             </div>}
           </Route>
-          <fallback>{_ -> "Not found"}</fallback>
+          <Route to="*">{_ -> "Not found"}</fallback>
         </Router>
       </body>
     </html>);
@@ -260,9 +254,52 @@ When you compile the app again, this should just work! If you take a peek at the
 
 > Note: this feature is still pretty new and may not work well yet.
 
-### Plugins
+### Extensions
 
+Extensions are core to the way Bridge works. They are simple, composable functions that hook into Bridge events.
 
+Let's write a quick example that will simply log a message when a bridge app is generated:
+
+```haxe
+import blok.bridge.*;
+
+function logMessage():Extension {
+  return bridge -> {
+    bridge.events.init.add(_ -> {
+      trace('Hello world!');
+    });
+  }
+}
+```
+
+We can now add this extension to our app:
+
+```haxe
+import blok.bridge.*;
+import blok.bridge.CoreExtensions;
+
+function main() {
+  Bridge
+    .start({
+      version: '0.0.1',
+      outputPath: 'dist/www'
+    })
+    .use(
+      generateStaticSiteUsingDefaults(),
+      // Add your new Extension here:
+      logMessage()
+    )
+    .generate(() -> example.Example.node({}))
+    .handle(result -> switch result {
+      case Ok(_): trace('Done!');
+      case Error(error): trace(error.message);
+    });
+}
+```
+
+You'll now see `Hello world!` in your console once when your app initializes.
+
+> More coming soon.
 
 ## More Information
 
