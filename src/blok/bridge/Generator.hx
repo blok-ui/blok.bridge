@@ -100,7 +100,7 @@ class Generator {
 			bridge.events.rendering.dispatch(rendered);
 
 			var root = mount(document, Provider
-				.provide(visitor)
+				.share(visitor)
 				.provide(new BridgeContext({bridge: bridge}))
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(new SuspenseBoundaryContext({

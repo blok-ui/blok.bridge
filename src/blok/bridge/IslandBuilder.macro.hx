@@ -27,7 +27,6 @@ function build() {
 						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
 						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
 					});
-				// @todo: handle `blok.ui.Child` as well
 				default:
 					None;
 			},
