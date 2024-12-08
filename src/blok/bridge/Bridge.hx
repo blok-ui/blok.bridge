@@ -39,18 +39,6 @@ class Bridge extends Object implements Context {
 		return this;
 	}
 
-	@:deprecated('Use extensions instead')
-	public function plugin(plugin:Plugin) {
-		plugin.register(this);
-		return this;
-	}
-
-	@:deprecated('Use extensions instead')
-	public function plugins(plugins:Array<Plugin>) {
-		for (plugin in plugins) this.plugin(plugin);
-		return this;
-	}
-
 	public function generate(render:() -> Child) {
 		var generator = new Generator(this, render);
 		return generator.generate();
