@@ -101,7 +101,7 @@ class Generator {
 
 			var root = mount(document, Provider
 				.share(visitor)
-				.provide(new BridgeContext({bridge: bridge}))
+				.share(bridge)
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(new SuspenseBoundaryContext({
 					onSuspended: () -> {

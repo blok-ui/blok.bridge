@@ -6,9 +6,12 @@ import blok.ui.Child;
 import kit.file.*;
 import kit.file.adaptor.*;
 #end
+import blok.context.Context;
 import blok.data.Object;
+import blok.debug.Debug;
 
-class Bridge extends Object {
+@:fallback(error('No Bridge instance found'))
+class Bridge extends Object implements Context {
 	#if blok.client
 	public macro static function hydrateIslands(?options);
 	#else
@@ -57,4 +60,6 @@ class Bridge extends Object {
 		return Task.reject(new Error(NotImplemented, 'Serving Bridge apps is not ready yet'));
 	}
 	#end
+
+	public function dispose() {}
 }

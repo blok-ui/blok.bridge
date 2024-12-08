@@ -5,13 +5,13 @@ import blog.layout.MainLayout;
 import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
-import blok.bridge.BridgeContext;
+import blok.bridge.Bridge;
 import blok.bridge.component.DefaultNotFoundRoute;
 import blok.context.Provider;
 import blok.router.Router;
 
 class Blog extends Component {
-	@:context final bridge:BridgeContext;
+	@:context final bridge:Bridge;
 
 	public function render():Child {
 		return Provider
