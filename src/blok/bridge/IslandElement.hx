@@ -1,7 +1,7 @@
 package blok.bridge;
 
 import blok.signal.Signal;
-import blok.ui.*;
+import blok.*;
 import haxe.Json;
 
 using Reflect;

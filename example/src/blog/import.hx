@@ -1,6 +1,6 @@
 import Breeze;
 import blok.data.*;
-import blok.ui.*;
+import blok.*;
 import blok.html.Html;
 
 using Kit;

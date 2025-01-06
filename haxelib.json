@@ -4,10 +4,10 @@
   "classPath": "src",
   "tags": ["ui"],
   "contributors": ["wartman"],
-  "version": "0.1.0",
-  "releasenote": "Update kit",
+  "version": "0.2.0-alpha.1",
+  "releasenote": "Latest blok",
   "dependencies": {
-    "blok.core": "0.9.0",
+    "blok.core": "0.10.0",
     "blok.router": "0.0.0",
     "kit.file": "0.1.0"
   }

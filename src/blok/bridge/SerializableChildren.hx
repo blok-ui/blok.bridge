@@ -2,7 +2,7 @@ package blok.bridge;
 
 import blok.debug.Debug;
 import blok.signal.Signal;
-import blok.ui.*;
+import blok.*;
 #if !blok.client
 import blok.html.server.*;
 #end
@@ -22,7 +22,7 @@ typedef SerializedPrimitive = {
 function fromJson(data:Array<SerializedPrimitive>):Children {
 	return [for (child in data) switch child.type {
 		case Text:
-			blok.ui.Text.node(child.data);
+			blok.Text.node(child.data);
 		case Element:
 			var props:{} = {};
 			for (name in Reflect.fields(child.data)) {

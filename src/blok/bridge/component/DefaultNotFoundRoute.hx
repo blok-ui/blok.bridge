@@ -1,9 +1,9 @@
 package blok.bridge.component;
 
-import blok.ui.*;
-import blok.router.RouteComponent;
+import blok.*;
+import blok.router.Page;
 
-class DefaultNotFoundRoute extends RouteComponent<'*'> {
+class DefaultNotFoundRoute extends Page<'*'> {
 	function render():Child {
 		return DefaultErrorView.node({
 			code: NotFound,

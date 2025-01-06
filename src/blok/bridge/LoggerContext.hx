@@ -2,7 +2,6 @@ package blok.bridge;
 
 import blok.bridge.log.DefaultLogger;
 import blok.bridge.Logger;
-import blok.context.Context;
 
 @:fallback(new LoggerContext(new DefaultLogger()))
 class LoggerContext implements Context implements Logger {

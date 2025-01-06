@@ -2,7 +2,7 @@ package blok.bridge;
 
 import kit.macro.*;
 import kit.macro.step.*;
-import blok.ui.ComponentBuilder;
+import blok.ComponentBuilder;
 
 using Lambda;
 using haxe.macro.Tools;
@@ -15,13 +15,13 @@ function build() {
 				case macro :blok.signal.Signal<$wrappedType>:
 					var name = options.name;
 					Some(options.parser(macro this.$name.get(), name, wrappedType));
-				case macro :blok.ui.Children:
+				case macro :blok.Children:
 					var name = options.name;
 					Some({
 						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
 						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
 					});
-				case macro :blok.ui.Child:
+				case macro :blok.Child:
 					var name = options.name;
 					Some({
 						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
@@ -31,7 +31,7 @@ function build() {
 					None;
 			},
 			constructorAccessor: macro node,
-			returnType: macro :blok.ui.Child
+			returnType: macro :blok.Child
 		}))
 		.addStep(new IslandBuilder())
 		.export();
@@ -53,7 +53,7 @@ class IslandBuilder implements BuildStep {
 					#if blok.client
 					$render;
 					#else
-					var child:() -> blok.ui.Child = () -> $render;
+					var child:() -> blok.Child = () -> $render;
 					return switch findAncestorOfType(blok.bridge.Island) {
 						case None:
 							blok.bridge.IslandElement.node({
@@ -75,13 +75,13 @@ class IslandBuilder implements BuildStep {
 			public static final islandName = $v{path};
 
 			#if blok.client
-			public static function hydrateIslands(adaptor:blok.adaptor.Adaptor, ?options):blok.core.Disposable {
+			public static function hydrateIslands(adaptor:blok.Adaptor, ?options):blok.Disposable {
 				var elements = blok.bridge.IslandElement.getIslandElementsForComponent(islandName, options);
 				var islands = [
 					for (el in elements) {
 						var props:{} = blok.bridge.IslandElement.getIslandProps(el);
 						var cursor = adaptor.createCursor(el);
-						var root = blok.ui.Root.node({
+						var root = blok.Root.node({
 							target: el,
 							child: fromJson(props)
 						}).createView();
@@ -89,7 +89,7 @@ class IslandBuilder implements BuildStep {
 						root;
 					}
 				];
-				return blok.core.DisposableItem.ofCallback(() -> {
+				return blok.DisposableItem.ofCallback(() -> {
 					for (island in islands) island.dispose();
 				});
 			}

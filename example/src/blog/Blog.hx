@@ -7,7 +7,6 @@ import blog.route.*;
 import blog.ui.*;
 import blok.bridge.Bridge;
 import blok.bridge.component.DefaultNotFoundRoute;
-import blok.context.Provider;
 import blok.router.Router;
 
 class Blog extends Component {

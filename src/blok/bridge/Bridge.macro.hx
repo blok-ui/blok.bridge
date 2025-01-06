@@ -16,7 +16,7 @@ class Bridge {
 		return macro {
 			var adaptor = new blok.html.client.ClientAdaptor();
 			var disposables = [$a{islandHydration}];
-			blok.core.DisposableItem.ofCallback(() -> {
+			blok.DisposableItem.ofCallback(() -> {
 				for (disposable in disposables) disposable.dispose();
 			});
 		};

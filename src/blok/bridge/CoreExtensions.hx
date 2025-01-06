@@ -3,7 +3,6 @@ package blok.bridge;
 import blok.bridge.Constants;
 import blok.bridge.log.DefaultLogger;
 import blok.bridge.util.Sources;
-import blok.context.Provider;
 import blok.data.Object;
 import blok.html.server.*;
 import kit.file.Directory;

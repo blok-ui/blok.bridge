@@ -40,7 +40,7 @@ The entrypoint of our Bridge app is just a normal Component (called "Example" in
 ```haxe
 package example;
 
-import blok.ui.*;
+import blok.*;
 import blok.html.Html;
 import blok.bridge.Bootstrap;
 
@@ -80,7 +80,7 @@ Bridge uses the Blok Router package to handle routes. It will automatically foll
 package example;
 
 import blok.html.Html;
-import blok.ui.Child;
+import blok.Child;
 import blok.router.*;
 import blok.bridge.Bootstrap;
 
@@ -135,7 +135,7 @@ An `Island` is almost exactly like a standard Blok component, but it has a littl
 package example;
 
 import blok.bridge.*;
-import blok.ui.*;
+import blok.*;
 import blok.html.Html;
 
 class Counter extends Island {
@@ -156,7 +156,7 @@ class Counter extends Island {
 package example;
 
 import blok.html.Html;
-import blok.ui.Child;
+import blok.Child;
 import blok.router.*;
 import blok.bridge.Bootstrap;
 
@@ -208,7 +208,7 @@ You may be curious what happens if you try to pass children to an Island. Let's 
 
 ```haxe
 import blok.bridge.*;
-import blok.ui.*;
+import blok.*;
 import blok.html.Html;
 
 class Counter extends Island {
@@ -227,7 +227,7 @@ class Counter extends Island {
 Let's make this a little more interesting and also create a Label component (it won't do anything special, we just need it for an explanation):
 
 ```haxe
-import blok.ui.*;
+import blok.*;
 import blok.html.Html;
 
 class Label extends Component {

@@ -1,5 +1,7 @@
 -cp example/src
+
 -D analyzer-optimize
+-D message.reporting=pretty
 
 -dce full
 --debug

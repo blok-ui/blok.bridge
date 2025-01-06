@@ -1,7 +1,7 @@
 package blok.bridge.component;
 
 import blok.html.Html;
-import blok.ui.*;
+import blok.*;
 import kit.Error;
 
 class DefaultErrorView extends Component {

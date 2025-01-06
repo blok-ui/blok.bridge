@@ -1,10 +1,8 @@
 package blok.bridge;
 
 import blok.bridge.util.*;
-import blok.core.*;
 import blok.html.server.NodePrimitive;
 import blok.router.RouteVisitor;
-import blok.ui.Child;
 import haxe.Exception;
 
 class Events {
