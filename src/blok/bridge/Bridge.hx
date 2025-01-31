@@ -2,6 +2,7 @@ package blok.bridge;
 
 #if !blok.client
 import blok.bridge.util.*;
+import blok.bridge.plugin.*;
 import kit.file.*;
 import kit.file.adaptor.*;
 #end
@@ -13,10 +14,10 @@ class Bridge extends Object implements Context {
 	#if blok.client
 	public macro static function hydrateIslands(?options);
 	#else
-	public macro static function trackIslands();
+	// public macro static function trackIslands();
 
 	public inline static function start(props) {
-		trackIslands();
+		// trackIslands();
 		return new Bridge(props);
 	}
 
@@ -24,26 +25,33 @@ class Bridge extends Object implements Context {
 	@:value public final outputPath:String = 'dist/www';
 	@:value public final version:SemVer;
 
-	public final events:Events;
 	public final output:Directory;
 
+	var plugins:Array<Plugin> = [];
+
 	public function new() {
-		events = new Events();
 		output = fs.directory(outputPath);
 	}
 
-	public function use(...extensions:Extension) {
-		for (extension in extensions) extension.apply(this);
+	public function use(...plugins:Plugin) {
+		this.plugins = this.plugins.concat(plugins.toArray());
 		return this;
 	}
 
-	public function generate(render:() -> Child) {
-		var generator = new Generator(this, render);
-		return generator.generate();
-	}
+	public function generate() {
+		var core = new Core({
+			bridge: this,
+			children: plugins
+		});
 
-	public function serve(render:() -> Child) {
-		return Task.reject(new Error(NotImplemented, 'Serving Bridge apps is not ready yet'));
+		core.activate(null);
+
+		return core
+			.dispatch()
+			.next(_ -> {
+				core.dispose();
+				Task.nothing();
+			});
 	}
 	#end
 
