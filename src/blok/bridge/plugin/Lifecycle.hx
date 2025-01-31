@@ -2,15 +2,15 @@ package blok.bridge.plugin;
 
 import blok.bridge.util.*;
 
-class Core extends Plugin {
+class Lifecycle extends Plugin {
 	@:noUsing
 	public static function from(plugin:Plugin) {
-		return maybeFrom(plugin).orThrow('No Core plugin found');
+		return maybeFrom(plugin).orThrow('No Lifecycle plugin found');
 	}
 
 	@:noUsing
 	public static function maybeFrom(plugin:Plugin) {
-		return plugin.findAncestorOfType(Core);
+		return plugin.findAncestorOfType(Lifecycle);
 	}
 
 	@:value public final bridge:Bridge;

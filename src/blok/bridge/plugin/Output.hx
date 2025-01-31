@@ -27,13 +27,13 @@ class Output extends Plugin {
 	public function run() {
 		for (child in children) registerChild(child);
 
-		var link = Core.from(this).export.add(queue -> {
+		var link = Lifecycle.from(this).export.add(queue -> {
 			exporting.dispatch(queue);
 		});
 		addDisposable(() -> link.cancel());
 
 		if (logOutput) Logging.maybeFrom(this).inspect(logger -> {
-			var link = Core.from(this).cleanup.add(_ -> logger.log(Info, [
+			var link = Lifecycle.from(this).cleanup.add(_ -> logger.log(Info, [
 				'File output:'
 			].concat(paths.map(path -> '    $path')).join('\n')));
 			addDisposable(() -> link.cancel());

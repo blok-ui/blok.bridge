@@ -21,6 +21,23 @@ class Bridge extends Object implements Context {
 		return new Bridge(props);
 	}
 
+	public static function simpleStart(props, render) {
+		return new Bridge(props)
+			.use(new Generator({
+				render: render,
+				mode: RenderFullSiteWithErrorPage,
+				children: [
+					new StaticHtml({
+						strategy: DirectoryWithIndexHtmlFile
+					}),
+					new ClientApp({
+						dependencies: InheritDependencies,
+						minify: #if debug false #else true #end
+					})
+				]
+			}));
+	}
+
 	@:value public final fs:FileSystem = new FileSystem(new SysAdaptor(Sys.getCwd()));
 	@:value public final outputPath:String = 'dist/www';
 	@:value public final version:SemVer;
@@ -39,7 +56,7 @@ class Bridge extends Object implements Context {
 	}
 
 	public function generate() {
-		var core = new Core({
+		var core = new Lifecycle({
 			bridge: this,
 			children: plugins
 		});

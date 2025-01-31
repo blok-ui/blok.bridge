@@ -18,16 +18,14 @@ Bridge apps start with simple configuration and some optional plugins. Here's a 
 
 ```haxe
 import blok.bridge.*;
-import blok.bridge.CoreExtensions;
 
 function main() {
   Bridge
-    .start({
+    .simpleStart({
       version: '0.0.1',
       outputPath: 'dist/www'
-    })
-    .use(generateStaticSiteUsingDefaults())
-    .generate(() -> example.Example.node({}))
+    }, () -> example.Example.node({}))
+    .generate()
     .handle(result -> switch result {
       case Ok(_): trace('Done!');
       case Error(error): trace(error.message);
@@ -254,18 +252,24 @@ When you compile the app again, this should just work! If you take a peek at the
 
 > Note: this feature is still pretty new and may not work well yet.
 
-### Extensions
+### Plugins
 
-Extensions are core to the way Bridge works. They are simple, composable functions that hook into Bridge events.
+Plugins are core to the way Bridge works. They are simple, composable classes that hook into Bridge events.
 
 Let's write a quick example that will simply log a message when a bridge app is generated:
 
 ```haxe
 import blok.bridge.*;
+import blok.bridge.plugin.*;
 
-function logMessage():Extension {
-  return bridge -> {
-    bridge.events.init.add(_ -> {
+class MessageLogger extends Plugin {
+  public function run() {
+    // Plugins have a similar context API to Blok
+    // components, so we can look up the Plugin tree and
+    // find the Lifecycle plugin which has some events we can
+    // hook into. In this case we're going to trace "Hello world!"
+    // during the setup phase.
+    Lifecycle.from(this).setup.add(_ -> {
       trace('Hello world!');
     });
   }
@@ -276,7 +280,7 @@ We can now add this extension to our app:
 
 ```haxe
 import blok.bridge.*;
-import blok.bridge.CoreExtensions;
+import blok.bridge.plugin.*;
 
 function main() {
   Bridge
@@ -285,11 +289,28 @@ function main() {
       outputPath: 'dist/www'
     })
     .use(
-      generateStaticSiteUsingDefaults(),
-      // Add your new Extension here:
-      logMessage()
+      // Rather than use `simpleStart` we'll configure our Generator
+      // plugin directly.
+      new Generator({
+				render: () -> example.Example.node({}),
+				mode: RenderFullSiteWithErrorPage,
+				children: [
+          // These children depend on the Generator's events. Note that this
+          // means you can have more than one Generator with different kinds of output
+          // in the same app.
+					new StaticHtml({
+						strategy: DirectoryWithIndexHtmlFile
+					}),
+					new ClientApp({
+						dependencies: InheritDependencies,
+						minify: #if debug false #else true #end
+					}),
+				]
+			}),
+      // And here's our simple plugin:
+      new MessageLogger()
     )
-    .generate(() -> example.Example.node({}))
+    .generate()
     .handle(result -> switch result {
       case Ok(_): trace('Done!');
       case Error(error): trace(error.message);
@@ -299,7 +320,7 @@ function main() {
 
 You'll now see `Hello world!` in your console once when your app initializes.
 
-> More coming soon.
+> More coming soon, especially about composability and context stuff.
 
 ## More Information
 

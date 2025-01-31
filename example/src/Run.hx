@@ -34,7 +34,7 @@ function main() {
 			outputPath: 'dist/www'
 		})
 		.use(
-			new Generate({
+			new Generator({
 				render: () -> blog.Blog.node({}),
 				mode: RenderFullSiteWithErrorPage,
 				children: [

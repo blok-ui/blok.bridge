@@ -20,7 +20,7 @@ enum RenderMode {
 	RenderSinglePage(page:Path);
 }
 
-class Generate extends Plugin {
+class Generator extends Plugin {
 	@:noUsing
 	public static function from(plugin:Plugin) {
 		return maybeFrom(plugin).orThrow('No Render plugin found');
@@ -28,9 +28,10 @@ class Generate extends Plugin {
 
 	@:noUsing
 	public static function maybeFrom(plugin:Plugin) {
-		return plugin.findAncestorOfType(Generate);
+		return plugin.findAncestorOfType(Generator);
 	}
 
+	@:prop(get = _visitor) public final visitor:RouteVisitor;
 	public final rendering = new Event<Path, NodePrimitive, RenderResult>();
 	public final renderComplete = new Event<Path, NodePrimitive>();
 	public final renderSuspended = new Event<Path, NodePrimitive>();
@@ -44,25 +45,23 @@ class Generate extends Plugin {
 	});
 	@:value final children:Array<Plugin>;
 
-	// public function include(path:String) {
-	// }
+	var _visitor = new RouteVisitor();
 
 	public function run() {
 		for (child in children) registerChild(child);
 
-		var link = Core.from(this).generate.add(queue -> {
-			var visitor = new RouteVisitor();
-
+		var link = Lifecycle.from(this).generate.add(queue -> {
 			switch mode {
 				case RenderFullSiteWithErrorPage:
 					visitor.enqueue('/');
 					visitor.enqueue('/404.html');
-					queue.enqueue(renderUntilComplete(visitor));
+					queue.enqueue(renderUntilComplete());
 				case RenderFullSite(include):
 					visitor.enqueue('/');
 					if (include != null) for (path in include) visitor.enqueue(path);
-					queue.enqueue(renderUntilComplete(visitor));
+					queue.enqueue(renderUntilComplete());
 				case RenderSinglePage(path):
+					var visitor = new RouteVisitor();
 					visitor.enqueue(path);
 					queue.enqueue(renderPath(path, visitor));
 			}
@@ -71,14 +70,18 @@ class Generate extends Plugin {
 		addDisposable(() -> link.cancel());
 	}
 
-	function renderUntilComplete(visitor:RouteVisitor):Task<Nothing> {
-		var paths = visitor.drain();
+	function renderUntilComplete():Task<Nothing> {
+		var paths = _visitor.drain();
 		return Task
-			.parallel(...paths.map(path -> renderPath(path, visitor)))
+			.parallel(...paths.map(path -> renderPath(path, _visitor)))
 			.next(_ -> {
-				if (visitor.hasPending()) {
-					return renderUntilComplete(visitor);
+				if (_visitor.hasPending()) {
+					return renderUntilComplete();
 				}
+
+				_visitor.dispose();
+				_visitor = new RouteVisitor();
+
 				return Task.nothing();
 			});
 	}
@@ -89,13 +92,14 @@ class Generate extends Plugin {
 		return new Task(activate -> {
 			var document = new ElementPrimitive('#document', {});
 			var activated = false;
+			var bridge = Lifecycle.from(this).bridge;
 			var rendered = new RenderResult(render());
 
 			rendering.dispatch(path, document, rendered);
 
 			var root = mount(document, Provider
 				.share(visitor)
-				.share(Core.from(this).bridge)
+				.share(bridge)
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(new SuspenseBoundaryContext({
 					onSuspended: () -> {

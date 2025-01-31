@@ -25,7 +25,7 @@ class Assets extends Plugin {
 	}
 
 	public function run() {
-		var link = Generate.from(this).renderComplete.add((_, document) -> {
+		var link = Generator.from(this).renderComplete.add((_, document) -> {
 			var head = document
 				.find(el -> el.as(ElementPrimitive)?.tag == 'head', true)
 				.or(() -> new ElementPrimitive('head'));

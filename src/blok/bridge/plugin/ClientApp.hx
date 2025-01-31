@@ -44,7 +44,7 @@ class ClientApp extends Plugin {
 
 	public function run() {
 		var target = target.normalize().withExtension('js');
-		var core = Core.from(this);
+		var core = Lifecycle.from(this);
 		var output = Output.from(this);
 
 		registerChild(new Assets({

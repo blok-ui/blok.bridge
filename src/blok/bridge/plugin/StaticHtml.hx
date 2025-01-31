@@ -20,8 +20,8 @@ class StaticHtml extends Plugin {
 
 	public function run() {
 		var entries:Array<OutputHtmlEntry> = [];
-		var render = Generate.from(this);
-		var core = Core.from(this);
+		var render = Generator.from(this);
+		var core = Lifecycle.from(this);
 		var output = Output.maybeFrom(this).orThrow('Output required for StaticHtml');
 		var links:Cancellable = [
 			render.renderComplete.add((path, document) -> {

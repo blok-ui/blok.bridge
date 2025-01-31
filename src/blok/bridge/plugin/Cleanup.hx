@@ -5,7 +5,7 @@ import kit.file.*;
 class Cleanup extends Plugin {
 	public function run() {
 		Output.maybeFrom(this).inspect(output -> {
-			var link = Core.from(this).cleanup.add(queue -> {
+			var link = Lifecycle.from(this).cleanup.add(queue -> {
 				queue.enqueue(cleanupDir(output.directory, output));
 			});
 			addDisposable(() -> link.cancel());
