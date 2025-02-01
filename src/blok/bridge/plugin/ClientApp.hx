@@ -18,14 +18,6 @@ enum ClientAppNamingStrategy {
 	UseName(name:String);
 }
 
-// private final mainContents = '// THIS IS A GENERATED FILE.
-// // DO NOT EDIT.
-// function main() {
-//   #if blok.client
-// 	blok.bridge.Bridge.hydrateIslands();
-//   #end
-// }';
-
 class ClientApp extends Plugin {
 	@:noUsing
 	public static function maybeFrom(plugin:Plugin) {
@@ -33,7 +25,6 @@ class ClientApp extends Plugin {
 	}
 
 	@:value final target:String = '/assets/app';
-	// @:value final main:String = 'BridgeIslands';
 	@:value final sources:Array<String> = ['src'];
 	@:value final dependencies:ClientAppDependencies = InheritDependencies;
 	@:value final flags:Array<String> = [];
@@ -61,10 +52,11 @@ class ClientApp extends Plugin {
 
 		for (child in children) registerChild(child);
 
-		output.exporting.add(queue -> {
+		// @todo: If we ever get the server to work, we'll want to make sure that this
+		// only gets run when needed, not for every request.
+		var link = output.exporting.addOnce(queue -> {
 			var task = output.directory.getMeta().next(meta -> {
 				var target = Path.join([meta.path, target]).withExtension('js');
-				// var mainPath = Path.join([DotBridge, IslandsMain]).withExtension('hx');
 
 				return new Task(activate -> switch Sys.command(createHaxeCommand(target)) {
 					case 0: activate(Ok(Nothing));
@@ -84,6 +76,8 @@ class ClientApp extends Plugin {
 
 			queue.enqueue(task);
 		});
+
+		addDisposable(() -> link.cancel());
 	}
 
 	function createHaxeCommand(target:String) {

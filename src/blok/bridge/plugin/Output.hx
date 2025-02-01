@@ -27,7 +27,7 @@ class Output extends Plugin {
 	public function run() {
 		for (child in children) registerChild(child);
 
-		var link = Lifecycle.from(this).export.add(queue -> {
+		var link = Lifecycle.from(this).commit.add(queue -> {
 			exporting.dispatch(queue);
 		});
 		addDisposable(() -> link.cancel());

@@ -16,8 +16,8 @@ class Lifecycle extends Plugin {
 	@:value public final bridge:Bridge;
 
 	public final setup = new Event<TaskQueue>();
-	public final generate = new Event<TaskQueue>();
-	public final export = new Event<TaskQueue>();
+	public final serve = new Event<TaskQueue>();
+	public final commit = new Event<TaskQueue>();
 	public final cleanup = new Event<TaskQueue>();
 
 	@:value final children:Array<Plugin> = [];
@@ -43,14 +43,14 @@ class Lifecycle extends Plugin {
 
 		return setupTasks.parallel()
 			.next(_ -> {
-				var generateTasks = new TaskQueue();
-				generate.dispatch(generateTasks);
-				generateTasks.parallel();
+				var serveTasks = new TaskQueue();
+				serve.dispatch(serveTasks);
+				serveTasks.parallel();
 			})
 			.next(_ -> {
-				var exportTasks = new TaskQueue();
-				export.dispatch(exportTasks);
-				exportTasks.parallel();
+				var commitTasks = new TaskQueue();
+				commit.dispatch(commitTasks);
+				commitTasks.parallel();
 			})
 			.next(_ -> {
 				var cleanupTasks = new TaskQueue();

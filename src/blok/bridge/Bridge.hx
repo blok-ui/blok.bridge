@@ -25,7 +25,6 @@ class Bridge extends Object implements Context {
 		return new Bridge(props)
 			.use(new Generator({
 				render: render,
-				mode: RenderFullSiteWithErrorPage,
 				children: [
 					new StaticHtml({
 						strategy: DirectoryWithIndexHtmlFile
@@ -55,7 +54,7 @@ class Bridge extends Object implements Context {
 		return this;
 	}
 
-	public function generate() {
+	public function run() {
 		var core = new Lifecycle({
 			bridge: this,
 			children: plugins
@@ -63,12 +62,10 @@ class Bridge extends Object implements Context {
 
 		core.activate(null);
 
-		return core
-			.dispatch()
-			.next(_ -> {
-				core.dispose();
-				Task.nothing();
-			});
+		return core.dispatch().next(_ -> {
+			core.dispose();
+			Task.nothing();
+		});
 	}
 	#end
 

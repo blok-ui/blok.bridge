@@ -17,20 +17,27 @@ typedef OutputHtmlEntry = {
 
 class StaticHtml extends Plugin {
 	@:value final strategy:HtmlGenerationStrategy;
+	@:value final render404Page:Bool = true;
 
 	public function run() {
 		var entries:Array<OutputHtmlEntry> = [];
-		var render = Generator.from(this);
-		var core = Lifecycle.from(this);
-		var output = Output.maybeFrom(this).orThrow('Output required for StaticHtml');
+		var generator = Generator.from(this);
+		var lifecycle = Lifecycle.from(this);
+		var output = Output.from(this);
 		var links:Cancellable = [
-			render.renderComplete.add((path, document) -> {
+			lifecycle.serve.add(queue -> {
+				generator.visitor.enqueue('/');
+				if (render404Page) generator.visitor.enqueue('/404.html');
+				queue.enqueue(generator.renderFullSite());
+			}),
+
+			generator.renderComplete.add((path, document) -> {
 				var path = path.trim().normalize();
 				if (path.startsWith('/')) path = path.substr(1);
 				entries.push({path: path, document: document});
 			}),
 
-			core.export.add(queue -> queue.enqueue(
+			output.exporting.add(queue -> queue.enqueue(
 				Task.parallel(...entries.map(entry -> {
 					var head = entry.document
 						.find(el -> el.as(ElementPrimitive)?.tag == 'head', true)
@@ -65,7 +72,7 @@ class StaticHtml extends Plugin {
 				})
 			)),
 
-			core.cleanup.add(_ -> entries.resize(0)),
+			lifecycle.cleanup.add(_ -> entries.resize(0)),
 		];
 
 		addDisposable(() -> links.cancel());

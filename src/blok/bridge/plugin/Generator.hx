@@ -14,12 +14,6 @@ import kit.Error;
 using Lambda;
 using blok.Modifiers;
 
-enum RenderMode {
-	RenderFullSiteWithErrorPage;
-	RenderFullSite(?include:Array<Path>);
-	RenderSinglePage(page:Path);
-}
-
 class Generator extends Plugin {
 	@:noUsing
 	public static function from(plugin:Plugin) {
@@ -37,7 +31,6 @@ class Generator extends Plugin {
 	public final renderSuspended = new Event<Path, NodePrimitive>();
 	public final renderFailed = new Event<Exception>();
 
-	@:value final mode:RenderMode;
 	@:value final render:() -> Child;
 	@:value final error:(code:ErrorCode, message:String) -> Child = (code, message) -> DefaultErrorView.node({
 		code: code,
@@ -49,47 +42,40 @@ class Generator extends Plugin {
 
 	public function run() {
 		for (child in children) registerChild(child);
-
-		var link = Lifecycle.from(this).generate.add(queue -> {
-			switch mode {
-				case RenderFullSiteWithErrorPage:
-					visitor.enqueue('/');
-					visitor.enqueue('/404.html');
-					queue.enqueue(renderUntilComplete());
-				case RenderFullSite(include):
-					visitor.enqueue('/');
-					if (include != null) for (path in include) visitor.enqueue(path);
-					queue.enqueue(renderUntilComplete());
-				case RenderSinglePage(path):
-					var visitor = new RouteVisitor();
-					visitor.enqueue(path);
-					queue.enqueue(renderPath(path, visitor));
-			}
-		});
-
-		addDisposable(() -> link.cancel());
 	}
 
-	function renderUntilComplete():Task<Nothing> {
-		var paths = _visitor.drain();
+	public function renderFullSite() {
+		return renderUntilComplete(_visitor).next(_ -> {
+			_visitor.dispose();
+			_visitor = new RouteVisitor();
+			Task.nothing();
+		});
+	}
+
+	public function renderSinglePage(path:String) {
+		var visitor = new RouteVisitor();
+		return renderPath(path, visitor).next(document -> {
+			visitor.dispose();
+			document;
+		});
+	}
+
+	function renderUntilComplete(visitor:RouteVisitor):Task<Nothing> {
+		var paths = visitor.drain();
 		return Task
-			.parallel(...paths.map(path -> renderPath(path, _visitor)))
+			.parallel(...paths.map(path -> renderPath(path, visitor)))
 			.next(_ -> {
-				if (_visitor.hasPending()) {
-					return renderUntilComplete();
+				if (visitor.hasPending()) {
+					return renderUntilComplete(visitor);
 				}
-
-				_visitor.dispose();
-				_visitor = new RouteVisitor();
-
-				return Task.nothing();
+				Task.nothing();
 			});
 	}
 
-	function renderPath(path:String, visitor:RouteVisitor):Task<Nothing> {
+	function renderPath(path:String, visitor:RouteVisitor):Task<NodePrimitive> {
 		Logging.maybeFrom(this).inspect(logger -> logger.log(Info, 'Rendering $path'));
 
-		return new Task(activate -> {
+		return new Task<NodePrimitive>(activate -> {
 			var document = new ElementPrimitive('#document', {});
 			var activated = false;
 			var bridge = Lifecycle.from(this).bridge;
@@ -112,7 +98,7 @@ class Generator extends Plugin {
 						}
 						activated = true;
 						renderComplete.dispatch(path, document);
-						activate(Ok(Nothing));
+						activate(Ok(document));
 					}
 				}))
 				.child(rendered

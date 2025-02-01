@@ -36,7 +36,6 @@ function main() {
 		.use(
 			new Generator({
 				render: () -> blog.Blog.node({}),
-				mode: RenderFullSiteWithErrorPage,
 				children: [
 					new Assets({
 						assets: [
@@ -53,7 +52,7 @@ function main() {
 				]
 			}),
 		)
-		.generate()
+		.run()
 		.handle(result -> switch result {
 			case Ok(_): trace('Done!');
 			case Error(error): trace(error.message);
