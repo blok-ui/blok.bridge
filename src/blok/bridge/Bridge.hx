@@ -1,8 +1,9 @@
 package blok.bridge;
 
 #if !blok.client
-import blok.bridge.util.*;
+import blok.bridge.log.DefaultLogger;
 import blok.bridge.plugin.*;
+import blok.bridge.util.*;
 import kit.file.*;
 import kit.file.adaptor.*;
 #end
@@ -23,15 +24,20 @@ class Bridge extends Object implements Context {
 
 	public static function simpleStart(props, render) {
 		return new Bridge(props)
-			.use(new Generator({
-				render: render,
+			.use(new Logging({
+				logger: new DefaultLogger(),
 				children: [
-					new StaticHtml({
-						strategy: DirectoryWithIndexHtmlFile
-					}),
-					new ClientApp({
-						dependencies: InheritDependencies,
-						minify: #if debug false #else true #end
+					new Generator({
+						render: render,
+						children: [
+							new StaticHtml({
+								strategy: DirectoryWithIndexHtmlFile
+							}),
+							new ClientApp({
+								dependencies: InheritDependencies,
+								minify: #if debug false #else true #end
+							})
+						]
 					})
 				]
 			}));

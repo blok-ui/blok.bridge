@@ -23,17 +23,10 @@ class Lifecycle extends Plugin {
 	@:value final children:Array<Plugin> = [];
 
 	public function run() {
-		registerChild(new Logging({
-			#if bridge.no_logging
-			logger: new blok.bridge.log.NullLogger(),
-			#end
-			children: [
-				new Output({
-					fs: bridge.fs,
-					directory: bridge.output,
-					children: children
-				})
-			]
+		registerChild(new Output({
+			fs: bridge.fs,
+			directory: bridge.output,
+			children: children
 		}));
 	}
 
