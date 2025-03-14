@@ -15,10 +15,7 @@ class Bridge extends Object implements Context {
 	#if blok.client
 	public macro static function hydrateIslands(?options);
 	#else
-	// public macro static function trackIslands();
-
 	public inline static function start(props) {
-		// trackIslands();
 		return new Bridge(props);
 	}
 
