@@ -24,6 +24,6 @@ class DevServerModule implements Module {
 
 		container
 			.getMapping(MiddlewareStack)
-			.extend(stack -> stack.add(container.get(StaticFileMiddleware)));
+			.extend(stack -> stack.prepend(container.get(StaticFileMiddleware)));
 	}
 }

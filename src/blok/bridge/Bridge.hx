@@ -21,7 +21,10 @@ class Bridge {
 	public function run(render) {
 		switch config.target {
 			case Static(_):
-				generateStaticSite(render).eager();
+				generateStaticSite(render).handle(result -> switch result {
+					case Ok(_): logger.log(Info, 'Site generation complete');
+					case Error(error): logger.log(Error, error.toString());
+				});
 			case Server(port):
 				serveDevSite(
 					// @todo: handle non-node targets
@@ -37,11 +40,10 @@ class Bridge {
 								logger.log(Info, 'Serving app on localhost:${port}');
 								Process.registerCloseHandler(() -> {
 									logger.log(Info, 'Closing server...');
-									close(status -> {
-										if (status)
-											logger.log(Info, 'Server closed');
-										else
-											logger.log(Info, 'Server closed badly');
+									close(status -> if (status) {
+										logger.log(Info, 'Server closed');
+									} else {
+										logger.log(Info, 'Server closed badly');
 									});
 								});
 							case Closed:

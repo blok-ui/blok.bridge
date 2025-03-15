@@ -36,7 +36,7 @@ class StaticSiteBuilder {
 			visitor.enqueue('/404.html');
 
 			server
-				.serve(handler.into(...middleware.add(gatherer).unwrap()))
+				.serve(handler.into(...middleware.append(gatherer).unwrap()))
 				.handle(status -> switch status {
 					case Failed(e):
 						logger.log(Error, e.message);
@@ -69,7 +69,6 @@ class StaticSiteBuilder {
 							logger.log(Info, 'All pages visited. Closing server...');
 							close(success -> {
 								if (!success) {
-									logger.log(Error, 'Mock server failed to close. No files will be output.');
 									activate(Error(new Error(InternalError, 'Mock server failed to close. No files will be output.')));
 									return;
 								}
@@ -77,8 +76,11 @@ class StaticSiteBuilder {
 								Task
 									.parallel(...gatherer.pages.map(writePage))
 									.handle(result -> switch result {
-										case Error(error): activate(Error(error));
-										default: activate(Ok(gatherer.pages));
+										case Error(error):
+											activate(Error(error));
+										default:
+											logger.log(Info, 'All pages output');
+											activate(Ok(gatherer.pages));
 									});
 							});
 						}
@@ -102,7 +104,7 @@ class StaticSiteBuilder {
 										if (pending == 0) {
 											link?.cancel();
 											link = null;
-											batch([]);
+											batch(visitor.drain());
 										}
 									});
 
@@ -112,7 +114,7 @@ class StaticSiteBuilder {
 							}
 						}
 
-						batch([]);
+						batch(visitor.drain());
 					case Closed:
 				});
 		});

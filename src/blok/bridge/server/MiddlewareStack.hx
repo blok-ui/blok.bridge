@@ -7,8 +7,13 @@ abstract MiddlewareStack(Array<Middleware>) {
 		this = mw;
 	}
 
-	public inline function add(mw:Middleware) {
+	public inline function append(mw:Middleware) {
 		this.push(mw);
+		return abstract;
+	}
+
+	public inline function prepend(mw:Middleware) {
+		this.unshift(mw);
 		return abstract;
 	}
 
