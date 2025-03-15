@@ -1,7 +1,10 @@
 -cp src
 
+-lib kit.http
+-lib mime
 -lib blok.core
 -lib blok.router
+-lib capsule
 
 -D blok.bridge=0.0.1
 

@@ -1,76 +1,82 @@
 package blok.bridge;
 
-#if !blok.client
-import blok.bridge.log.DefaultLogger;
-import blok.bridge.plugin.*;
+import blok.bridge.log.*;
+import blok.bridge.module.*;
+import blok.bridge.server.*;
 import blok.bridge.util.*;
-import kit.file.*;
-import kit.file.adaptor.*;
-#end
-import blok.data.Object;
-import blok.debug.Debug;
+import capsule.Container;
 
-@:fallback(error('No Bridge instance found'))
-class Bridge extends Object implements Context {
-	#if blok.client
-	public macro static function hydrateIslands(?options);
-	#else
+class Bridge {
 	public inline static function start(props) {
 		return new Bridge(props);
 	}
 
-	public static function simpleStart(props, render) {
-		return new Bridge(props)
-			.use(new Logging({
-				logger: new DefaultLogger(),
-				children: [
-					new Generator({
-						render: render,
-						children: [
-							new StaticHtml({
-								strategy: DirectoryWithIndexHtmlFile
-							}),
-							new ClientApp({
-								dependencies: InheritDependencies,
-								minify: #if debug false #else true #end
-							})
-						]
-					})
-				]
-			}));
+	final config:Config;
+	final logger:Logger = new DefaultLogger();
+
+	public function new(config) {
+		this.config = new Config(config);
 	}
 
-	@:value public final fs:FileSystem = new FileSystem(new SysAdaptor(Sys.getCwd()));
-	@:value public final outputPath:String = 'dist/www';
-	@:value public final version:SemVer;
-
-	public final output:Directory;
-
-	var plugins:Array<Plugin> = [];
-
-	public function new() {
-		output = fs.directory(outputPath);
+	public function run(render) {
+		switch config.target {
+			case Static(_):
+				generateStaticSite(render).eager();
+			case Server(port):
+				serveDevSite(
+					// @todo: handle non-node targets
+					new kit.http.server.NodeServer(port),
+					render
+				).handle(result -> switch result {
+					case Ok(status):
+						switch status {
+							case Failed(e):
+								logger.log(Error, 'Failed to start server');
+								Sys.exit(1);
+							case Running(close):
+								logger.log(Info, 'Serving app on localhost:${port}');
+								Process.registerCloseHandler(() -> {
+									logger.log(Info, 'Closing server...');
+									close(status -> {
+										if (status)
+											logger.log(Info, 'Server closed');
+										else
+											logger.log(Info, 'Server closed badly');
+									});
+								});
+							case Closed:
+								Sys.exit(0);
+						}
+					case Error(error):
+						logger.log(Error, error.message);
+						Sys.exit(0);
+				});
+		}
 	}
 
-	public function use(...plugins:Plugin) {
-		this.plugins = this.plugins.concat(plugins.toArray());
-		return this;
+	public function generateStaticSite(render) {
+		var container = Container.build(
+			new CoreModule(config, render, logger),
+			new StaticSiteModule()
+		);
+
+		var clientBuilder = container.get(ClientBuilder);
+		var siteBuilder = container.get(StaticSiteBuilder);
+
+		return clientBuilder.build()
+			.next(_ -> siteBuilder.build());
 	}
 
-	public function run() {
-		var core = new Lifecycle({
-			bridge: this,
-			children: plugins
-		});
+	public function serveDevSite(server, render) {
+		var container = Container.build(
+			new CoreModule(config, render, logger),
+			new DevServerModule(server)
+		);
 
-		core.activate(null);
+		var clientBuilder = container.get(ClientBuilder);
+		var devServer = container.get(DevServer);
 
-		return core.dispatch().next(_ -> {
-			core.dispose();
-			Task.nothing();
-		});
+		return clientBuilder.build()
+			.next(_ -> devServer.serve());
 	}
-	#end
-
-	public function dispose() {}
 }

@@ -1,5 +1,6 @@
 package blog.layout;
 
+import blok.bridge.*;
 import blog.route.*;
 import blog.data.*;
 import blog.ui.Dropdown;
@@ -11,12 +12,17 @@ class MainLayout extends Component {
 
 	function render():Child {
 		return Html.html().child([
-			Html.head().child([
-				Html.title().child(['Blogish ', pageTitle])
-			]).node(),
+			Head.node({
+				children: [
+					Html.title().child(['Blogish ', pageTitle]).node(),
+					Asset.node({type: CssAsset('/assets/styles.css')})
+				]
+			}),
+			// Html.head().child([
+			// 	Html.title().child(['Blogish ', pageTitle])
+			// ]).node(),
 
 			Html.body().child([
-				Html.div().attr(Id, 'portal'),
 				Html.header()
 					.style(Breeze.compose(
 						Flex.display(),

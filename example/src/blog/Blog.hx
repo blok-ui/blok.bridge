@@ -5,16 +5,20 @@ import blog.layout.MainLayout;
 import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
-import blok.bridge.Bridge;
+import blok.bridge.*;
 import blok.bridge.component.DefaultNotFoundRoute;
 import blok.router.Router;
+import kit.file.FileSystem;
+import kit.file.adaptor.SysAdaptor;
 
 class Blog extends Component {
-	@:context final bridge:Bridge;
+	@:context final bridge:BridgeRequest;
 
 	public function render():Child {
+		var fs = new FileSystem(new SysAdaptor(bridge.config.rootPath));
+
 		return Provider
-			.provide(new PostStore(bridge.fs.directory('example/data/post')))
+			.provide(new PostStore(fs.directory('example/data/post')))
 			.child(Router.node({
 				routes: [
 					HomeRoute.route(_ -> {
