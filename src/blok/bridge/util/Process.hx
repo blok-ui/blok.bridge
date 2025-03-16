@@ -1,10 +1,7 @@
 package blok.bridge.util;
 
-#if nodejs
-import js.node.ChildProcess;
-#end
-
-class Process {
+@:forward
+abstract Process(Task<Int>) to Task<Int> {
 	public static function registerCloseHandler(close:() -> Void) {
 		#if nodejs
 		var readline = js.node.Readline.createInterface({
@@ -13,27 +10,30 @@ class Process {
 		});
 		readline.once('close', close);
 		#else
+		// @todo: implement this.
 		throw new haxe.exceptions.NotImplementedException();
 		#end
 	}
 
-	final task:Task<Int>;
-
 	public function new(cmd:String, args:Array<String>) {
-		task = new Task(activate -> {
+		this = new Task(activate -> {
 			#if nodejs
-			var process = ChildProcess.spawn(cmd, args);
-			process.on('exit', (code, _) -> {
-				activate(Ok(code));
+			var process = js.node.ChildProcess.spawn(cmd, args, {shell: true});
+			process.on('exit', code -> switch code {
+				case 0:
+					activate(Ok(code));
+				case code:
+					activate(Error(new Error(InternalError, 'Failed with code: $code')));
 			});
 			#else
 			var process = new sys.io.Process(cmd, args);
-			activate(Ok(process.exitCode()));
+			switch process.exitCode() {
+				case 0:
+					activate(Ok(code));
+				case code:
+					activate(Error(new Error(InternalError, 'Failed with code: $code')));
+			}
 			#end
 		});
-	}
-
-	public inline function getTask() {
-		return task;
 	}
 }

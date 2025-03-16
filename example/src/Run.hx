@@ -5,6 +5,7 @@ function main() {
 		.start({
 			version: '0.0.1',
 			clientDependencies: UseHxml('example-client.hxml'),
+			clientMinified: true,
 			#if debug
 			target: Server(8080),
 			#else

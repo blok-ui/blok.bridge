@@ -1,6 +1,6 @@
 package blok.bridge.server;
 
-import blok.bridge.BridgeRequest;
+import blok.bridge.RequestContext;
 import blok.bridge.component.DefaultErrorView;
 import blok.html.Server;
 import blok.html.server.*;
@@ -19,7 +19,7 @@ class Generator implements Disposable {
 		this.logger = logger;
 	}
 
-	public function generatePage(context:BridgeRequest):Task<NodePrimitive> {
+	public function generatePage(context:RequestContext):Task<NodePrimitive> {
 		var path = context.request.url.toString();
 		var visitor = context.visitor;
 

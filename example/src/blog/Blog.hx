@@ -12,7 +12,7 @@ import kit.file.FileSystem;
 import kit.file.adaptor.SysAdaptor;
 
 class Blog extends Component {
-	@:context final bridge:BridgeRequest;
+	@:context final bridge:RequestContext;
 
 	public function render():Child {
 		var fs = new FileSystem(new SysAdaptor(bridge.config.rootPath));

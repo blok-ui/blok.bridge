@@ -5,10 +5,10 @@ import blok.router.RouteVisitor;
 import kit.http.*;
 
 @:fallback(error('No BridgeRequest found'))
-class BridgeRequest implements Context {
+class RequestContext implements Context {
 	public final config:Config;
 	public final request:Request;
-	public final response:BridgeResponseStub = new BridgeResponseStub();
+	public final response:ResponseStub = new ResponseStub();
 	public final visitor:RouteVisitor;
 
 	public function new(config, request, visitor) {
@@ -20,7 +20,7 @@ class BridgeRequest implements Context {
 	public function dispose() {}
 }
 
-class BridgeResponseStub {
+class ResponseStub {
 	public var code:StatusCode = OK;
 	public final headers:Headers = [];
 
