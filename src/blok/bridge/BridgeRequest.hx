@@ -8,6 +8,7 @@ import kit.http.*;
 class BridgeRequest implements Context {
 	public final config:Config;
 	public final request:Request;
+	public final response:BridgeResponseStub = new BridgeResponseStub();
 	public final visitor:RouteVisitor;
 
 	public function new(config, request, visitor) {
@@ -17,4 +18,11 @@ class BridgeRequest implements Context {
 	}
 
 	public function dispose() {}
+}
+
+class BridgeResponseStub {
+	public var code:StatusCode = OK;
+	public final headers:Headers = [];
+
+	public function new() {}
 }

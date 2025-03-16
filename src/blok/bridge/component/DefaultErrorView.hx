@@ -5,7 +5,7 @@ import blok.*;
 import kit.Error;
 
 class DefaultErrorView extends Component {
-	@:attribute final code:ErrorCode = InternalError;
+	@:attribute final code:ErrorCode = NotFound;
 	@:attribute final title:Maybe<String> = None;
 	@:attribute final message:String;
 
