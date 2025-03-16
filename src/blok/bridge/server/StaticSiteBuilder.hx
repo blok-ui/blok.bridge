@@ -87,8 +87,8 @@ class StaticSiteBuilder {
 
 						function batch(pages:Array<String>) {
 							switch pages {
-								case [] if (visitor.hasPending()):
-									batch(visitor.drain());
+								// case [] if (visitor.hasPending()):
+								// 	batch(visitor.drain());
 								case []:
 									end();
 								case pages:

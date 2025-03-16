@@ -1,7 +1,7 @@
 package blok.bridge.server;
 
-import blok.bridge.component.DefaultErrorView;
 import blok.bridge.BridgeRequest;
+import blok.bridge.component.DefaultErrorView;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
@@ -51,12 +51,6 @@ class Generator implements Disposable {
 				.child(render())
 				.node()
 				.inErrorBoundary((component, e) -> {
-					// if (e is BlokException) {
-					// 	renderFailed.dispatch(cast e);
-					// } else {
-					// 	renderFailed.dispatch(new BlokComponentException(e.message, component));
-					// }
-
 					if (!activated) {
 						activated = true;
 						logger.log(Error, e.message);
@@ -65,6 +59,8 @@ class Generator implements Disposable {
 						logger.log(Error, 'A component failed but triggered onComplete');
 						logger.log(Error, e.message);
 					}
+
+					context.response.code = InternalServerError;
 
 					return DefaultErrorView.node({
 						code: InternalError,

@@ -15,6 +15,7 @@ class DevServerModule implements Module {
 
 	public function provide(container:Container) {
 		container.map(Server).to(server);
+		// @todo: We need to make RouteVisitor optional -- it's not needed here.
 		container.map(RouteVisitor).to(RouteVisitor).share();
 		container.map(ClientBuilder).to(ClientBuilder).share();
 		container.map(Generator).to(Generator).share();

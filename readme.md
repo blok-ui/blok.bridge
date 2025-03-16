@@ -14,22 +14,19 @@ In the future it might also be possible to use Bridge with server-side rendering
 
 ### Setting Things Up
 
-Bridge apps start with simple configuration and some optional plugins. Here's a minimal example:
+Bridge apps start with simple configuration. Here's a minimal example:
 
 ```haxe
 import blok.bridge.*;
 
 function main() {
   Bridge
-    .simpleStart({
+    .start({
       version: '0.0.1',
-      outputPath: 'dist/www'
-    }, () -> example.Example.node({}))
-    .generate()
-    .handle(result -> switch result {
-      case Ok(_): trace('Done!');
-      case Error(error): trace(error.message);
-    });
+      outputPath: 'dist/www',
+      target: Server(8080)
+    })
+    .run(() -> example.Example.node({}));
 }
 ```
 
@@ -57,18 +54,24 @@ class Example extends Component {
 }
 ```
 
-Instead of compiling your app to a target (although you certainly can do that!) you can just `--run` it:
+We're going to run a dev server in node for now, although Bridge also supports a PHP target:
 
 ```hxml
 -cp src
 
 -lib blok.bridge
 -lib kit.file
+-lib hxnodejs
 
---run Run
+-main Run
+
+-js dist/run
+-cmd node dist/run
 ```
 
-This will output static HTML to `dist/www` for every route in your app in addition to a client-side app inside `dist/www/assets`. Right now this is just a single `index.html` file and some javascript that does nothing, so let's dig into making our app more interesting. 
+This will build a client-side app and setup a simple server you can visit at `http://localhost:8080`.
+
+> Note that the server support Bridge provides is still highly experimental, limited and not for production. Generate a static site (more on that later) for production apps instead.
 
 ### Adding Routes
 
@@ -119,9 +122,7 @@ class Example extends Component {
 }
 ```
 
-If you compile your app again you should see that html was generated for `/counter/1` and `/counter/2`.
-
-> Note: Bridge doesn't have anything like a development server yet, so the DX here is not the best. For now, I've been using the `serve` package from npm to host the `dist/public` folder (but any similar solution should work). This does require you to reload the page every time you make a change -- no cool hot-module-reloading here -- but it works. This is a place I want to improve (and which will simply work by calling `serve` instead of `generate` in your `main` function), but it's lower down on the priority list.
+If you compile your app again you should be able to visit `/counter/1` and `/counter/2`.
 
 This is starting to become useful, but still isn't much more exciting than just creating those HTML files yourself. Let's add a little interactivity.
 
@@ -248,79 +249,9 @@ Now lets update our counter route:
 </Route>
 ```
 
-When you compile the app again, this should just work! If you take a peek at the html again, you'll see that the children in the `label` attribute have been serialized to a very simple JSON representation. Importantly, however, there is no sign of the `Label` component -- Bridge has pre-rendered it and _only_ sent the resulting HTML. This means that Components passed to Islands in this way will simply be rendered away, meaning they'll never need to get sent to the client as code.
+When you compile the app again, this should just work! If you take a peek at the html in your browser console, you'll see that the children in the `label` attribute have been serialized to a very simple JSON representation. Importantly, however, there is no sign of the `Label` component -- Bridge has pre-rendered it and _only_ sent the resulting HTML. This means that Components passed to Islands in this way will simply be rendered away, meaning they'll never need to get sent to the client as code.
 
 > Note: this feature is still pretty new and may not work well yet.
-
-### Plugins
-
-Plugins are core to the way Bridge works. They are simple, composable classes that hook into Bridge events.
-
-Let's write a quick example that will simply log a message when a bridge app is generated:
-
-```haxe
-import blok.bridge.*;
-import blok.bridge.plugin.*;
-
-class MessageLogger extends Plugin {
-  public function run() {
-    // Plugins have a similar context API to Blok
-    // components, so we can look up the Plugin tree and
-    // find the Lifecycle plugin which has some events we can
-    // hook into. In this case we're going to trace "Hello world!"
-    // during the setup phase.
-    Lifecycle.from(this).setup.add(_ -> {
-      trace('Hello world!');
-    });
-  }
-}
-```
-
-We can now add this extension to our app:
-
-```haxe
-import blok.bridge.*;
-import blok.bridge.plugin.*;
-
-function main() {
-  Bridge
-    .start({
-      version: '0.0.1',
-      outputPath: 'dist/www'
-    })
-    .use(
-      // Rather than use `simpleStart` we'll configure our Generator
-      // plugin directly.
-      new Generator({
-				render: () -> example.Example.node({}),
-				mode: RenderFullSiteWithErrorPage,
-				children: [
-          // These children depend on the Generator's events. Note that this
-          // means you can have more than one Generator with different kinds of output
-          // in the same app.
-					new StaticHtml({
-						strategy: DirectoryWithIndexHtmlFile
-					}),
-					new ClientApp({
-						dependencies: InheritDependencies,
-						minify: #if debug false #else true #end
-					}),
-				]
-			}),
-      // And here's our simple plugin:
-      new MessageLogger()
-    )
-    .generate()
-    .handle(result -> switch result {
-      case Ok(_): trace('Done!');
-      case Error(error): trace(error.message);
-    });
-}
-```
-
-You'll now see `Hello world!` in your console once when your app initializes.
-
-> More coming soon, especially about composability and context stuff.
 
 ## More Information
 

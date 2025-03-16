@@ -37,7 +37,7 @@ class Bridge {
 								logger.log(Error, 'Failed to start server');
 								Sys.exit(1);
 							case Running(close):
-								logger.log(Info, 'Serving app on localhost:${port}');
+								logger.log(Info, 'Serving app on http://localhost:${port}');
 								Process.registerCloseHandler(() -> {
 									logger.log(Info, 'Closing server...');
 									close(status -> if (status) {

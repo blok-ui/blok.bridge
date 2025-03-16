@@ -51,6 +51,6 @@ class BridgeMiddleware implements Middleware {
 			.find(el -> el.as(ElementPrimitive)?.tag == 'body', true)
 			.or(() -> new ElementPrimitive('body'));
 
-		return '<!doctype html><html>${head.toString({ includeTextMarkers: false })}${body.toString()}</html>';
+		return '<!doctype html><html>${head.toString({includeTextMarkers: false})}${body.toString()}</html>';
 	}
 }
