@@ -1,4 +1,4 @@
-package blok.bridge.server;
+package blok.bridge;
 
 import kit.file.Directory;
 

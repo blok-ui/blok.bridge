@@ -1,13 +1,12 @@
-package blok.bridge.server;
+package blok.bridge.client;
 
-import blok.bridge.util.Process;
 import blok.bridge.Constants;
-import blok.bridge.util.Sources;
+import blok.bridge.util.*;
 
 using blok.bridge.util.Commands;
 using haxe.io.Path;
 
-class ClientBuilder {
+class ClientAppPlugin implements Plugin {
 	final config:Config;
 	final output:OutputDirectory;
 	final logger:Logger;
@@ -18,7 +17,7 @@ class ClientBuilder {
 		this.logger = logger;
 	}
 
-	public function build():Task<Nothing> {
+	public function apply():Task<Nothing> {
 		return output.getMeta().next(meta -> {
 			var target = Path.join([meta.path, config.clientName]).withExtension('js');
 			var sources:Array<String> = config.clientSources.concat([DotBridge]);

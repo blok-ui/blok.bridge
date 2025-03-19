@@ -18,16 +18,14 @@ class StaticSiteGenerator implements Target {
 	final strategy:HtmlGenerationStrategy;
 	final config:Config;
 	final logger:Logger;
-	final events:StaticSiteGeneratorEvents;
 	final visitor:RouteVisitor;
 	final output:OutputDirectory;
 	final middleware:AppMiddleware;
 
-	public function new(config, strategy, logger, events, visitor, middleware, output) {
+	public function new(config, strategy, logger, visitor, middleware, output) {
 		this.config = config;
 		this.strategy = strategy;
 		this.logger = logger;
-		this.events = events;
 		this.visitor = visitor;
 		this.middleware = middleware;
 		this.output = output;
@@ -36,7 +34,7 @@ class StaticSiteGenerator implements Target {
 	public function run():Task<Nothing> {
 		return new Task(activate -> {
 			var server = new MockServer();
-			var gatherer = new PageGatherer(events);
+			var gatherer = new PageGatherer();
 			var handler:Handler = request -> Future.immediate(new Response(NotFound, [], ''));
 
 			visitor.enqueue('/');
@@ -81,8 +79,6 @@ class StaticSiteGenerator implements Target {
 								}
 								logger.log(Info, 'Outputting all visited pages...');
 
-								events.renderedSite.dispatch(gatherer.pages);
-
 								Task
 									.parallel(...gatherer.pages.map(writePage))
 									.handle(result -> switch result {
@@ -119,7 +115,6 @@ class StaticSiteGenerator implements Target {
 									});
 
 									for (page in pages) {
-										events.visiting.dispatch(page);
 										server.request(new Request(Get, page, [new HeaderField(Accept, 'text/html')]));
 									}
 							}
@@ -140,11 +135,7 @@ typedef PageEntry = {
 class PageGatherer implements Middleware {
 	public final pages:Array<PageEntry> = [];
 
-	final events:StaticSiteGeneratorEvents;
-
-	public function new(events) {
-		this.events = events;
-	}
+	public function new() {}
 
 	public function apply(handler:Handler):Handler {
 		return request -> {
@@ -158,7 +149,6 @@ class PageGatherer implements Middleware {
 				var body = response.body.map(body -> body.toString()).or('<html></html>');
 				var entry:PageEntry = {path: path, body: body};
 
-				events.renderedPage.dispatch(entry);
 				pages.push(entry);
 
 				response;

@@ -10,7 +10,8 @@ class CoreModule implements Module {
 	public function new() {}
 
 	public function provide(container:Container) {
-		container.map(Runner).to(Runner).share();
+		container.map(AppRunner).to(AppRunner).share();
+		container.map(AppPlugins).to(() -> new AppPlugins([])).share();
 		container.map(AppProviders).to(() -> new AppProviders([])).share();
 		container.map(Logger).toDefault(DefaultLogger).share();
 		container.map(FileSystem)

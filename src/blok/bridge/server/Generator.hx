@@ -10,6 +10,9 @@ import blok.router.navigation.*;
 using blok.Modifiers;
 
 class Generator implements Disposable {
+	public final onPageVisited = new Event<String>();
+	public final onPageRendered = new Event<String, NodePrimitive>();
+
 	final render:Render;
 	final logger:Logger;
 	final providers:AppProviders;
@@ -25,6 +28,7 @@ class Generator implements Disposable {
 		var path = context.request.url.toString();
 
 		logger.log(Info, 'Rendering [$path]');
+		onPageVisited.dispatch(path);
 
 		return new Task<NodePrimitive>(activate -> {
 			var document = new ElementPrimitive('#document', {});
@@ -45,6 +49,9 @@ class Generator implements Disposable {
 						}
 
 						logger.log(Info, 'Completed rendering [$path]');
+
+						onPageRendered.dispatch(path, document);
+
 						activated = true;
 						activate(Ok(document));
 					}

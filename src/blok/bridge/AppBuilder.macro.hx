@@ -61,7 +61,7 @@ private function buildApp(types:Array<Type>) {
 
 		public function run() {
 			return createContainer()
-				.get(blok.bridge.server.Runner)
+				.get(blok.bridge.AppRunner)
 				.run()
 				.eager();
 		}

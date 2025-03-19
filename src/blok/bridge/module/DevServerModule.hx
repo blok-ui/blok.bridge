@@ -9,7 +9,6 @@ class DevServerModule implements Module {
 
 	public function provide(container:Container) {
 		container.map(Target).to(DevServer).share();
-		container.map(ClientBuilder).to(ClientBuilder).share();
 		container.map(Generator).to(Generator).share();
 		container.map(StaticExpiry).toDefault(100).share();
 		container.map(StaticFileMiddleware).to(StaticFileMiddleware).share();

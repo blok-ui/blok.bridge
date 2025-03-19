@@ -22,7 +22,7 @@ import blok.bridge.*;
 import blok.bridge.module.*;
 
 function main() {
-  var app = new App<DevServerModule>({
+  var app = new App<ClientAppModule, DevServerModule>({
     version: '0.0.1',
     outputPath: 'dist/www',
   }, () -> example.Example.node({}));
@@ -289,7 +289,7 @@ import blok.bridge.module.*;
 
 function main() {
   // Add it as a type param right here:
-  var app = new App<example.ExampleModule, DevServerModule>({
+  var app = new App<example.ExampleModule, ClientAppModule, DevServerModule>({
     version: '0.0.1',
     outputPath: 'dist/www',
   }, () -> example.Example.node({}));
