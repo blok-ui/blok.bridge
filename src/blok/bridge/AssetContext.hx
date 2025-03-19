@@ -24,7 +24,7 @@ class AssetContext implements Context {
 		// Note: We're using a resource here because we want rendering to be suspended
 		// whenever we add an asset.
 		//
-		// Not actually sure if this will work.
+		// Not 1000% sure if this is needed?
 		return resource();
 	}
 

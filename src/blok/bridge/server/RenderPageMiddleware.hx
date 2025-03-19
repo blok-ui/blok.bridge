@@ -1,19 +1,16 @@
 package blok.bridge.server;
 
-import blok.html.server.*;
 import blok.bridge.server.Generator;
-import blok.router.RouteVisitor;
+import blok.html.server.*;
 import kit.http.*;
 
-class BridgeMiddleware implements Middleware {
+class RenderPageMiddleware implements Middleware {
 	public final config:Config;
 	public final generator:Generator;
-	public final visitor:RouteVisitor;
 
-	public function new(config, generator, visitor) {
+	public function new(config, generator) {
 		this.config = config;
 		this.generator = generator;
-		this.visitor = visitor;
 	}
 
 	public function apply(handler:Handler):Handler {
@@ -22,7 +19,7 @@ class BridgeMiddleware implements Middleware {
 			var accepts = request.headers.find(Accept).map(header -> header.value).or('text/html');
 			if (accepts.indexOf('text/html') < 0) return handler.process(request);
 
-			var context = new RequestContext(config, request, visitor);
+			var context = new RequestContext(config, request);
 
 			return generator
 				.generatePage(context)

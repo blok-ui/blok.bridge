@@ -9,27 +9,34 @@ using Lambda;
 using StringTools;
 using haxe.io.Path;
 
-class StaticSiteBuilder {
+enum abstract HtmlGenerationStrategy(String) to String from String {
+	final DirectoryWithIndexHtmlFile;
+	final NamedHtmlFile;
+}
+
+class StaticSiteGenerator implements Target {
+	final strategy:HtmlGenerationStrategy;
 	final config:Config;
 	final logger:Logger;
+	final events:StaticSiteGeneratorEvents;
 	final visitor:RouteVisitor;
 	final output:OutputDirectory;
-	final middleware:MiddlewareStack;
+	final middleware:AppMiddleware;
 
-	public function new(config, logger, visitor, middleware, output) {
+	public function new(config, strategy, logger, events, visitor, middleware, output) {
 		this.config = config;
+		this.strategy = strategy;
 		this.logger = logger;
+		this.events = events;
 		this.visitor = visitor;
 		this.middleware = middleware;
 		this.output = output;
 	}
 
-	public function build():Task<Nothing> {
+	public function run():Task<Nothing> {
 		return new Task(activate -> {
-			config.target.extract(Static(strategy = Config.HtmlGenerationStrategy.DirectoryWithIndexHtmlFile));
-
 			var server = new MockServer();
-			var gatherer = new PageGatherer();
+			var gatherer = new PageGatherer(events);
 			var handler:Handler = request -> Future.immediate(new Response(NotFound, [], ''));
 
 			visitor.enqueue('/');
@@ -73,6 +80,9 @@ class StaticSiteBuilder {
 									return;
 								}
 								logger.log(Info, 'Outputting all visited pages...');
+
+								events.renderedSite.dispatch(gatherer.pages);
+
 								Task
 									.parallel(...gatherer.pages.map(writePage))
 									.handle(result -> switch result {
@@ -109,6 +119,7 @@ class StaticSiteBuilder {
 									});
 
 									for (page in pages) {
+										events.visiting.dispatch(page);
 										server.request(new Request(Get, page, [new HeaderField(Accept, 'text/html')]));
 									}
 							}
@@ -129,7 +140,11 @@ typedef PageEntry = {
 class PageGatherer implements Middleware {
 	public final pages:Array<PageEntry> = [];
 
-	public function new() {}
+	final events:StaticSiteGeneratorEvents;
+
+	public function new(events) {
+		this.events = events;
+	}
 
 	public function apply(handler:Handler):Handler {
 		return request -> {
@@ -140,10 +155,12 @@ class PageGatherer implements Middleware {
 			return handler.process(request).map(response -> {
 				var path = request.url.toString().trim().normalize();
 				if (path.startsWith('/')) path = path.substr(1);
-				pages.push({
-					path: path,
-					body: response.body.map(body -> body.toString()).or('<html></html>')
-				});
+				var body = response.body.map(body -> body.toString()).or('<html></html>');
+				var entry:PageEntry = {path: path, body: body};
+
+				events.renderedPage.dispatch(entry);
+				pages.push(entry);
+
 				response;
 			});
 		};

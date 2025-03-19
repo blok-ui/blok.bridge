@@ -12,24 +12,25 @@ using blok.Modifiers;
 class Generator implements Disposable {
 	final render:Render;
 	final logger:Logger;
+	final providers:AppProviders;
 	final owner = new Owner();
 
-	public function new(render, logger) {
+	public function new(render, logger, providers) {
 		this.render = render;
 		this.logger = logger;
+		this.providers = providers;
 	}
 
 	public function generatePage(context:RequestContext):Task<NodePrimitive> {
 		var path = context.request.url.toString();
-		var visitor = context.visitor;
 
 		logger.log(Info, 'Rendering [$path]');
 
 		return new Task<NodePrimitive>(activate -> {
 			var document = new ElementPrimitive('#document', {});
 			var activated = false;
-			var node = Provider
-				.share(visitor)
+			var node = providers
+				.provide()
 				.share(context)
 				.provide(new AssetContext())
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))

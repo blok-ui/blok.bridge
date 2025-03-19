@@ -1,16 +1,13 @@
+import blog.*;
 import blok.bridge.*;
+import blok.bridge.module.*;
 
 function main() {
-	Bridge
-		.start({
-			version: '0.0.1',
-			clientDependencies: UseHxml('example-client.hxml'),
-			clientMinified: true,
-			#if debug
-			target: Server(8080),
-			#else
-			target: Static(DirectoryWithIndexHtmlFile),
-			#end
-		})
-		.run(() -> blog.Blog.node({}));
+	var app = new App<BlogModule, #if debug DevServerModule #else StaticSiteGeneratorModule #end>({
+		version: '0.0.1',
+		clientDependencies: UseHxml('example-client.hxml'),
+		clientMinified: true
+	}, () -> blog.Blog.node({}));
+
+	app.run();
 }

@@ -1,31 +1,24 @@
 package blok.bridge.module;
 
+import blok.bridge.log.DefaultLogger;
 import blok.bridge.server.*;
 import capsule.*;
 import kit.file.FileSystem;
 import kit.file.adaptor.SysAdaptor;
 
 class CoreModule implements Module {
-	final config:Config;
-	final render:Render;
-	final logger:Logger;
-
-	public function new(config, render, logger) {
-		this.config = config;
-		this.render = render;
-		this.logger = logger;
-	}
+	public function new() {}
 
 	public function provide(container:Container) {
-		container.map(Config).toDefault(config).share();
-		container.map(Render).toDefault(render).share();
-		container.map(Logger).toDefault(logger).share();
+		container.map(Runner).to(Runner).share();
+		container.map(AppProviders).to(() -> new AppProviders([])).share();
+		container.map(Logger).toDefault(DefaultLogger).share();
 		container.map(FileSystem)
 			.toDefault((config:Config) -> new FileSystem(new SysAdaptor(config.rootPath)))
 			.share();
-		container.map(BridgeMiddleware).to(BridgeMiddleware).share();
-		container.map(MiddlewareStack)
-			.to((bridge:BridgeMiddleware) -> new MiddlewareStack([bridge]))
+		container.map(RenderPageMiddleware).to(RenderPageMiddleware).share();
+		container.map(AppMiddleware)
+			.to((renderer:RenderPageMiddleware) -> new AppMiddleware([renderer]))
 			.share();
 		container.map(OutputDirectory)
 			.toDefault((fs:FileSystem, config:Config) -> fs.directory(config.outputPath))

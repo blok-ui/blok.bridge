@@ -1,50 +1,77 @@
 package blog;
 
-import blog.data.PostStore;
+// import blog.data.PostStore;
+// import blok.bridge.*;
+// import kit.file.FileSystem;
+// import kit.file.adaptor.SysAdaptor;
 import blog.layout.MainLayout;
 import blog.post.*;
 import blog.route.*;
 import blog.ui.*;
-import blok.bridge.*;
 import blok.bridge.component.DefaultNotFoundRoute;
 import blok.router.Router;
-import kit.file.FileSystem;
-import kit.file.adaptor.SysAdaptor;
 
 class Blog extends Component {
-	@:context final bridge:RequestContext;
-
 	public function render():Child {
-		var fs = new FileSystem(new SysAdaptor(bridge.config.rootPath));
-
-		return Provider
-			.provide(new PostStore(fs.directory('example/data/post')))
-			.child(Router.node({
-				routes: [
-					HomeRoute.route(_ -> {
-						MainLayout.node({
-							pageTitle: 'Home',
-							children: [
-								Collapse.node({
-									header: 'Home',
-									children: [
-										Heading.node({children: 'Hey world!'}),
-										Html.p().child('This is the home page!'),
-										Html.p().child('It can be collapsed.')
-									]
-								})
-							]
-						});
-					}),
-					CounterRoute.route(params -> MainLayout.node({
-						pageTitle: 'Counter | ${params.initial}',
-						children: blog.island.Counter.node({count: params.initial})
-					})),
-					ArchiveRoute.route(params -> ArchivePage.node({})),
-					PostRoute.route({}),
-					DelayRoute.route({}),
-					DefaultNotFoundRoute.route({})
-				]
-			}));
+		return Router.node({
+			routes: [
+				HomeRoute.route(_ -> {
+					MainLayout.node({
+						pageTitle: 'Home',
+						children: [
+							Collapse.node({
+								header: 'Home',
+								children: [
+									Heading.node({children: 'Hey world!'}),
+									Html.p().child('This is the home page!'),
+									Html.p().child('It can be collapsed.')
+								]
+							})
+						]
+					});
+				}),
+				CounterRoute.route(params -> MainLayout.node({
+					pageTitle: 'Counter | ${params.initial}',
+					children: blog.island.Counter.node({count: params.initial})
+				})),
+				ArchiveRoute.route(params -> ArchivePage.node({})),
+				PostRoute.route({}),
+				DelayRoute.route({}),
+				DefaultNotFoundRoute.route({})
+			]
+		});
 	}
+	// @:context final request:RequestContext;
+	// public function render():Child {
+	// 	var fs = new FileSystem(new SysAdaptor(request.config.rootPath));
+	// 	return Provider
+	// 		.provide(new PostStore(fs.directory('example/data/post')))
+	// 		.child(Router.node({
+	// 			routes: [
+	// 				HomeRoute.route(_ -> {
+	// 					MainLayout.node({
+	// 						pageTitle: 'Home',
+	// 						children: [
+	// 							Collapse.node({
+	// 								header: 'Home',
+	// 								children: [
+	// 									Heading.node({children: 'Hey world!'}),
+	// 									Html.p().child('This is the home page!'),
+	// 									Html.p().child('It can be collapsed.')
+	// 								]
+	// 							})
+	// 						]
+	// 					});
+	// 				}),
+	// 				CounterRoute.route(params -> MainLayout.node({
+	// 					pageTitle: 'Counter | ${params.initial}',
+	// 					children: blog.island.Counter.node({count: params.initial})
+	// 				})),
+	// 				ArchiveRoute.route(params -> ArchivePage.node({})),
+	// 				PostRoute.route({}),
+	// 				DelayRoute.route({}),
+	// 				DefaultNotFoundRoute.route({})
+	// 			]
+	// 		}));
+	// }
 }

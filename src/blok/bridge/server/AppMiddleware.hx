@@ -2,7 +2,7 @@ package blok.bridge.server;
 
 import kit.http.Middleware;
 
-abstract MiddlewareStack(Array<Middleware>) {
+abstract AppMiddleware(Array<Middleware>) {
 	public inline function new(mw) {
 		this = mw;
 	}

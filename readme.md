@@ -17,16 +17,17 @@ In the future it might also be possible to use Bridge with server-side rendering
 Bridge apps start with simple configuration. Here's a minimal example:
 
 ```haxe
+import capsule.*;
 import blok.bridge.*;
+import blok.bridge.module.*;
 
 function main() {
-  Bridge
-    .start({
-      version: '0.0.1',
-      outputPath: 'dist/www',
-      target: Server(8080)
-    })
-    .run(() -> example.Example.node({}));
+  var app = new App<DevServerModule>({
+    version: '0.0.1',
+    outputPath: 'dist/www',
+  }, () -> example.Example.node({}));
+
+  app.run();
 }
 ```
 
@@ -252,6 +253,54 @@ Now lets update our counter route:
 When you compile the app again, this should just work! If you take a peek at the html in your browser console, you'll see that the children in the `label` attribute have been serialized to a very simple JSON representation. Importantly, however, there is no sign of the `Label` component -- Bridge has pre-rendered it and _only_ sent the resulting HTML. This means that Components passed to Islands in this way will simply be rendered away, meaning they'll never need to get sent to the client as code.
 
 > Note: this feature is still pretty new and may not work well yet.
+
+### Extending Bridge
+
+> Note: this functionality is still under development and could change rapidly.
+
+Bridge uses [capsule](https://github.com/wartman/capsule) to manage its dependencies, and you can hook into or replace most of them through it. For example, if we want to add additional middleware we can do this:
+
+```haxe
+package example;
+
+import capsule.*;
+import blok.bridge.server.*;
+
+class ExampleModule extends Module {
+  public function new() {}
+
+  public function provide(container:Container) {
+    // Map our middleware to the container:
+    container.map(ExampleMiddleware).to(ExampleMiddleware);
+
+    // Add a hook that will prepend our middleware to the AppMiddleware stack
+    // when Bridge resolves it:
+    container.when(AppMiddleware).resolved((mw:ExampleMiddleware) -> value.prepend(mw));
+  }
+}
+```
+
+We can then add this module to our app:
+
+```haxe
+import capsule.*;
+import blok.bridge.*;
+import blok.bridge.module.*;
+
+function main() {
+  // Add it as a type param right here:
+  var app = new App<example.ExampleModule, DevServerModule>({
+    version: '0.0.1',
+    outputPath: 'dist/www',
+  }, () -> example.Example.node({}));
+
+  app.run();
+}
+```
+
+Capsule checks all dependencies at compile time, so it will not compile if a dependency is missing.
+
+> More on this to come as I nail down the API
 
 ## More Information
 

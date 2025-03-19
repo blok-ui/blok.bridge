@@ -11,18 +11,17 @@ enum ClientAppDependencies {
 	UseCustom(deps:Array<{name:String, ?version:String}>);
 }
 
-enum Target {
-	Static(strategy:HtmlGenerationStrategy);
-	Server(port:Int);
-}
-
-enum abstract HtmlGenerationStrategy(String) to String from String {
-	final DirectoryWithIndexHtmlFile;
-	final NamedHtmlFile;
-}
+// enum Target {
+// 	Static(strategy:HtmlGenerationStrategy);
+// 	Server(port:Int);
+// }
+// enum abstract HtmlGenerationStrategy(String) to String from String {
+// 	final DirectoryWithIndexHtmlFile;
+// 	final NamedHtmlFile;
+// }
 
 class Config extends Object {
-	@:value public final target:Target = Static(DirectoryWithIndexHtmlFile);
+	// @:value public final target:Target = Static(DirectoryWithIndexHtmlFile);
 	@:value public final rootPath:String = Sys.getCwd();
 	@:value public final outputPath:String = 'dist/www';
 	@:value public final version:SemVer;
