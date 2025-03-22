@@ -12,7 +12,7 @@ class AssetContext implements Context {
 	public function new() {
 		Owner.capture(owner, {
 			assets = new Signal([]);
-			resource = new Resource(() -> Task.resolve(assets()));
+			resource = new Resource(() -> Task.ok(assets()));
 		});
 	}
 

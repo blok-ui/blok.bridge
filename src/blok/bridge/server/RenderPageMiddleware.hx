@@ -16,7 +16,7 @@ class RenderPageMiddleware implements Middleware {
 	public function apply(handler:Handler):Handler {
 		return request -> {
 			// @todo: better validation
-			var accepts = request.headers.find(Accept).map(header -> header.value).or('text/html');
+			var accepts = request.getHeader(Accept).map(header -> header.value).or('text/html');
 			if (accepts.indexOf('text/html') < 0) return handler.process(request);
 
 			var context = new RequestContext(config, request);
