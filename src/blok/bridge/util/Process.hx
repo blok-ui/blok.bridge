@@ -29,7 +29,7 @@ abstract Process(Task<Int>) to Task<Int> {
 			var process = new sys.io.Process(cmd, args);
 			switch process.exitCode() {
 				case 0:
-					activate(Ok(code));
+					activate(Ok(0));
 				case code:
 					activate(Error(new Error(InternalError, 'Failed with code: $code')));
 			}
