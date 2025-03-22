@@ -15,6 +15,11 @@ enum abstract HtmlGenerationStrategy(String) to String from String {
 	final NamedHtmlFile;
 }
 
+typedef PageEntry = {
+	public final path:String;
+	public final body:String;
+};
+
 class StaticSiteGenerator implements Target {
 	final strategy:HtmlGenerationStrategy;
 	final config:Config;
@@ -122,8 +127,3 @@ class StaticSiteGenerator implements Target {
 		});
 	}
 }
-
-typedef PageEntry = {
-	public final path:String;
-	public final body:String;
-};
