@@ -1,4 +1,4 @@
-build-shared.hxml
+spa-shared.hxml
 
 -D breeze.output=cwd:dist/spa/www/assets/styles.css
 

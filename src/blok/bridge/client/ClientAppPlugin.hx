@@ -1,5 +1,6 @@
 package blok.bridge.client;
 
+import kit.file.FileMeta;
 import blok.bridge.macro.BridgeConfig;
 import blok.bridge.util.*;
 
@@ -17,8 +18,15 @@ class ClientAppPlugin implements Plugin {
 		this.logger = logger;
 	}
 
+	function ensureDirectory():Task<FileMeta> {
+		return output.exists().flatMap(exists -> {
+			if (!exists) return output.create().next(_ -> output.getMeta());
+			output.getMeta();
+		});
+	}
+
 	public function apply():Task<Nothing> {
-		return output.getMeta().next(meta -> {
+		return ensureDirectory().next(meta -> {
 			var target = Path.join([meta.path, config.clientName]).withExtension('js');
 			var sources:Array<String> = config.clientSources.concat([getDotBridgeDirectory()]);
 			var args = [];

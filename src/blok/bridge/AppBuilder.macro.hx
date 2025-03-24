@@ -60,10 +60,17 @@ private function buildApp(types:Array<Type>) {
 		}
 
 		public function run() {
-			return createContainer()
+			var container = createContainer();
+			return container
 				.get(blok.bridge.AppRunner)
 				.run()
-				.eager();
+				.handle(result -> {
+					var logger = container.get(blok.bridge.Logger);
+					switch result {
+						case Ok(_): logger.log(Info, 'Setup complete');
+						case Error(error): logger.log(Error, 'Failed with: ' + error.toString());
+					}
+				});
 		}
 	});
 

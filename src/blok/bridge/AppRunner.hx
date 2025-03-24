@@ -9,7 +9,7 @@ class AppRunner {
 		this.target = target;
 	}
 
-	public function run() {
+	public function run():Task<Nothing> {
 		return plugins.apply().next(_ -> target.run());
 	}
 }
