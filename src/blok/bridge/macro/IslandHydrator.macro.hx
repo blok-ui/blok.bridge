@@ -1,6 +1,6 @@
 package blok.bridge.macro;
 
-import blok.bridge.Constants;
+import blok.bridge.macro.BridgeConfig;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type.ModuleType;
@@ -49,7 +49,7 @@ private function getMainPath() {
 	if (root.extension().length != 0) {
 		root = root.directory();
 	}
-	return Path.join([root, DotBridge, IslandsMain]).withExtension('hx');
+	return Path.join([root, getDotBridgeDirectory(), getIslandsMainName()]).withExtension('hx');
 }
 
 private function generateMain(types:Array<String>) {

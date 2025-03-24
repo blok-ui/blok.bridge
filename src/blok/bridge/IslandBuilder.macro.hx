@@ -1,46 +1,99 @@
 package blok.bridge;
 
+import blok.ComponentBuilder;
+import haxe.macro.Expr;
 import kit.macro.*;
 import kit.macro.step.*;
-import blok.ComponentBuilder;
 
 using Lambda;
 using haxe.macro.Tools;
+using kit.macro.Tools;
 
 function build() {
 	return ClassBuilder.fromContext()
 		.addBundle(new ComponentBuilder())
-		.addStep(new JsonSerializerBuildStep({
-			customParser: options -> switch options.type.toType().toComplexType() {
-				case macro :blok.signal.Signal<$wrappedType>:
-					var name = options.name;
-					Some(options.parser(macro this.$name.get(), name, wrappedType));
-				case macro :blok.Children:
-					var name = options.name;
-					Some({
-						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
-						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
-					});
-				case macro :blok.Child:
-					var name = options.name;
-					Some({
-						serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
-						deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
-					});
-				default:
-					None;
-			},
-			constructorAccessor: macro node,
-			returnType: macro :blok.Child
-		}))
-		.addStep(new IslandBuilder())
+		.addBundle(new IslandBuilder())
 		.export();
 }
 
-class IslandBuilder implements BuildStep {
+final IslandContextSerializeHook = 'islands:context-serialize';
+final IslandContextDeserializeHook = 'islands:context-deserialize';
+
+class IslandContextSerializerBuildStep implements BuildStep {
+	public final priority:Priority = Before;
+
+	public function new() {}
+
+	public function apply(builder:ClassBuilder) {
+		for (field in builder.findFieldsByMeta(':context')) {
+			parseField(builder, field);
+		}
+	}
+
+	function parseField(builder:ClassBuilder, field:Field) {
+		switch field.kind {
+			case FVar(t, _) if (t != null):
+				var pos = field.pos;
+				var name = field.name;
+				var path = switch t {
+					case TPath(p):
+						p.typePathToArray();
+					default:
+						field.pos.error('Could not resolve type');
+						return;
+				}
+				var prefix = t.toType().toComplexType().toString();
+
+				builder
+					.hook(IslandContextSerializeHook)
+					.addExpr(macro @:pos(field.pos) Reflect.setField(__context, $v{name}, this.$name.toJson()));
+				builder
+					.hook(IslandContextDeserializeHook)
+					.addExpr(macro @:pos(field.pos) resolver.resolve(
+						$v{prefix},
+						Reflect.field(context, $v{name}),
+						$p{path}.fromJson
+					));
+			default:
+				// Allow the main ContextFieldBuildStep to handle errors.
+		}
+	}
+}
+
+class IslandBuilder implements BuildBundle implements BuildStep {
 	public final priority:Priority = Late;
 
 	public function new() {}
+
+	public function steps():Array<BuildStep> {
+		return [
+			new IslandContextSerializerBuildStep(),
+			new JsonSerializerBuildStep({
+				customParser: options -> switch options.type.toType().toComplexType() {
+					case macro :blok.signal.Signal<$wrappedType>:
+						var name = options.name;
+						Some(options.parser(macro this.$name.get(), name, wrappedType));
+					case macro :blok.Children:
+						var name = options.name;
+						Some({
+							serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
+							deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
+						});
+					case macro :blok.Child:
+						var name = options.name;
+						Some({
+							serializer: macro blok.bridge.SerializableChildren.toJson(this, this.$name),
+							deserializer: macro blok.bridge.SerializableChildren.fromJson(Reflect.field(data, $v{name}))
+						});
+					default:
+						None;
+				},
+				constructorAccessor: macro node,
+				returnType: macro :blok.Child
+			}),
+			this
+		];
+	}
 
 	public function apply(builder:ClassBuilder) {
 		var path = builder.getType().follow().toComplexType().toString();
@@ -59,6 +112,7 @@ class IslandBuilder implements BuildStep {
 							blok.bridge.IslandElement.node({
 								component: __islandName(),
 								props: toJson(),
+								context: contextToJson(),
 								child: child()
 							});
 						case Some(_):
@@ -71,6 +125,19 @@ class IslandBuilder implements BuildStep {
 			default:
 		});
 
+		var contextSerializers = builder.hook(IslandContextSerializeHook).getExprs();
+		var contextDeserializers = builder.hook(IslandContextDeserializeHook).getExprs();
+		var deserializeBody:Expr = if (contextDeserializers.length > 0) {
+			var providers = contextDeserializers.map(expr -> macro {
+				value: $expr,
+				shared: true
+			});
+			macro {
+				var resolver = blok.bridge.IslandContextResolver.current();
+				new blok.Provider.VProvider([$a{providers}]).child(child);
+			}
+		} else macro child;
+
 		builder.add(macro class {
 			public static final islandName = $v{path};
 
@@ -80,10 +147,12 @@ class IslandBuilder implements BuildStep {
 				var islands = [
 					for (el in elements) {
 						var props:{} = blok.bridge.IslandElement.getIslandProps(el);
+						var context:{} = blok.bridge.IslandElement.getIslandContext(el);
 						var cursor = adaptor.createCursor(el);
+						var child = fromJson(props);
 						var root = blok.Root.node({
 							target: el,
-							child: fromJson(props)
+							child: $deserializeBody
 						}).createView();
 						root.hydrate(cursor, adaptor, null, null);
 						root;
@@ -92,6 +161,12 @@ class IslandBuilder implements BuildStep {
 				return blok.DisposableItem.ofCallback(() -> {
 					for (island in islands) island.dispose();
 				});
+			}
+			#else
+			function contextToJson() {
+				var __context = {};
+				@:mergeBlock $b{contextSerializers};
+				return __context;
 			}
 			#end
 

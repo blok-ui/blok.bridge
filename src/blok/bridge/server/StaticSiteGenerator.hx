@@ -86,11 +86,13 @@ class StaticSiteGenerator implements Target {
 					case Running(close):
 						logger.log(Info, 'Running a mock server to generate static HTML');
 
-						function visitPages() {
+						function visitPages():Task<Array<PageEntry>> {
 							var pages = visitor.drain();
 							return Task.parallel(...pages.map(visitPage))
 								.next(entries -> {
-									if (visitor.hasPending()) return visitPages();
+									if (visitor.hasPending()) {
+										return visitPages().next(newEntries -> Task.ok(entries.concat(newEntries)));
+									}
 									return Task.ok(entries);
 								});
 						}

@@ -1,0 +1,11 @@
+build-shared.hxml
+
+-D breeze.output=cwd:dist/spa/www/assets/styles.css
+
+-lib kit.file
+-lib boxup
+-lib hxnodejs
+
+-main Run
+
+-js dist/run-spa.js

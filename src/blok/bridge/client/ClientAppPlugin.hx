@@ -1,6 +1,6 @@
 package blok.bridge.client;
 
-import blok.bridge.Constants;
+import blok.bridge.macro.BridgeConfig;
 import blok.bridge.util.*;
 
 using blok.bridge.util.Commands;
@@ -20,7 +20,7 @@ class ClientAppPlugin implements Plugin {
 	public function apply():Task<Nothing> {
 		return output.getMeta().next(meta -> {
 			var target = Path.join([meta.path, config.clientName]).withExtension('js');
-			var sources:Array<String> = config.clientSources.concat([DotBridge]);
+			var sources:Array<String> = config.clientSources.concat([getDotBridgeDirectory()]);
 			var args = [];
 			var libraries = ['blok.bridge'];
 			var flags = config.clientFlags.copy();
@@ -60,7 +60,7 @@ class ClientAppPlugin implements Plugin {
 			}
 
 			args.push('-D blok.client');
-			args.push('-main ${IslandsMain}');
+			args.push('-main ${getIslandsMainName()}');
 			args.push('-js ${target}');
 
 			return new Process('haxe'.createNodeCommand(), args)

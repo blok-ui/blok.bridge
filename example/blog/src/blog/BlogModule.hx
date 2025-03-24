@@ -11,7 +11,7 @@ class BlogModule implements Module {
 	public function new() {}
 
 	public function provide(container:Container) {
-		container.map(PostStore).to((fs:FileSystem) -> new PostStore(fs.directory('example/data/post')));
+		container.map(PostStore).to((fs:FileSystem) -> new PostStore(fs.directory('example/blog/data/post')));
 
 		container.when(AppProviders).resolved((store:PostStore) -> value.add(store));
 

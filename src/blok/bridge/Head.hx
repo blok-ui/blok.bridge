@@ -6,7 +6,7 @@ import blok.html.Html;
 using haxe.io.Path;
 
 class Head extends Component {
-	@:children @:attribute final children:Children;
+	@:children @:attribute final children:Children = [];
 
 	function render():Child {
 		// var request = RequestContext.from(this);

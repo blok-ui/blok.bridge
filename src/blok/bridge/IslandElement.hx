@@ -24,6 +24,11 @@ class IslandElement extends Component {
 		return haxe.Json.parse(raw.htmlUnescape());
 	}
 
+	public static function getIslandContext(el:js.html.Element):{} {
+		var raw = el.getAttribute('data-context') ?? '';
+		return haxe.Json.parse(raw.htmlUnescape());
+	}
+
 	static function getIslandElements():Array<js.html.Element> {
 		var items = js.Browser.document.querySelectorAll(tag);
 		return [for (i in 0...items.length) items.item(i).as(js.html.Element)];
@@ -38,6 +43,7 @@ class IslandElement extends Component {
 
 	@:attribute final component:String;
 	@:attribute final props:{};
+	@:attribute final context:{} = {};
 	@:children @:attribute final child:Child;
 
 	function render():Child {
@@ -50,6 +56,7 @@ class IslandElement extends Component {
 			{
 				'data-component': Signal.ofValue(component),
 				'data-props': Signal.ofValue(Json.stringify(props).htmlEscape(true)),
+				'data-context': Signal.ofValue(Json.stringify(context).htmlEscape(true)),
 				'style': Signal.ofValue('display:contents')
 			},
 			[child]
