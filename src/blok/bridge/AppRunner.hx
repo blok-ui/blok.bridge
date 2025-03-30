@@ -10,6 +10,6 @@ class AppRunner {
 	}
 
 	public function run():Task<Nothing> {
-		return plugins.apply().next(_ -> target.run());
+		return plugins.apply().then(_ -> target.run());
 	}
 }

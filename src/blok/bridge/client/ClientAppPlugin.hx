@@ -20,13 +20,13 @@ class ClientAppPlugin implements Plugin {
 
 	function ensureDirectory():Task<FileMeta> {
 		return output.exists().flatMap(exists -> {
-			if (!exists) return output.create().next(_ -> output.getMeta());
+			if (!exists) return output.create().then(_ -> output.getMeta());
 			output.getMeta();
 		});
 	}
 
 	public function apply():Task<Nothing> {
-		return ensureDirectory().next(meta -> {
+		return ensureDirectory().then(meta -> {
 			var target = Path.join([meta.path, config.clientName]).withExtension('js');
 			var sources:Array<String> = config.clientSources.concat([getDotBridgeDirectory()]);
 			var args = [];
@@ -72,7 +72,7 @@ class ClientAppPlugin implements Plugin {
 			args.push('-js ${target}');
 
 			return new Process('haxe'.createNodeCommand(), args)
-				.next(_ -> if (config.clientMinified) {
+				.then(_ -> if (config.clientMinified) {
 					logger.log(Info, 'Minifying client app');
 					// @todo: Make it so we don't need to only use uglifyjs
 					new Process('uglifyjs'.createNodeCommand(), [
@@ -80,11 +80,11 @@ class ClientAppPlugin implements Plugin {
 						'--compress',
 						'--mangle',
 						'-o ' + target.withExtension('min.js')
-					]).next(_ -> Task.nothing());
+					]).then(_ -> Task.nothing());
 				} else {
 					Task.nothing();
 				})
-				.next(_ -> {
+				.then(_ -> {
 					logger.log(Info, 'Client app built successfully');
 					Task.nothing();
 				});

@@ -12,7 +12,9 @@ class PageLayout extends Component {
 		return Html.view(<div className={Breeze.compose(
 			Spacing.pad(3)
 		)}>
-			<header>name</header>
+			<header>
+				<h1>name</h1>
+			</header>
 			<div>
 				children
 			</div>

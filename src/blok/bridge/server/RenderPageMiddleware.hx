@@ -23,7 +23,7 @@ class RenderPageMiddleware implements Middleware {
 
 			return generator
 				.generatePage(context)
-				.next(document -> {
+				.then(document -> {
 					var code = context.response.code;
 					var headers = context.response.headers;
 

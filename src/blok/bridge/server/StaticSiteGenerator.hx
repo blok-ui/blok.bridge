@@ -47,7 +47,7 @@ class StaticSiteGenerator implements Target {
 				var request = new Request(Get, page, [new HeaderField(Accept, 'text/html')]);
 				var path = page.trim().normalize();
 				if (path.startsWith('/')) path = path.substr(1);
-				return client.request(request).next(response -> {
+				return client.request(request).then(response -> {
 					var body = response.body.toString().or('<html></html>');
 					var entry:PageEntry = {path: path, body: body};
 					return entry;
@@ -69,7 +69,7 @@ class StaticSiteGenerator implements Target {
 						entry.path.withExtension('html');
 				}
 
-				return output.file(path).write(entry.body).next(_ -> {
+				return output.file(path).write(entry.body).then(_ -> {
 					logger.log(Info, 'Wrote page: ${path}');
 					Task.nothing();
 				});
@@ -88,10 +88,12 @@ class StaticSiteGenerator implements Target {
 
 						function visitPages():Task<Array<PageEntry>> {
 							var pages = visitor.drain();
-							return Task.parallel(...pages.map(visitPage))
-								.next(entries -> {
+							return pages
+								.map(visitPage)
+								.inParallel()
+								.then(entries -> {
 									if (visitor.hasPending()) {
-										return visitPages().next(newEntries -> Task.ok(entries.concat(newEntries)));
+										return visitPages().then(newEntries -> Task.ok(entries.concat(newEntries)));
 									}
 									return Task.ok(entries);
 								});
@@ -109,8 +111,9 @@ class StaticSiteGenerator implements Target {
 
 										logger.log(Info, 'Outputting all visited pages...');
 
-										Task
-											.parallel(...pages.map(writePage))
+										pages
+											.map(writePage)
+											.inParallel()
 											.handle(result -> switch result {
 												case Error(error):
 													activate(Error(error));

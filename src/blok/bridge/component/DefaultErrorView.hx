@@ -21,7 +21,10 @@ class DefaultErrorView extends Component {
 					Html.h1().child(title)
 				),
 				Html.div().child(
-					Html.p().child(message)
+					Html.p().child(message),
+					#if debug
+					Html.p().child('Warning: this is Blok\'s default ErrorView! You should probably implement your own.')
+					#end
 				)
 			)
 		);

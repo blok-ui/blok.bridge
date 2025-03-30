@@ -1,0 +1,9 @@
+-cp test
+
+-lib hxnodejs
+-lib blok.bridge
+
+-main Run
+-js dist/test/node/index.js
+-cmd node dist/test/node
+

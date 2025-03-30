@@ -50,7 +50,7 @@ class StaticFileMiddleware implements Middleware {
 	}
 
 	function partial(req:Request, file:File, contentType:String):Task<Response> {
-		return file.getMeta().next(meta -> file.readBytes().next(source -> {
+		return file.getMeta().then(meta -> file.readBytes().then(source -> {
 			var headers:Headers = [
 				new HeaderField('Accept-Ranges', 'bytes'),
 				new HeaderField('Vary', 'Accept-Encoding'),

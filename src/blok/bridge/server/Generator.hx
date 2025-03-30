@@ -1,7 +1,7 @@
 package blok.bridge.server;
 
 import blok.bridge.RequestContext;
-import blok.bridge.component.DefaultErrorView;
+import blok.bridge.component.*;
 import blok.html.Server;
 import blok.html.server.*;
 import blok.router.*;
@@ -40,7 +40,7 @@ class Generator implements Disposable {
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(new SuspenseBoundaryContext({
 					onSuspended: () -> {
-						logger.log(Debug, 'Suspended...'); // Or something
+						logger.log(Info, 'Suspended...'); // Or something
 					},
 					onComplete: () -> {
 						if (activated) {
@@ -56,9 +56,11 @@ class Generator implements Disposable {
 						activate(Ok(document));
 					}
 				}))
-				.child(render())
+				.child(Scope.wrap(_ -> render()).inSuspense(() -> DefaultSuspenseView.node({})))
 				.node()
 				.inErrorBoundary((component, e) -> {
+					trace(activated);
+					trace(e.message);
 					if (!activated) {
 						activated = true;
 						logger.log(Error, e.message);
@@ -75,6 +77,7 @@ class Generator implements Disposable {
 						message: e.message
 					});
 				});
+
 			var root = mount(document, node);
 			owner.addDisposable(root);
 		});

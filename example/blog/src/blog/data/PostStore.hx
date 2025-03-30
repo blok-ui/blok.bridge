@@ -26,16 +26,16 @@ class PostStore implements Context {
 
 	public function all():Task<Array<Post>> {
 		return dir.listFiles()
-			.next(files -> Task.parallel(...files.map(file -> file.getMeta())))
-			.next(metas -> metas.filter(meta -> meta.path.extension() == 'box'))
-			.next(metas -> Task.parallel(...metas.map(meta -> get(meta.name))));
+			.then(files -> files.map(file -> file.getMeta()).inParallel())
+			.then(metas -> metas.filter(meta -> meta.path.extension() == 'box'))
+			.then(metas -> metas.map(meta -> get(meta.name)).inParallel());
 	}
 
 	public function get(id:String):Task<Post> {
-		return dir.file(id.withExtension('box')).getMeta().next(meta -> {
+		return dir.file(id.withExtension('box')).getMeta().then(meta -> {
 			dir.file(id.withExtension('box'))
 				.read()
-				.next(contents -> parse({file: meta.fullPath, content: contents}));
+				.then(contents -> parse({file: meta.fullPath, content: contents}));
 		});
 	}
 
