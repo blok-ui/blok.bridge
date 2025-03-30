@@ -59,8 +59,6 @@ class Generator implements Disposable {
 				.child(Scope.wrap(_ -> render()).inSuspense(() -> DefaultSuspenseView.node({})))
 				.node()
 				.inErrorBoundary((component, e) -> {
-					trace(activated);
-					trace(e.message);
 					if (!activated) {
 						activated = true;
 						logger.log(Error, e.message);
