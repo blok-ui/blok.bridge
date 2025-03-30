@@ -46,7 +46,11 @@ class RenderPageMiddleware implements Middleware {
 			.or(() -> new ElementPrimitive('head'));
 		var body = document
 			.find(el -> el.as(ElementPrimitive)?.tag == 'body', true)
-			.or(() -> new ElementPrimitive('body'));
+			.or(() -> {
+				var body = new ElementPrimitive('body');
+				body.append(document.clone());
+				body;
+			});
 
 		return '<!doctype html><html>${head.toString({includeTextMarkers: false})}${body.toString()}</html>';
 	}

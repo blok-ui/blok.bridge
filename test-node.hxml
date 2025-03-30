@@ -1,6 +1,7 @@
 -cp test
 
 -lib hxnodejs
+-lib kit.file
 -lib blok.bridge
 
 -main Run

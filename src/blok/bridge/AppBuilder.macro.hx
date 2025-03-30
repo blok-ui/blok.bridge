@@ -11,10 +11,8 @@ using kit.macro.Tools;
 
 function buildGeneric() {
 	return switch Context.getLocalType() {
-		case TInst(_, params):
-			buildApp(params);
-		default:
-			throw 'assert';
+		case TInst(_, params): buildApp(params);
+		default: throw 'assert';
 	}
 }
 

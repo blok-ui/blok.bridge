@@ -18,6 +18,8 @@ abstract AppPlugins(Array<Plugin>) {
 	}
 
 	public function apply() {
-		return Task.parallel(...this.map(plugin -> plugin.apply()));
+		return this.map(plugin -> plugin.apply())
+			.inParallel()
+			.then(_ -> Task.nothing());
 	}
 }

@@ -9,7 +9,7 @@ abstract AppProviders(Array<Providable>) from Array<Providable> to Array<Provida
 
 	public function add(provider) {
 		this.push(provider);
-		return this;
+		return abstract;
 	}
 
 	public function provide() {
