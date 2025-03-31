@@ -18,10 +18,7 @@ class Routes extends Component {
 				Suspends.route({}),
 				Route.to('*').renders(_ -> 'Not found')
 			]
-		})
-			.inSuspense(() -> 'Loading...')
-			.node()
-			.inErrorBoundary((component, e) -> e.message);
+		}).inErrorBoundary((component, e) -> e.message);
 	}
 }
 

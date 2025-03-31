@@ -59,21 +59,10 @@ class Generator implements Disposable {
 				.child(Scope.wrap(_ -> render()).inSuspense(() -> DefaultSuspenseView.node({})))
 				.node()
 				.inErrorBoundary((component, e) -> {
-					if (!activated) {
-						activated = true;
-						logger.log(Error, e.message);
-						activate(Error(new Error(InternalError, e.message)));
-					} else {
-						logger.log(Error, 'A component failed but triggered onComplete');
-						logger.log(Error, e.message);
-					}
-
-					context.response.code = InternalServerError;
-
-					return DefaultErrorView.node({
-						code: InternalError,
-						message: e.message
-					});
+					var error:Error = e;
+					logger.log(Error, error.toString());
+					context.response.code = error.code;
+					return DefaultErrorView.node({error: error});
 				});
 
 			var root = mount(document, node);

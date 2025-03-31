@@ -9,9 +9,6 @@ class DefaultNotFoundRoute extends Page<'*'> {
 			context.response.code = NotFound;
 		});
 
-		return DefaultErrorView.node({
-			code: NotFound,
-			message: 'Page not found'
-		});
+		return DefaultErrorView.node({error: new Error(NotFound, 'Page not found')});
 	}
 }

@@ -5,12 +5,11 @@ import blok.*;
 import kit.Error;
 
 class DefaultErrorView extends Component {
-	@:attribute final code:ErrorCode = NotFound;
 	@:attribute final title:Maybe<String> = None;
-	@:attribute final message:String;
+	@:attribute final error:Error;
 
 	function render():Child {
-		var title = title.or(() -> 'Error ' + code);
+		var title = title.or(() -> 'Error ' + error.code);
 
 		return Html.html().child(
 			Html.head().child(
@@ -21,7 +20,7 @@ class DefaultErrorView extends Component {
 					Html.h1().child(title)
 				),
 				Html.div().child(
-					Html.p().child(message),
+					Html.p().child(error.message),
 					#if debug
 					Html.p().child('Warning: this is Blok\'s default ErrorView! You should probably implement your own.')
 					#end
