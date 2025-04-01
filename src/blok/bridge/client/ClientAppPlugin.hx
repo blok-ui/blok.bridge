@@ -35,11 +35,19 @@ class ClientAppPlugin implements Plugin {
 
 			switch config.clientDependencies {
 				case InheritDependencies:
+					logger.log(Warning, 'Attempting to use class paths from the server app to build the client app.');
+					logger.log(Warning, 'This is HIGHLY UNSTABLE. It\'s very likely you\'ll encounter strange '
+						+ 'compiler issues and hard to reason with bugs. Occasionally code will even compile but will '
+						+ 'fail at runtime. If you run into problems, this option is probably the culprit. '
+						+ 'Try switching to `UseHtml` (the preferred method) or `UseCustom`.'
+					);
 					var paths = Sources.getCurrentClassPaths().filter(path -> path != '' && path != null);
 					sources = sources.concat(paths);
 				case UseHxml(path):
+					logger.log(Info, 'Building the client app using $path');
 					args.push(path.withExtension('hxml'));
 				case UseCustom(deps):
+					logger.log(Info, 'Building the client app using custom deps');
 					for (lib in deps) {
 						libraries.push(lib.name);
 					}

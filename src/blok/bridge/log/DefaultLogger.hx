@@ -1,40 +1,53 @@
 package blok.bridge.log;
 
-#if (js && !nodejs)
-import js.Browser.console;
-#end
+import kit.cli.*;
 import blok.bridge.Logger;
+import blok.bridge.cli.Spinner;
+
+using kit.cli.StyleTools;
 
 class DefaultLogger implements Logger {
-	public function new() {}
+	final output:Output;
+	final spinner:Spinner;
+
+	public function new(output) {
+		this.output = output;
+		this.spinner = new Spinner(output);
+	}
+
+	public function startWorking(?message:String) {
+		if (message != null) output.writeLn(message.bold().color(Yellow));
+		spinner.start();
+	}
+
+	public function finishWork(?message:String) {
+		spinner.stop();
+		if (message != null) output.writeLn(message);
+	}
 
 	public function log(level:LogLevel, message:String) {
-		#if (js && !nodejs)
-		switch level {
+		var prefix = switch level {
 			case Debug:
-				#if debug
-				console.debug(message);
-				#end
-			case Error:
-				console.error(message);
+				' DEBUG '.backgroundColor(Cyan).bold();
 			case Info:
-				console.info(message);
-			case Warning:
-				console.warn(message);
-		}
-		#else
-		switch level {
-			case Debug:
-				#if debug
-				Sys.println('DEBUG: ' + message);
-				#end
+				' INFO '.backgroundColor(Blue).bold();
 			case Error:
-				Sys.println('ERROR: ' + message);
-			case Info:
-				Sys.println('INFO: ' + message);
+				' ERROR '.backgroundColor(Red).bold();
 			case Warning:
-				Sys.println('WARNING: ' + message);
+				' WARNING '.backgroundColor(Yellow).bold();
 		}
-		#end
+
+		if (spinner.isRunning()) {
+			switch level {
+				case Error | Warning | Debug:
+					spinner.stop();
+					output.writeLn(prefix + ' ' + message);
+					spinner.start();
+				default:
+					spinner.setStatus(prefix + (' ' + message + ' ').color(Black).backgroundColor(White));
+			}
+		} else {
+			output.writeLn(prefix + ' ' + message);
+		}
 	}
 }

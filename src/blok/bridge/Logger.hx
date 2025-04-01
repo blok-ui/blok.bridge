@@ -12,5 +12,7 @@ typedef LoggerOptions = {
 }
 
 interface Logger {
+	public function startWorking(?message:String):Void;
+	public function finishWork(?message:String):Void;
 	public function log(level:LogLevel, message:String):Void;
 }

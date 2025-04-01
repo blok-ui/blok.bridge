@@ -1,15 +1,20 @@
 package blok.bridge;
 
 class AppRunner {
+	final logger:Logger;
 	final plugins:AppPlugins;
 	final target:Target;
 
-	public function new(plugins, target) {
+	public function new(logger, plugins, target) {
+		this.logger = logger;
 		this.plugins = plugins;
 		this.target = target;
 	}
 
 	public function run():Task<Nothing> {
-		return plugins.apply().then(_ -> target.run());
+		logger.startWorking('Blok Bridge');
+		return plugins.apply()
+			.inspect(_ -> target.run())
+			.inspect(_ -> logger.finishWork());
 	}
 }

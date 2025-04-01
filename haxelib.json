@@ -11,6 +11,8 @@
     "blok.core": "0.10.0",
     "blok.router": "0.0.0",
     "kit.file": "0.1.0",
-    "kit.http": "0.0.1"
+    "kit.http": "0.0.1",
+    "kit.cli": "0.0.2",
+    "mime": "0.1.2"
   }
 }

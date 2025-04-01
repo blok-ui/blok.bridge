@@ -51,8 +51,10 @@ class DevServer implements Target {
 						logger.log(Info, 'Closing server...');
 						close(status -> if (status) {
 							logger.log(Info, 'Server closed');
+							Sys.exit(0);
 						} else {
 							logger.log(Info, 'Server closed badly');
+							Sys.exit(1);
 						});
 					});
 					Nothing;

@@ -8,4 +8,12 @@ class NullLogger implements Logger {
 	public function log(level:LogLevel, message:String) {
 		// noop
 	}
+
+	public function startWorking(?message:String) {
+		// noop
+	}
+
+	public function finishWork(?message:String) {
+		// noop
+	}
 }

@@ -1,6 +1,7 @@
 -cp src
 
 -lib kit.http
+-lib kit.cli
 -lib mime
 -lib blok.core
 -lib blok.router
