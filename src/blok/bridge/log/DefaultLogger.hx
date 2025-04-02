@@ -2,27 +2,15 @@ package blok.bridge.log;
 
 import kit.cli.*;
 import blok.bridge.Logger;
-import blok.bridge.cli.Spinner;
 
 using kit.cli.StyleTools;
+using kit.cli.display.TaskTools;
 
 class DefaultLogger implements Logger {
-	final output:Output;
-	final spinner:Spinner;
+	var console:Console;
 
-	public function new(output) {
-		this.output = output;
-		this.spinner = new Spinner(output);
-	}
-
-	public function startWorking(?message:String) {
-		if (message != null) output.writeLn(message.bold().color(Yellow));
-		spinner.start();
-	}
-
-	public function finishWork(?message:String) {
-		spinner.stop();
-		if (message != null) output.writeLn(message);
+	public function new(console) {
+		this.console = console;
 	}
 
 	public function log(level:LogLevel, message:String) {
@@ -37,17 +25,17 @@ class DefaultLogger implements Logger {
 				' WARNING '.backgroundColor(Yellow).bold();
 		}
 
-		if (spinner.isRunning()) {
-			switch level {
-				case Error | Warning | Debug:
-					spinner.stop();
-					output.writeLn(prefix + ' ' + message);
-					spinner.start();
-				default:
-					spinner.setStatus(prefix + (' ' + message + ' ').color(Black).backgroundColor(White));
-			}
-		} else {
-			output.writeLn(prefix + ' ' + message);
-		}
+		console.writeLine(prefix + ' ' + message);
+	}
+
+	public function work(handler:() -> Task<Nothing>):Task<Nothing> {
+		var currentConsole = this.console;
+		return console.runTask(console -> {
+			this.console = console;
+			handler().then(_ -> {
+				this.console = currentConsole;
+				0;
+			});
+		});
 	}
 }

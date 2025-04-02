@@ -7,8 +7,6 @@ import blok.router.*;
 import spa.routes.*;
 
 class AppRouter extends Island {
-	// This line is all that's needed to ensure the Router's navigation
-	// is available on the client side.
 	@:context final navigator:Navigator;
 
 	function render():Child {

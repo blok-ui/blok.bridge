@@ -12,9 +12,6 @@ class AppRunner {
 	}
 
 	public function run():Task<Nothing> {
-		logger.startWorking('Blok Bridge');
-		return plugins.apply()
-			.inspect(_ -> target.run())
-			.inspect(_ -> logger.finishWork());
+		return logger.work(() -> plugins.apply().then(_ -> target.run()));
 	}
 }

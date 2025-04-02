@@ -1,6 +1,7 @@
 package blok.bridge;
 
 import blok.ComponentBuilder;
+import haxe.macro.Context;
 import haxe.macro.Expr;
 import kit.macro.*;
 import kit.macro.step.*;
@@ -19,16 +20,43 @@ function build() {
 final IslandContextSerializeHook = 'islands:context-serialize';
 final IslandContextDeserializeHook = 'islands:context-deserialize';
 
-class IslandContextSerializerBuildStep implements BuildStep {
+class IslandContextProviderBuildStep implements BuildStep {
 	public final priority:Priority = Before;
 
 	public function new() {}
 
 	public function apply(builder:ClassBuilder) {
+		// for (meta in builder.getClass().meta.extract(':provide')) {
+		// 	processClassProvide(builder, meta);
+		// }
+
 		for (field in builder.findFieldsByMeta(':context')) {
 			parseField(builder, field);
 		}
 	}
+
+	// function processClassProvide(builder:ClassBuilder, meta:MetadataEntry) {
+	// 	switch meta.params {
+	// 		case null | []:
+	// 		case types:
+	// 			for (expr in types) {
+	// 				// @todo: We don't actually want to get `Class<...>` as  our name.
+	// 				// Also we need to check that this unifies with Context correctly.
+	// 				var type = Context.typeof(expr).toComplexType();
+	// 				var name = type.toString();
+	// 				builder
+	// 					.hook(IslandContextSerializeHook)
+	// 					.addExpr(macro @:pos(meta.pos) Reflect.setField(__context, $v{name}, $expr.from(this).toJson()));
+	// 				builder
+	// 					.hook(IslandContextDeserializeHook)
+	// 					.addExpr(macro @:pos(meta.pos) resolver.resolve(
+	// 						$v{name},
+	// 						Reflect.field(context, $v{name}),
+	// 						${expr}.fromJson
+	// 					));
+	// 			}
+	// 	}
+	// }
 
 	function parseField(builder:ClassBuilder, field:Field) {
 		switch field.kind {
@@ -67,7 +95,7 @@ class IslandBuilder implements BuildBundle implements BuildStep {
 
 	public function steps():Array<BuildStep> {
 		return [
-			new IslandContextSerializerBuildStep(),
+			new IslandContextProviderBuildStep(),
 			new JsonSerializerBuildStep({
 				customParser: options -> switch options.type.toType().toComplexType() {
 					case macro :blok.signal.Signal<$wrappedType>:

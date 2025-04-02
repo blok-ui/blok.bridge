@@ -1,11 +1,10 @@
 package blok.bridge.module;
 
-import kit.cli.*;
-import kit.cli.output.*;
-import kit.cli.input.*;
 import blok.bridge.log.*;
 import blok.bridge.server.*;
 import capsule.*;
+import kit.cli.*;
+import kit.cli.sys.*;
 import kit.file.FileSystem;
 import kit.file.adaptor.SysAdaptor;
 
@@ -16,8 +15,7 @@ class CoreModule implements Module {
 		container.map(AppRunner).to(AppRunner).share();
 		container.map(AppPlugins).to(() -> new AppPlugins([])).share();
 		container.map(AppProviders).to(() -> new AppProviders([])).share();
-		container.map(Output).toDefault(SysOutput).share();
-		container.map(Input).toDefault(SysInput).share();
+		container.map(Console).toDefault(SysConsole).share();
 		container.map(Logger).toDefault(DefaultLogger).share();
 		container.map(FileSystem)
 			.toDefault((config:Config) -> new FileSystem(new SysAdaptor(config.rootPath)))
