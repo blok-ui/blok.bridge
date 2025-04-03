@@ -4,7 +4,8 @@ import blok.html.Html;
 import blok.*;
 import blok.bridge.*;
 import blok.router.*;
-import spa.routes.*;
+import spa.home.*;
+import spa.note.*;
 
 class AppRouter extends Island {
 	@:context final navigator:Navigator;
@@ -13,7 +14,7 @@ class AppRouter extends Island {
 		return Html.view(<div>
 			<Router>
 				<HomePage />
-				<EditNote />
+				<EditNotePage />
 				<Route to="*">{_ -> 'Not found'}</Route>
 			</Router>
 		</div>);

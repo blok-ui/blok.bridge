@@ -1,4 +1,4 @@
-package spa.data;
+package spa.note;
 
 import blok.data.Model;
 

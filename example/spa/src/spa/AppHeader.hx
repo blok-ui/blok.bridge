@@ -4,7 +4,8 @@ import blok.html.Html;
 import blok.*;
 import blok.bridge.*;
 import blok.router.*;
-import spa.routes.*;
+import spa.home.*;
+import spa.note.EditNotePage;
 
 class AppHeader extends Island {
 	@:context final navigator:Navigator;
@@ -14,7 +15,7 @@ class AppHeader extends Island {
 			<h1><Link to={HomePage.createUrl()}>"Spa Example"</Link></h1>
 			<nav>
 				<ul>
-					<li><Link to={EditNote.createUrl({id: 'test'})}>"Test"</Link></li>
+					<li><Link to={EditNotePage.createUrl({id: 'test'})}>"Test"</Link></li>
 				</ul>
 			</nav>
 		</header>);

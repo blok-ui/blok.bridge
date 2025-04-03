@@ -1,4 +1,4 @@
-package spa.routes;
+package spa.home;
 
 import blok.*;
 import blok.html.Html;
