@@ -4,5 +4,6 @@
 	},
 	"scripts": {
 		"postinstall": "lix download"
-	}
+	},
+	"private": "true"
 }

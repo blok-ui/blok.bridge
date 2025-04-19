@@ -1,6 +1,5 @@
 package blok.bridge.macro;
 
-import blok.bridge.Constants;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 

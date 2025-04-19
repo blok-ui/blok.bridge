@@ -4,11 +4,15 @@
   "classPath": "src",
   "tags": ["ui"],
   "contributors": ["wartman"],
-  "version": "0.2.0-alpha.1",
+  "version": "0.3.0-alpha.1",
   "releasenote": "Latest blok",
   "dependencies": {
+    "capsule": "0.5.0",
     "blok.core": "0.10.0",
     "blok.router": "0.0.0",
-    "kit.file": "0.1.0"
+    "kit.file": "0.1.0",
+    "kit.http": "0.0.1",
+    "kit.cli": "0.0.2",
+    "mime": "0.1.2"
   }
 }

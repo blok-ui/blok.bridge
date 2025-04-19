@@ -13,4 +13,5 @@ typedef LoggerOptions = {
 
 interface Logger {
 	public function log(level:LogLevel, message:String):Void;
+	public function work(handler:() -> Task<Nothing>):Task<Nothing>;
 }

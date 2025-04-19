@@ -1,7 +1,8 @@
--cp example/src
+-cp example/blog/src
 
 -D analyzer-optimize
 -D message.reporting=pretty
+-D js-es=6
 
 -dce full
 --debug

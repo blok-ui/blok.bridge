@@ -1,40 +1,41 @@
 package blok.bridge.log;
 
-#if (js && !nodejs)
-import js.Browser.console;
-#end
+import kit.cli.*;
 import blok.bridge.Logger;
 
+using kit.cli.StyleTools;
+using kit.cli.display.TaskTools;
+
 class DefaultLogger implements Logger {
-	public function new() {}
+	var console:Console;
+
+	public function new(console) {
+		this.console = console;
+	}
 
 	public function log(level:LogLevel, message:String) {
-		#if (js && !nodejs)
-		switch level {
+		var prefix = switch level {
 			case Debug:
-				#if debug
-				console.debug(message);
-				#end
-			case Error:
-				console.error(message);
+				' DEBUG '.backgroundColor(Cyan).bold();
 			case Info:
-				console.info(message);
-			case Warning:
-				console.warn(message);
-		}
-		#else
-		switch level {
-			case Debug:
-				#if debug
-				Sys.println('DEBUG: ' + message);
-				#end
+				' INFO '.backgroundColor(Blue).bold();
 			case Error:
-				Sys.println('ERROR: ' + message);
-			case Info:
-				Sys.println('INFO: ' + message);
+				' ERROR '.backgroundColor(Red).bold();
 			case Warning:
-				Sys.println('WARNING: ' + message);
+				' WARNING '.backgroundColor(Yellow).bold();
 		}
-		#end
+
+		console.writeLine(prefix + ' ' + message);
+	}
+
+	public function work(handler:() -> Task<Nothing>):Task<Nothing> {
+		var currentConsole = this.console;
+		return console.runTask(console -> {
+			this.console = console;
+			handler().then(_ -> {
+				this.console = currentConsole;
+				0;
+			});
+		});
 	}
 }

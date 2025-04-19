@@ -1,0 +1,10 @@
+-cp example/spa/src
+
+-D blok.bridge.islands-main=SpaIslandsMain
+-D analyzer-optimize
+-D message.reporting=pretty
+-D js-es=6
+
+-lib blok.foundation
+-lib blok.bridge
+-lib breeze

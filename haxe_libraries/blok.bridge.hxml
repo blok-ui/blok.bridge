@@ -1,6 +1,12 @@
 -cp src
 
+-lib kit.http
+-lib kit.cli
+-lib mime
 -lib blok.core
 -lib blok.router
+-lib capsule
 
 -D blok.bridge=0.0.1
+
+extraParams.hxml
