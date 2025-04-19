@@ -11,7 +11,8 @@ class ClientAppModule implements Module {
 	public function provide(container:Container) {
 		container.map(ClientAppPlugin).to(ClientAppPlugin).share();
 
-		container.when(Generator).resolved((config:Config) -> {
+		// Add a script tag to the generated HTML so our client app will be loaded.
+		container.when(Generator).resolved((config:Config, logger:Logger) -> {
 			value.onPageRendered.add((_, document) -> {
 				document
 					.find(el -> el.as(ElementPrimitive)?.tag == 'body', true)

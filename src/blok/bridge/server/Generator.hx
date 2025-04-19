@@ -40,7 +40,7 @@ class Generator implements Disposable {
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(new SuspenseBoundaryContext({
 					onSuspended: () -> {
-						logger.log(Info, 'Suspended...'); // Or something
+						logger.log(Info, 'Suspending [$path]...');
 					},
 					onComplete: () -> {
 						if (activated) {
