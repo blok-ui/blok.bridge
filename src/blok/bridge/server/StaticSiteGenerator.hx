@@ -1,7 +1,7 @@
 package blok.bridge.server;
 
 import blok.debug.Debug;
-import blok.router.RouteVisitor;
+import blok.html.server.*;
 import kit.http.*;
 import kit.http.client.MockClient;
 import kit.http.server.MockServer;
@@ -24,15 +24,15 @@ class StaticSiteGenerator implements Target {
 	final strategy:HtmlGenerationStrategy;
 	final config:Config;
 	final logger:Logger;
-	final visitor:RouteVisitor;
+	final generator:Generator;
 	final output:OutputDirectory;
 	final middleware:AppMiddleware;
 
-	public function new(config, strategy, logger, visitor, middleware, output) {
+	public function new(config, strategy, logger, generator, middleware, output) {
 		this.config = config;
 		this.strategy = strategy;
 		this.logger = logger;
-		this.visitor = visitor;
+		this.generator = generator;
 		this.middleware = middleware;
 		this.output = output;
 	}
@@ -42,8 +42,38 @@ class StaticSiteGenerator implements Target {
 			var server = new MockServer();
 			var client = new MockClient(server);
 			var handler:Handler = request -> Future.immediate(new Response(NotFound, [], ''));
+			var paths:Array<String> = [];
+			var visited:Array<String> = [];
+
+			function scrapePathsToVisit(node:NodePrimitive) {
+				if (node is ElementPrimitive) {
+					var el = node.as(ElementPrimitive);
+					if (el?.tag == 'a') switch (el?.getAttribute('href') : Null<String>) {
+						case null:
+							// @todo: We need a much more robust strategy to figure out if this is a
+							// local path we should visit:
+						case path if (path.startsWith('/') && !paths.contains(path) && !visited.contains(path)):
+							paths.push(path);
+						default:
+					}
+				}
+
+				for (node in node.children) {
+					scrapePathsToVisit(node);
+				}
+			}
+
+			function drainPaths() {
+				var drained = paths.copy();
+				paths = [];
+				return drained;
+			}
 
 			function visitPage(page:String) {
+				if (visited.contains(page)) return Task.error(new Error(InternalError, 'Already visited $page'));
+
+				visited.push(page);
+
 				var request = new Request(Get, page, [new HeaderField(Accept, 'text/html')]);
 				var path = page.trim().normalize();
 				if (path.startsWith('/')) path = path.substr(1);
@@ -52,6 +82,20 @@ class StaticSiteGenerator implements Target {
 					var entry:PageEntry = {path: path, body: body};
 					return entry;
 				});
+			}
+
+			function visitPagesRecursively(pages:Array<String>):Task<Array<PageEntry>> {
+				return pages
+					.map(visitPage)
+					.inParallel()
+					.then(entries -> {
+						var paths = drainPaths().filter(path -> !visited.contains(path));
+						if (paths.length > 0) {
+							return visitPagesRecursively(paths)
+								.then(newEntries -> Task.ok(entries.concat(newEntries)));
+						}
+						return Task.ok(entries);
+					});
 			}
 
 			// @todo: clear the target dir before output?
@@ -75,8 +119,9 @@ class StaticSiteGenerator implements Target {
 				});
 			}
 
-			visitor.enqueue('/');
-			visitor.enqueue('/404.html');
+			// Hook into the generator and scrape the primitive tree for paths to visit.
+			// We need to do this here as our server will return a string.
+			var link = generator.onPageRendered.add((_, primitive) -> scrapePathsToVisit(primitive));
 
 			server
 				.serve(handler.into(...middleware.unwrap()))
@@ -86,20 +131,8 @@ class StaticSiteGenerator implements Target {
 					case Running(close):
 						logger.log(Info, 'Running a mock server to generate static HTML');
 
-						function visitPages():Task<Array<PageEntry>> {
-							var pages = visitor.drain();
-							return pages
-								.map(visitPage)
-								.inParallel()
-								.then(entries -> {
-									if (visitor.hasPending()) {
-										return visitPages().then(newEntries -> Task.ok(entries.concat(newEntries)));
-									}
-									return Task.ok(entries);
-								});
-						}
-
-						visitPages()
+						visitPagesRecursively(['/', '/404.html'])
+							.always(() -> link.cancel())
 							.handle(result -> switch result {
 								case Ok(pages):
 									logger.log(Info, 'All pages visited. Closing server...');
