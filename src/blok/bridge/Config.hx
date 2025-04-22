@@ -1,5 +1,6 @@
 package blok.bridge;
 
+import blok.bridge.Logger.LogLevel;
 import blok.bridge.util.SemVer;
 import blok.data.Object;
 
@@ -25,4 +26,5 @@ class Config extends Object {
 	@:value public final clientSources:Array<String> = ['src'];
 	@:value public final clientDependencies:ClientAppDependencies = InheritDependencies;
 	@:value public final clientFlags:Array<String> = [];
+	@:value public final logDepth:LogLevel = #if debug Debug #else Warning #end;
 }

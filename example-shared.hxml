@@ -5,7 +5,7 @@
 -D js-es=6
 
 -dce full
-# --debug
+--debug
 
 -lib blok.foundation
 -lib blok.bridge

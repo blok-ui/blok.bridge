@@ -7,13 +7,17 @@ using kit.cli.StyleTools;
 using kit.cli.display.TaskTools;
 
 class DefaultLogger implements Logger {
+	final options:LoggerOptions;
 	var console:Console;
 
-	public function new(console) {
+	public function new(options, console) {
+		this.options = options;
 		this.console = console;
 	}
 
 	public function log(level:LogLevel, message:String) {
+		if ((options.depth : Int) > (level : Int)) return;
+
 		var prefix = switch level {
 			case Debug:
 				' DEBUG '.backgroundColor(Cyan).bold();

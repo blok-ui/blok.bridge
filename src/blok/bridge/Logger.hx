@@ -1,14 +1,14 @@
 package blok.bridge;
 
-enum abstract LogLevel(Int) {
+enum abstract LogLevel(Int) to Int {
 	final Debug = 0;
-	final Info;
-	final Warning;
-	final Error;
+	final Warning = 1;
+	final Error = 2;
+	final Info = 3;
 }
 
 typedef LoggerOptions = {
-	// @todo: Should be able to configure logging levels etc here.
+	public final depth:LogLevel;
 }
 
 interface Logger {

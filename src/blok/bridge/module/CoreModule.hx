@@ -16,7 +16,11 @@ class CoreModule implements Module {
 		container.map(AppPlugins).to(() -> new AppPlugins([])).share();
 		container.map(AppProviders).to(() -> new AppProviders([])).share();
 		container.map(Console).toDefault(SysConsole).share();
-		container.map(Logger).toDefault(DefaultLogger).share();
+		container.map(Logger)
+			.toDefault((config:Config, console:Console) -> new DefaultLogger({
+				depth: config.logDepth
+			}, console))
+			.share();
 		container.map(FileSystem)
 			.toDefault((config:Config) -> new FileSystem(new SysAdaptor(config.rootPath)))
 			.share();
