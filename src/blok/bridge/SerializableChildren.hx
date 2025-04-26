@@ -29,7 +29,7 @@ function fromJson(data:Array<SerializedPrimitive>):Children {
 				Reflect.setField(props, name, new ReadOnlySignal(Reflect.field(child.data, name)));
 			}
 			new VPrimitiveView(
-				PrimitiveView.getTypeForTag(child.tag),
+				ElementPrimitiveView.getTypeForTag(child.tag),
 				child.tag,
 				props,
 				fromJson(child.children)

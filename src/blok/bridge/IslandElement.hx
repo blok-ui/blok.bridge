@@ -51,7 +51,7 @@ class IslandElement extends Component {
 		return child;
 		#else
 		return new VPrimitiveView(
-			PrimitiveView.getTypeForTag(tag),
+			ElementPrimitiveView.getTypeForTag(tag),
 			tag,
 			{
 				'data-component': Signal.ofValue(component),
