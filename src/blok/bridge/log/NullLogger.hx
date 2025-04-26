@@ -16,4 +16,8 @@ class NullLogger implements Logger {
 	public function finishWork(?message:String) {
 		// noop
 	}
+
+	public function work(handler:() -> Task<Nothing, Error>):Task<Nothing, Error> {
+		return handler();
+	}
 }
