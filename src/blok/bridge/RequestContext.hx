@@ -3,7 +3,7 @@ package blok.bridge;
 import blok.debug.Debug;
 import kit.http.*;
 
-@:fallback(error('No BridgeRequest found'))
+@:fallback(error('No RequestContext found'))
 class RequestContext implements Context {
 	public final config:Config;
 	public final request:Request;
