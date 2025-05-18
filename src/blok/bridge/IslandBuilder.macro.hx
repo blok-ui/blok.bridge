@@ -107,7 +107,7 @@ class IslandBuilder implements BuildBundle implements BuildStep {
 					$render;
 					#else
 					var child:() -> blok.Child = () -> $render;
-					return switch findAncestorOfType(blok.bridge.Island) {
+					return switch investigate().findAncestorComponent(blok.bridge.Island) {
 						case None:
 							blok.bridge.IslandElement.node({
 								component: __islandName(),
@@ -134,7 +134,7 @@ class IslandBuilder implements BuildBundle implements BuildStep {
 			});
 			macro {
 				var resolver = blok.bridge.IslandContextResolver.current();
-				new blok.Provider.VProvider([$a{providers}]).child(child);
+				new blok.Provider.ProviderFactory([$a{providers}]).child(child).node();
 			}
 		} else macro child;
 
@@ -142,23 +142,19 @@ class IslandBuilder implements BuildBundle implements BuildStep {
 			public static final islandName = $v{path};
 
 			#if blok.client
-			public static function hydrateIslands(adaptor:blok.Adaptor, ?options):blok.Disposable {
+			public static function hydrateIslands(adaptor:blok.engine.Adaptor, ?options):blok.core.Disposable {
 				var elements = blok.bridge.IslandElement.getIslandElementsForComponent(islandName, options);
 				var islands = [
 					for (el in elements) {
 						var props:{} = blok.bridge.IslandElement.getIslandProps(el);
 						var context:{} = blok.bridge.IslandElement.getIslandContext(el);
-						var cursor = adaptor.createCursor(el);
 						var child = fromJson(props);
-						var root = blok.Root.node({
-							target: el,
-							child: $deserializeBody
-						}).createView();
-						root.hydrate(cursor, adaptor, null, null);
+						var root = new blok.Root(el, adaptor, $deserializeBody);
+						root.hydrate().orThrow();
 						root;
 					}
 				];
-				return blok.DisposableItem.ofCallback(() -> {
+				return blok.core.DisposableItem.ofCallback(() -> {
 					for (island in islands) island.dispose();
 				});
 			}

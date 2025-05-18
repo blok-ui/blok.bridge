@@ -1,6 +1,7 @@
 package blok.bridge;
 
 import blok.Provider;
+import blok.engine.*;
 
 abstract AppProviders(Array<Providable>) from Array<Providable> to Array<Providable> {
 	public function new(providers) {
@@ -13,6 +14,6 @@ abstract AppProviders(Array<Providable>) from Array<Providable> to Array<Provida
 	}
 
 	public function provide() {
-		return new VProvider(this.map(provider -> {shared: true, value: provider}));
+		return new ProviderFactory(this.map(provider -> {shared: true, value: provider}));
 	}
 }

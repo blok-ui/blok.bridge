@@ -1,8 +1,9 @@
 package blok.bridge;
 
 import blok.debug.Debug;
+import blok.engine.*;
+import blok.html.Html;
 import blok.signal.Signal;
-import blok.*;
 #if !blok.client
 import blok.html.server.*;
 #end
@@ -28,8 +29,7 @@ function fromJson(data:Array<SerializedPrimitive>):Children {
 			for (name in Reflect.fields(child.data)) {
 				Reflect.setField(props, name, new ReadOnlySignal(Reflect.field(child.data, name)));
 			}
-			new VPrimitiveView(
-				ElementPrimitiveView.getTypeForTag(child.tag),
+			new ElementNode(
 				child.tag,
 				props,
 				fromJson(child.children)
@@ -38,18 +38,15 @@ function fromJson(data:Array<SerializedPrimitive>):Children {
 }
 
 #if blok.client
-function toJson(parent:View, children:Children):Array<SerializedPrimitive> {
+function toJson(parent:IntoView, children:Children):Array<SerializedPrimitive> {
 	return [];
 }
 #else
-function toJson(parent:View, children:Children):Array<SerializedPrimitive> {
+function toJson(parent:IntoView, children:Children):Array<SerializedPrimitive> {
 	var node = new ElementPrimitive('#fragment', {});
-	var root = Root.node({
-		target: node,
-		child: children
-	}).createView();
+	var root = new Root(node, new ServerAdaptor(), children.toChild());
 
-	root.mount(new ServerAdaptor(), parent, null);
+	root.mount().orThrow();
 
 	var serialized:Array<SerializedPrimitive> = node.children.map(serializePrimitive).filter(n -> n != null);
 

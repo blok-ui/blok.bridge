@@ -1,7 +1,8 @@
 package blok.bridge;
 
-import blok.signal.*;
+import blok.core.*;
 import blok.debug.Debug.error;
+import blok.signal.*;
 
 @:fallback(error('No AssetContext found'))
 class AssetContext implements Context {

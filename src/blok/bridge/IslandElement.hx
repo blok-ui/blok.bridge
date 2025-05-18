@@ -50,8 +50,7 @@ class IslandElement extends Component {
 		#if blok.client
 		return child;
 		#else
-		return new VPrimitiveView(
-			ElementPrimitiveView.getTypeForTag(tag),
+		return new blok.engine.PrimitiveNode(
 			tag,
 			{
 				'data-component': Signal.ofValue(component),

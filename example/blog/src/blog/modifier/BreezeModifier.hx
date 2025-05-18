@@ -1,8 +1,8 @@
 package blog.modifier;
 
-import blok.html.VHtmlPrimitive;
+import blok.html.Html.ElementNode;
 import blok.signal.Signal.ReadOnlySignal;
 
-function style(primitive:VHtmlPrimitive, style:ReadOnlySignal<ClassName>) {
-	return primitive.attr(ClassName, style);
+function style<Attrs:{}>(node:ElementNode<Attrs>, style:ReadOnlySignal<ClassName>) {
+	return node.attr(ClassName, style);
 }

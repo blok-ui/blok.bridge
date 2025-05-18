@@ -2,7 +2,7 @@ package blok.bridge.server;
 
 import blok.bridge.RequestContext;
 import blok.bridge.component.*;
-import blok.html.Server;
+import blok.core.*;
 import blok.html.server.*;
 import blok.router.*;
 import blok.router.navigation.*;
@@ -58,15 +58,18 @@ class Generator implements Disposable {
 				}))
 				.child(Scope.wrap(_ -> render()).inSuspense(() -> DefaultSuspenseView.node({})))
 				.node()
-				.inErrorBoundary((component, e) -> {
+				.inErrorBoundary((e) -> {
 					var error:Error = e;
 					logger.log(Error, error.toString());
 					context.response.code = error.code;
 					return DefaultErrorView.node({error: error});
 				});
 
-			var root = mount(document, node);
-			owner.addDisposable(root);
+			var root = new Root(document, new ServerAdaptor(), node);
+
+			root.mount()
+				.inspect(_ -> owner.addDisposable(root))
+				.orThrow();
 		});
 	}
 
