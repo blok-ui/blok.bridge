@@ -18,7 +18,7 @@ class ClientAppModule implements Module {
 					.find(el -> el.as(ElementPrimitive)?.tag == 'body', true)
 					.inspect(body -> {
 						var script = new ElementPrimitive('script');
-						script.setAttribute('src', config.clientSrc);
+						script.setAttribute('src', config.clientPath);
 						script.setAttribute('defer', 'defer');
 						body.append(script);
 					});

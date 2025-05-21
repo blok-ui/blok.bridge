@@ -29,7 +29,7 @@ class StaticFileMiddleware implements Middleware {
 	public function apply(handler:Handler):Handler {
 		return request -> {
 			var path = request.url.path;
-			var prefix = config.assetsDirectory;
+			var prefix = config.assetsPath;
 
 			if (request.method != Get || !path.startsWith(prefix)) {
 				return handler.process(request);

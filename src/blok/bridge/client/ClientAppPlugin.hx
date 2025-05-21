@@ -28,10 +28,10 @@ class ClientAppPlugin implements Plugin {
 	public function apply():Task<Nothing> {
 		return ensureDirectory().then(meta -> {
 			var target = Path.join([meta.path, config.clientName]).withExtension('js');
-			var sources:Array<String> = config.clientSources.concat([getDotBridgeDirectory()]);
+			var sources:Array<String> = [getDotBridgeDirectory()];
 			var args = [];
 			var libraries = ['blok.bridge'];
-			var flags = config.clientFlags.copy();
+			var flags = [];
 
 			switch config.clientDependencies {
 				case InheritDependencies:
@@ -46,11 +46,11 @@ class ClientAppPlugin implements Plugin {
 				case UseHxml(path):
 					logger.log(Info, 'Building the client app using $path');
 					args.push(path.withExtension('hxml'));
-				case UseCustom(deps):
-					logger.log(Info, 'Building the client app using custom deps');
-					for (lib in deps) {
-						libraries.push(lib.name);
-					}
+				case UseCustom(config):
+					logger.log(Info, 'Building the client app using custom configuration');
+					sources = sources.concat(config.sources);
+					flags = flags.concat(config.flags);
+					libraries = libraries.concat(config.deps.map(dep -> dep.name));
 			}
 
 			for (lib in libraries) {

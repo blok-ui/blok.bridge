@@ -6,25 +6,117 @@ import blok.data.Object;
 
 using haxe.io.Path;
 
+class CustomClientAppConfig extends Object {
+	/**
+		Tell the Haxe compiler where to find sources for the client-side app. Defaults to `['src']`.
+	**/
+	@:value public final sources:Array<String> = ['src'];
+
+	/**
+		Define dependencies for the client-side app. Note that `blok.bridge` will be included for
+		you automatically.
+	**/
+	@:value public final deps:Array<{name:String, ?version:String}> = [];
+
+	/**
+		Define any flags you want to have present on the client app. Note that `--debug` is automatically
+		inherited from the sever-side app, and that the `blok.client` flag will automatically be set
+		to `true` for you.
+	**/
+	@:value public final flags:Array<String> = [];
+}
+
 enum ClientAppDependencies {
 	InheritDependencies;
 	UseHxml(path:String);
-	UseCustom(deps:Array<{name:String, ?version:String}>);
+	UseCustom(config:CustomClientAppConfig);
 }
 
 class Config extends Object {
-	@:value public final rootPath:String = Sys.getCwd();
-	@:value public final outputPath:String = 'dist/www';
+	/**
+		The current version of the app.
+	**/
 	@:value public final version:SemVer;
-	@:value public final assetsDirectory:String = '/assets';
+
+	/**
+		Set how many logger messages you see.
+	**/
+	@:value public final logDepth:LogLevel = #if debug Debug #else Warning #end;
+
+	/**
+		The root path all other paths will be relative to. Defaults to the
+		current working directory.
+	**/
+	@:value public final rootPath:String = Sys.getCwd();
+
+	/**
+		The folder all generated files will be saved to, relative to `rootPath`.
+		Defaults to `dist/www`. This should never be an absolute path.
+	**/
+	@:value public final outputPath:String = 'dist/www';
+
+	/**
+		The path all static assets will be saved to and served from. This should never
+		be an absolute path and should never include the full output path.
+	**/
+	@:value public final assetsPath:String = '/assets';
+
+	/**
+		The path to the client-side app, relative to `outputPath`. Does not 
+		need to include a file extension. Defaults to `/assets/app`.
+
+		Note that you should use `clientPath` to get the final, fully resolved path.
+	**/
 	@:value public final clientName:String = '/assets/app';
+
+	/**
+		Flag to check if the client app should be minified at build time or not. By default,
+		this will be true if the compiler is in debug mode and false otherwise.
+	**/
 	@:value public final clientMinified:Bool = #if debug false #else true #end;
+
+	/**
+		Resolve the final path to the client app. This will take into account if `clientMinified` is
+		set and use the appropriate extension.
+	**/
 	@:prop(get = switch clientMinified {
 			case true: clientName.withExtension('min.js');
 			case false: clientName.withExtension('js');
-		}) public final clientSrc:String;
-	@:value public final clientSources:Array<String> = ['src'];
-	@:value public final clientDependencies:ClientAppDependencies = InheritDependencies;
-	@:value public final clientFlags:Array<String> = [];
-	@:value public final logDepth:LogLevel = #if debug Debug #else Warning #end;
+		}) public final clientPath:String;
+
+	/**
+		Set how the client app's dependencies should be resolved.
+
+		Available options are:
+
+		#### InheritDependencies
+
+		This is the simplest but by far the most error-prone option. This will simply
+		try to use the same class-paths used to compile the server-side app to compile the client-side one.
+		This *can* work, but often results in very strange bugs, including otherwise inexplicable
+		runtime errors. Use with caution -- this is only really suitable for quick tests.
+
+		#### UseCustom(config)
+
+		Programmatically configure the client app.
+
+		#### UseHxml(path)
+
+		Use a hxml file to configure the client app. This is *by far* the recommended approach, since
+		it allows some code sharing.
+
+		Best practice is to have three hxml files (replace "{appName}" with your app's name):
+
+		- `{appName}-shared.hxml`: Contains configuration and dependencies shared by both sides of your app.
+			This *must not* include a `-main` option *or* any output options (like `-js app.js`). Note that
+			Bridge will not include this file for you -- this is just a convention, so you'll need to place
+			`{appName}-shared.hxml` at the top of the other two hxml files to import it.
+		- `{appName}-server.hxml`: Contains configuration only for the server-side of the app. This
+			is also the file you should point your IDE at. This *should* be where you have a `-main` option
+			and any output options (or `--run`, depending on your needs).
+		- `{appName}-client.hxml`: Contains configuration only for the client-side. This *must not*
+			include a `-main` option or any output options, as Bridge needs to handle those. Including them
+			will cause the things to fail whenever you build your app.
+	**/
+	@:value public final clientDependencies:ClientAppDependencies;
 }
