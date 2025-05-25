@@ -5,6 +5,8 @@ import blog.route.*;
 import blog.data.*;
 import blog.ui.Dropdown;
 
+using blok.foundation.dropdown.DropdownModifiers;
+
 class MainLayout extends Component {
 	@:attribute final pageTitle:Null<String>;
 	@:attribute final children:Children;
@@ -15,12 +17,9 @@ class MainLayout extends Component {
 			Head.node({
 				children: [
 					Html.title().child(['Blogish ', pageTitle]).node(),
-					Asset.node({type: CssAsset('/assets/styles.css')})
+					Html.link({href: '/assets/styles.css', rel: 'stylesheet'})
 				]
 			}),
-			// Html.head().child([
-			// 	Html.title().child(['Blogish ', pageTitle])
-			// ]).node(),
 
 			Html.body().child([
 				Html.header()
@@ -65,7 +64,10 @@ class MainLayout extends Component {
 											Dropdown.node({
 												label: 'Posts',
 												children: [for (post in posts())
-													PostRoute.link({id: post.slug}).child(post.title).node()
+													PostRoute.link({id: post.slug})
+														.child(post.title)
+														.node()
+														.asDropdownItem()
 												]
 											})
 										)

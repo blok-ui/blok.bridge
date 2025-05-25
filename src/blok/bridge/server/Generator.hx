@@ -36,7 +36,7 @@ class Generator implements Disposable {
 			var node = providers
 				.provide()
 				.share(context)
-				.provide(new AssetContext())
+				.provide(new HeadContext())
 				.provide(new Navigator(new ServerHistory(path), new UrlPathResolver()))
 				.provide(new SuspenseBoundaryContext({
 					onSuspended: () -> {

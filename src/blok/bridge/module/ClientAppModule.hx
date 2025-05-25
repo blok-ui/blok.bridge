@@ -21,11 +21,11 @@ class ClientAppModule implements Module {
 						script.setAttribute('src', config.clientPath);
 						script.setAttribute('defer', 'defer');
 						body.append(script);
+						logger.log(Debug, 'Client app appended to html.');
 					});
 			});
 			value;
 		});
-
 		container.when(AppPlugins).resolved((client:ClientAppPlugin) -> value.prepend(client));
 	}
 }

@@ -12,7 +12,7 @@ class Head extends Component {
 		return Html.view(<head>
 			{children}
 			<SuspenseBoundary>
-				<Scope>{context -> AssetContext.from(context).list()}</Scope>
+				<Scope>{context -> HeadContext.from(context).list()}</Scope>
 				<fallback>{() -> ''}</fallback>
 			</SuspenseBoundary>
 		</head>);

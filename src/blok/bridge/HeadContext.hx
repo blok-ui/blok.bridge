@@ -4,8 +4,8 @@ import blok.core.*;
 import blok.debug.Debug.error;
 import blok.signal.*;
 
-@:fallback(error('No AssetContext found'))
-class AssetContext implements Context {
+@:fallback(error('No HeadContext found'))
+class HeadContext implements Context {
 	final owner = new Owner();
 	final assets:Signal<Array<Child>>;
 	final resource:Resource<Children>;
