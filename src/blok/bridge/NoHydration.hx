@@ -19,7 +19,7 @@ class NoHydration extends Component {
 
 	function setup() {
 		// This is a bit of a hack: if `hydrating` was false this
-		// will trigger a re-render (as `update` is run *after*
+		// will trigger a re-render (as `setup` is run *after*
 		// rendering and mounting the component).
 		hydrating.set(false);
 	}
