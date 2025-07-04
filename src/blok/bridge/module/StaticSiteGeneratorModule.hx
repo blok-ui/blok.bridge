@@ -1,6 +1,6 @@
 package blok.bridge.module;
 
-import blok.bridge.server.StaticSiteGenerator.HtmlGenerationStrategy;
+import blok.bridge.server.StaticSiteGenerator;
 import blok.bridge.server.*;
 import capsule.*;
 

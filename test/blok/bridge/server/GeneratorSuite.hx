@@ -9,7 +9,7 @@ class GeneratorSuite extends Suite {
 	function simpleHtml() {
 		var generator = new Generator(() -> Routes.node({}), new NullLogger(), []);
 		return generator.generatePage(new RequestContext(
-			new Config({version: '0.0.1', clientDependencies: InheritDependencies}),
+			new Config({clientDependencies: InheritDependencies}),
 			new Request(Get, '/')
 		)).inspect(document -> {
 			document.toString({includeTextMarkers: false}).equals('Home Page');
@@ -20,7 +20,7 @@ class GeneratorSuite extends Suite {
 	function handlesErrorsCorrectly() {
 		var generator = new Generator(() -> Routes.node({}), new NullLogger(), []);
 		return generator.generatePage(new RequestContext(
-			new Config({version: '0.0.1', clientDependencies: InheritDependencies}),
+			new Config({clientDependencies: InheritDependencies}),
 			new Request(Get, '/error')
 		)).inspect(document -> {
 			document.toString({includeTextMarkers: false}).equals('Expected failure');
@@ -31,7 +31,7 @@ class GeneratorSuite extends Suite {
 	function handlesSuspenseCorrectly() {
 		var generator = new Generator(() -> Routes.node({}), new NullLogger(), []);
 		return generator.generatePage(new RequestContext(
-			new Config({version: '0.0.1', clientDependencies: InheritDependencies}),
+			new Config({clientDependencies: InheritDependencies}),
 			new Request(Get, '/suspends')
 		)).inspect(document -> {
 			document.toString({includeTextMarkers: false}).equals('Suspended');

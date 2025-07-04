@@ -14,6 +14,7 @@ class AppRouter extends Island {
 		return Html.view(<div>
 			<Router>
 				<HomePage />
+				<ViewNotePage />
 				<EditNotePage />
 				<Route to="*">{_ -> 'Not found'}</Route>
 			</Router>

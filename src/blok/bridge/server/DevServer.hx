@@ -3,7 +3,7 @@ package blok.bridge.server;
 import blok.bridge.util.Process;
 import kit.http.*;
 
-// @todo: Ideally this will be some kind of simple CLI thing that will
+// @todo: Ideally this will include some kind of simple CLI thing that will
 // restart whenever a file changes?
 class DevServer implements Target {
 	final logger:Logger;
@@ -30,7 +30,7 @@ class DevServer implements Target {
 					<aside>
 						<p><b>Warning!</b></p>
 						<p>This error handler is Bridge\'s default fallback. You should never see this in production.</p>
-						<p>If you are seeing this, check that you have a catch-all route (using a "*" path) in your router.</p> 
+						<p>If you are seeing this, check that you have a catch-all route (a route with a "*" path) in your router.</p> 
 					</aside>
 				</body>
 			</html>'));

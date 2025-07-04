@@ -5,8 +5,10 @@ import blok.html.Html;
 import blok.router.Page;
 import spa.ui.*;
 
-class EditNotePage extends Page<'/note/edit/{id:String}'> {
-	function render():Child {
+class ViewNotePage extends Page<'/node/{id:String}'> {
+	@:context final notebook:Notebook;
+
+	public function render():Child {
 		return Html.view(<PageLayout name="Edit Note">
 			<p>"Test"</p>
 		</PageLayout>);

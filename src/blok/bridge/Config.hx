@@ -34,11 +34,6 @@ enum ClientAppDependencies {
 
 class Config extends Object {
 	/**
-		The current version of the app.
-	**/
-	@:value public final version:SemVer;
-
-	/**
 		Set how many logger messages you see.
 	**/
 	@:value public final logDepth:LogLevel = #if debug Debug #else Warning #end;
@@ -51,21 +46,29 @@ class Config extends Object {
 
 	/**
 		The folder all generated files will be saved to, relative to `rootPath`.
-		Defaults to `dist/www`. This should never be an absolute path.
+		This should never be an absolute path.
+
+		Defaults to `'dist/www'`.
 	**/
 	@:value public final outputPath:String = 'dist/www';
 
 	/**
-		The path all static assets will be saved to and served from. This should never
-		be an absolute path and should never include the full output path.
+		The path all static assets will be saved to and served from. When being used to write
+		files, this is relative to `outputPath`. When serving them it's relative to your app's domain.
+
+		This should never be an absolute path.
+
+		Defaults to `'/assets'`.
 	**/
 	@:value public final assetsPath:String = '/assets';
 
 	/**
 		The path to the client-side app, relative to `outputPath`. Does not 
-		need to include a file extension. Defaults to `/assets/app`.
+		need to include a file extension.
 
 		Note that you should use `clientPath` to get the final, fully resolved path.
+
+		Defaults to `'/assets/app'`.
 	**/
 	@:value public final clientName:String = '/assets/app';
 
@@ -78,6 +81,9 @@ class Config extends Object {
 	/**
 		Resolve the final path to the client app. This will take into account if `clientMinified` is
 		set and use the appropriate extension.
+
+		Note that the `blok.bridge.module.ClientAppModule` will automatically insert a script tag to load
+		the client-side app, you do not need to add it yourself.
 	**/
 	@:prop(get = switch clientMinified {
 			case true: clientName.withExtension('min.js');
@@ -85,14 +91,14 @@ class Config extends Object {
 		}) public final clientPath:String;
 
 	/**
-		Set how the client app's dependencies should be resolved.
+		Configure the way the client app's dependencies are resolved.
 
 		Available options are:
 
 		#### InheritDependencies
 
-		This is the simplest but by far the most error-prone option. This will simply
-		try to use the same class-paths used to compile the server-side app to compile the client-side one.
+		This is the simplest but by far the most error-prone option. The compiler will
+		try to use the same class paths used to compile the server side app to compile the client-side one.
 		This *can* work, but often results in very strange bugs, including otherwise inexplicable
 		runtime errors. Use with caution -- this is only really suitable for quick tests.
 
@@ -102,21 +108,23 @@ class Config extends Object {
 
 		#### UseHxml(path)
 
-		Use a hxml file to configure the client app. This is *by far* the recommended approach, since
-		it allows some code sharing.
+		Use a hxml file to configure the client app. This is *by far* the recommended approach.
 
 		Best practice is to have three hxml files (replace "{appName}" with your app's name):
 
 		- `{appName}-shared.hxml`: Contains configuration and dependencies shared by both sides of your app.
 			This *must not* include a `-main` option *or* any output options (like `-js app.js`). Note that
-			Bridge will not include this file for you -- this is just a convention, so you'll need to place
-			`{appName}-shared.hxml` at the top of the other two hxml files to import it.
+			Bridge will not include this file for you -- this is just a convention, so you'll need to include
+			it at the top of your other hxml files manually.
 		- `{appName}-server.hxml`: Contains configuration only for the server-side of the app. This
 			is also the file you should point your IDE at. This *should* be where you have a `-main` option
 			and any output options (or `--run`, depending on your needs).
 		- `{appName}-client.hxml`: Contains configuration only for the client-side. This *must not*
 			include a `-main` option or any output options, as Bridge needs to handle those. Including them
 			will cause the things to fail whenever you build your app.
+
+		Note that this is just a recommendation and not something enforced (or required) by Bridge, other than
+		the notes that the client-side hxml file must not define `-main` or any compile targets.
 	**/
 	@:value public final clientDependencies:ClientAppDependencies;
 }

@@ -45,14 +45,21 @@ class StaticSiteGenerator implements Target {
 			var paths:Array<String> = [];
 			var visited:Array<String> = [];
 
+			function isVisitablePath(path:String) {
+				// @todo: We probably need a much more robust strategy to figure out if this is a
+				// local path we should visit, but this is a start:
+				return switch path.extension() {
+					case '' | 'html': path.startsWith('/') && !paths.contains(path) && !visited.contains(path);
+					default: false;
+				}
+			}
+
 			function scrapePathsToVisit(node:NodePrimitive) {
 				if (node is ElementPrimitive) {
 					var el = node.as(ElementPrimitive);
 					if (el?.tag == 'a') switch (el?.getAttribute('href') : Null<String>) {
 						case null:
-							// @todo: We need a much more robust strategy to figure out if this is a
-							// local path we should visit:
-						case path if (path.startsWith('/') && !paths.contains(path) && !visited.contains(path)):
+						case path if (isVisitablePath(path)):
 							paths.push(path);
 						default:
 					}
@@ -98,7 +105,6 @@ class StaticSiteGenerator implements Target {
 					});
 			}
 
-			// @todo: clear the target dir before output?
 			function writePage(entry:PageEntry):Task<Nothing> {
 				var path = switch strategy {
 					case DirectoryWithIndexHtmlFile:
